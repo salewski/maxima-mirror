@@ -1654,8 +1654,7 @@ first kind:
 	   ;;
 	   ;;   elliptic_ec(-1) = sqrt(2)*elliptic_ec(1/2)
 	   ;;
-	   ;; Should we expand out elliptic_ec(1/2) using the above result?
-	   #$sqrt(2)*elliptic_ec(1/2)$)
+	   #$sqrt(2)*(gamma(3/4)^2/(2*sqrt(%pi))+%pi^(3/2)/(4*gamma(3/4)^2))$)
 	  (t
 	   ;; Nothing to do
 	   (give-up)))))
