@@ -179,10 +179,15 @@
     (setq answer (third (mread stream)))
     answer))
 
+;;; Implements the lisp reader macro #$...$ that allows lisp code to
+;;; have embedded maxima expressions in it.  Thus #$sqrt(2)$ produces
+;;; ((MEXPT SIMP) 2 ((RAT SIMP) 1 2)).  This is easier than doing the
+;;; equivalent (power 2 (div 1 2)) and much easier to read.
+
 (defvar *sharp-read-buffer*
   (make-array 140 :element-type ' #.(array-element-type "a") :fill-pointer 0 :adjustable t))
 
-(defmfun $-read-aux (arg stream &aux (meval-flag t) (*mread-prompt* ""))
+(defun $-read-aux (arg stream &aux (meval-flag t) (*mread-prompt* ""))
   (declare (special *mread-prompt*)
 	   (ignore arg))
   (setf (fill-pointer *sharp-read-buffer*) 0)
