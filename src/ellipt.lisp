@@ -1515,6 +1515,8 @@ first kind:
 	   ;;
 	   ;; elliptic_e(x,1) = sin(phi) + 2*round(x/%pi)*elliptic_ec(m)
 	   ;;
+	   (with-maxima-expr "sin(?phi) + 2*round(?phi/%pi)*elliptic_ec(?m)")
+	   #+nil
 	   (add (ftake '%sin phi)
 		(mul 2
 		     (mul (ftake '%round (div phi '$%pi))
@@ -1529,6 +1531,8 @@ first kind:
 	   ;; Handle the case where phi is a number where we can apply
 	   ;; the periodicity property without blowing up the
 	   ;; expression.
+	   (with-maxima-expr "elliptic_e(?phi - %pi*round(?phi/%pi), ?m) + 2*round(?phi/%pi)*elliptic_ec(?m)")
+	   #+nil
 	   (add (ftake '%elliptic_e
 		       (add phi
 			    (mul (mul -1 '$%pi)
