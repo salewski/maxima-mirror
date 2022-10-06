@@ -481,6 +481,10 @@
     :depends-on (globals defmfun compatibility-macros)
     :components ((:file "nparse")))
 
+   (:module lexical-symbols :pathname ""
+    :depends-on (globals defmfun reader)
+    :components ((:file "lexical_symbols")))
+
    (:module display :pathname ""
     :depends-on (globals defmfun compatibility-macros)
     :components ((:file "displa") 

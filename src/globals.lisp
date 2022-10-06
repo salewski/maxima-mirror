@@ -242,6 +242,9 @@
     `(progn
        ,@maybe-reset
        ,@maybe-declare-type
+       ;; DISABLE GLOBAL DECLARATION. IT'S NOT WORKING DUE TO MKIND NOT BEING DEFINED IN TIME,
+       ;; SO PUT THIS ON THE BACK BURNER AND COME BACK IF I GET OTHER STUFF WORKING
+       #+nil (with-context-$global (mkind ',var '$global))
        (defvar ,var ,val ,doc)
        ,@maybe-set-props
        ,@maybe-predicate)))
@@ -928,7 +931,7 @@
   '($integer $noninteger $even $odd $rational $irrational $real $imaginary $complex
     $analytic $increasing $decreasing $oddfun $evenfun $posfun $constant
     $commutative $lassociative $rassociative $symmetric $antisymmetric
-    $integervalued))
+    $integervalued $global))
 
 (defmvar $features (cons '(mlist simp) (append featurel nil))
   "A list of mathematical features which are mathematical preoperties of
