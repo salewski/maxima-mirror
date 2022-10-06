@@ -17,6 +17,7 @@
       `((mlist simp)
         "rtest_sqdnst"
         "rtest_extensions"
+	"rtest_lexical_symbols_only"
 	((mlist simp) "rtest_rules"
 	 #+allegro ((mlist simp) 11 13))
         "rtestnset" 
