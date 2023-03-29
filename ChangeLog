@@ -11,6 +11,8 @@ New items in core:
    change.
  * --init-mac and --init-lisp are now (deprecated) aliases for --preload.
    This is an incompatible change.
+ * The variable $maxima_frontend_bugreportinfo allows the frontend to
+   tell bug_report() how to report frontend bugs.
 
 New items in share:
 -------------------
@@ -46,7 +48,7 @@ Changes in Xmaxima:
 
 Changes in the Windows installer:
 ---------------------------------
- * Update SBCL, wxWidgets and TCL/TK.
+ * Update Gnuplot, SBCL, wxWidgets and TCL/TK.
  * Compile a recent texinfo for building the installer. Maxima now needs
    texinfo 6.8, but 6.7 is included in the usual build machines for
    nightly builds, etc.

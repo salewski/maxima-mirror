@@ -150,7 +150,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
     (cond ((null hi)
 	   (setq form `((,fn simp array) ,@lo)))
 	  (b2
-	   (setq form `((mexpt) ((,fn simp array) ,@lo) (("") ,@hi))))
+	   (setq form `((mexpt) ((,fn simp array) ,@lo) ((mprogn) ,@hi))))
 	  (t
 	   (setq form `((mexpt) ((,fn simp array) ,@lo) ,@hi))))
     `((,form simp) ,@(nthcdr k x))))
@@ -351,7 +351,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 (setf (get '$pochhammer 'dimension) 'dimension-pochhammer)
 
 (defun dimension-pochhammer (form result)
-  (setq form `(( (("") ,(nth 1 form)) simp array) ,(nth 2 form)))
+  (setq form `(( ((mprogn) ,(nth 1 form)) simp array) ,(nth 2 form)))
   (dimension-array form result))
 
 ;; pochhammer-quotient(a b x n) returns pochhammer( a,n) / pochhammer(b,n).  
@@ -432,7 +432,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-jacobi-p (form result)
   (dimension-function
-   (dimension-sub-and-super-scripted-function "P" `(1) `(2 3) t 4 form)
+   (dimension-sub-and-super-scripted-function '|$p| `(1) `(2 3) t 4 form)
    result))
      	  
 ;; See A&S 22.5.46, page 779.
@@ -472,7 +472,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-ultraspherical (form result)
     (dimension-function
-     (dimension-sub-and-super-scripted-function "C" `(1) `(2) t 3 form)
+     (dimension-sub-and-super-scripted-function '|$c| `(1) `(2) t 3 form)
      result))
   
 (defun $chebyshev_t (n x)
@@ -502,7 +502,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-chebyshev-t (form result)
   (dimension-function
-   (dimension-sub-and-super-scripted-function "T" `(1) nil nil 2 form)
+   (dimension-sub-and-super-scripted-function '|$t| `(1) nil nil 2 form)
    result))
 
 ;; See A & S 22.5.48, page 779.
@@ -538,7 +538,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-chebyshev-u (form result)
   (dimension-function
-   (dimension-sub-and-super-scripted-function "U" `(1) nil nil 2 form)
+   (dimension-sub-and-super-scripted-function '|$u| `(1) nil nil 2 form)
    result))
 
 ;; See A&S 8.2.1 page 333 and 22.5.35 page 779.  We evaluate the legendre
@@ -570,7 +570,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-legendre-p (form result)
   (dimension-function
-   (dimension-sub-and-super-scripted-function "P" `(1) nil nil 2 form)
+   (dimension-sub-and-super-scripted-function '|$p| `(1) nil nil 2 form)
    result))
   
 (defun $legendre_q (n x)
@@ -600,7 +600,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-legendre-q (form result)
  (dimension-function
-   (dimension-sub-and-super-scripted-function "Q" `(1) nil nil 2 form)
+   (dimension-sub-and-super-scripted-function '|$q| `(1) nil nil 2 form)
    result))
    	 
 ;; See A & S 8.6.7 and 8.2.6 pages 333 and 334. I chose the 
@@ -718,7 +718,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-assoc-legendre-q (form result)
  (dimension-function
-   (dimension-sub-and-super-scripted-function "Q" `(1) `(2) nil 3 form)
+   (dimension-sub-and-super-scripted-function '|$q| `(1) `(2) nil 3 form)
    result))
 
 ;; See A & S 22.5.37 page 779, A & S 8.6.6 (second equation) page 334, and 
@@ -782,7 +782,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-assoc-legendre-p (form result)
   (dimension-function
-   (dimension-sub-and-super-scripted-function "P" `(1) `(2) nil 3 form)
+   (dimension-sub-and-super-scripted-function '|$p| `(1) `(2) nil 3 form)
    result))
 		  		
 ;; See A&S 22.5.55 and 22.5.56, page 780.
@@ -820,13 +820,20 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-hermite (form result)
  (dimension-function
-   (dimension-sub-and-super-scripted-function "H" `(1) nil nil 2 form)
+   (dimension-sub-and-super-scripted-function '|$h| `(1) nil nil 2 form)
    result))
 
 ;; See A & S 22.5.54, page 780.  For integer n, use the identity
 ;;     binomial(n+a,n) = pochhammer(a+1,n)/pochhammer(1,n)
 
 (defun $gen_laguerre (n a x)
+  (if (and (integerp a) (integerp n) (<= (- n) a) (< a 0))
+    ;; For (- n) <= a < 0, avoid problems with (a + k) in denominator of unsimplified expression.
+    (let ((a-gensym (gensym "a")))
+      ($ratsimp ($substitute a a-gensym ($ratsimp (gen_laguerre-1 n a-gensym x)))))
+    (gen_laguerre-1 n a x)))
+
+(defun gen_laguerre-1 (n a x)
   (cond ((use-hypergeo n x)
 	 (let ((f) (d) (e))
 	   ;(setq d (div ($pochhammer (add a 1) n) ($pochhammer 1 n)))
@@ -853,13 +860,13 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 (defprop $gen_laguerre tex-gen-laguerre tex)
 
 (defun tex-gen-laguerre (x l r)
-  (tex-sub-and-super-scripted-function "L" `(0) nil `(1) t 1 x l r))
+  (tex-sub-and-super-scripted-function "L" `(0) nil `(1) t 2 x l r))
 
 (setf (get '$gen_laguerre 'dimension) 'dimension-gen-laguerre)
 
 (defun dimension-gen-laguerre (form result)
   (dimension-function
-   (dimension-sub-and-super-scripted-function "L" `(1) `(2) t 3 form)
+   (dimension-sub-and-super-scripted-function '|$l| `(1) `(2) t 3 form)
    result))
 
 ;; See A & S 22.5.16, page 778.
@@ -891,7 +898,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-laguerre (form result)
   (dimension-function
-   (dimension-sub-and-super-scripted-function "L" `(1) nil nil 2 form)
+   (dimension-sub-and-super-scripted-function '|$l| `(1) nil nil 2 form)
    result))
 
 (defun $spherical_hankel1 (n x)
@@ -1146,7 +1153,7 @@ Maxima code for evaluating orthogonal polynomials listed in Chapter 22 of Abramo
 
 (defun dimension-spherical-harmonic (form result)
  (dimension-function
-  (dimension-sub-and-super-scripted-function "Y" `(1) `(2) nil 3 form)
+  (dimension-sub-and-super-scripted-function '|$y| `(1) `(2) nil 3 form)
   result))
 
 (putprop '$spherical_harmonic

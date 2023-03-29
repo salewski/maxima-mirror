@@ -865,13 +865,13 @@ The polynomials m4_math(<<<U_n(x)>>>,<<<chebyshev_u(n,x)>>>) can be written in t
 
 m4_displaymath(
 <<<U_n(x) = (n+1)\; {_{2}F_{1}}\left(-n, n+2; {3\over 2}; {1-x\over 2}\right)>>>,
-<<<cheybshev_u(n,x) = (n+1)*hypergeometric([-n,n+1],[3/2],(1-x)/2)>>>)
+<<<chebyshev_u(n,x) = (n+1)*hypergeometric([-n,n+1],[3/2],(1-x)/2)>>>)
 
 The polynomials can also be defined in terms of the sum
 
 m4_displaymath(
 <<<U_n(x) = \sum_{r=0}^{\lfloor n/2 \rfloor} (-1)^r {n-r \choose r} (2x)^{n-2r}>>>,
-<<<cheybshev_u(n,x) = sum((-1)^r*binomial(n-r,r)*(2*x)^(n-2*r), r, 0, floor(n/2))>>>)
+<<<chebyshev_u(n,x) = sum((-1)^r*binomial(n-r,r)*(2*x)^(n-2*r), r, 0, floor(n/2))>>>)
 
 or the Rodrigues formula
 
@@ -922,25 +922,25 @@ w(x) &= \sqrt{1-x^2} \cr
 
 @anchor{gen_laguerre}
 @deffn {Function} gen_laguerre (@var{n}, @var{a}, @var{x})
-The generalized Laguerre polynomial of degree @math{n}, m4_math(<<<L_n^{(\alpha)}(x)>>>,<<<gen_labuerre(n,a,x)>>>).
+The generalized Laguerre polynomial of degree @math{n}, m4_math(<<<L_n^{(\alpha)}(x)>>>,<<<gen_laguerre(n,a,x)>>>).
 
 These can be defined by
 
 m4_displaymath(
-<<<L_n^{(\alpha)} = {n+\alpha \choose n}\; {_1F_1}(-n; \alpha+1; x)>>>,
+<<<L_n^{(\alpha)}(x) = {n+\alpha \choose n}\; {_1F_1}(-n; \alpha+1; x)>>>,
 <<<gen_laguerre(n, a, x) = binomial(n+a,n)*hypergeometric([-n], [a+1], x)>>>)
 
 The polynomials can also be defined by the sum
 
 m4_displaymath(
-<<<L_n^{(\alpha)} = \sum_{k=0}^n {(\alpha + k + 1)_{n-k} \over (n-k)! k!} (-x)^k>>>,
+<<<L_n^{(\alpha)}(x) = \sum_{k=0}^n {(\alpha + k + 1)_{n-k} \over (n-k)! k!} (-x)^k>>>,
 <<<@math{gen_laguerre(n, a, x) = sum(pochhammer(a+k+1,n-k)/((n-k)!*k!)*(-x)^k, k, 0, n)}>>>)
 
 or the Rodrigues formula
 
 m4_displaymath(
 <<<L_n^{(\alpha)}(x) = {1\over \kappa_n  w(x)} {d^n\over dx^n}\left(w(x)x^n\right)>>>,
-<<<@math{chebyshev_u(n,x) = 1/(k(n)*w(x))*diff(w(x)*(1-x^2)^n, x, n)}>>>
+<<<@math{gen_laguerre(n, a, x) = 1/(k(n)*w(x))*diff(w(x)*x^n, x, n)}>>>
 )
 
 where

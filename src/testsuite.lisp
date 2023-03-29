@@ -15,6 +15,7 @@
 ;;; expected to fail, e.g.  ((mlist simp) "testfile.mac" ((mlist) 7 9 13)).
 (defparameter $testsuite_files
       `((mlist simp)
+        "rtest_sqdnst"
         "rtest_extensions"
 	((mlist simp) "rtest_rules"
 	 #+allegro ((mlist simp) 11 13))
@@ -161,6 +162,7 @@
 ;; can actually find these files. (file_search_maxima is a good choice.)
 (defparameter $share_testsuite_files
   '((mlist simp)
+    "rtest_orthopoly"
     "rtest_pslq"
     "rtestflatten"
     "rtest_z_transform"
