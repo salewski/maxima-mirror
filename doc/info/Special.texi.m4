@@ -237,12 +237,10 @@ Numerical evaluation:
 @example
 @group
 (%i1) hankel_1(1,0.5);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 1.555 KB.
 (%o1)      0.24226845767487384 - 1.4714723926702433 %i
 @end group
 @group
 (%i2) hankel_1(1,0.5+%i);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 1.922 KB.
 (%o2)     - 0.2558287994862166 %i - 0.23957560188301597
 @end group
 @end example
@@ -255,7 +253,6 @@ Expansion of @code{hankel_1} when @code{besselexpand} is @code{true}:
 @example
 @group
 (%i1) hankel_1(1/2,z),besselexpand:true;
-Evaluation took 0.0200 seconds (0.0200 elapsed) using 232.953 KB.
                sqrt(2) sin(z) - sqrt(2) %i cos(z)
 (%o1)          ----------------------------------
                        sqrt(%pi) sqrt(z)
@@ -272,14 +269,12 @@ order @math{v} is not supported. Maxima returns a noun form:
 @example
 @group
 (%i1) diff(hankel_1(v,z),z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 12.367 KB.
              hankel_1(v - 1, z) - hankel_1(v + 1, z)
 (%o1)        ---------------------------------------
                                 2
 @end group
 @group
 (%i2) diff(hankel_1(v,z),v);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 808 bytes.
                        d
 (%o2)                  -- (hankel_1(v, z))
                        dv
@@ -953,30 +948,25 @@ when possible.  Similar expansions hold for
 @example
 @group
 (%i1) gamma_incomplete(2,z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 248 bytes.
 (%o1)                gamma_incomplete(2, z)
 @end group
 @group
 (%i2) gamma_expand:true;
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 32 bytes.
 (%o2)                         true
 @end group
 @group
 (%i3) gamma_incomplete(2,z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 44.484 KB.
                                     - z
 (%o3)                     (z + 1) %e
 @end group
 @group
 (%i4) gamma_incomplete(3/2,z);
-Evaluation took 0.0200 seconds (0.0200 elapsed) using 3.546 MB.
                        - z   sqrt(%pi) erfc(sqrt(z))
 (%o4)        sqrt(z) %e    + -----------------------
                                         2
 @end group
 @group
 (%i5) gamma_incomplete(4/3,z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 42.641 KB.
                                              1
                             gamma_incomplete(-, z)
                 1/3   - z                    3
@@ -985,13 +975,11 @@ Evaluation took 0.0000 seconds (0.0000 elapsed) using 42.641 KB.
 @end group
 @group
 (%i6) gamma_incomplete(a+2,z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 76.789 KB.
        a               - z
 (%o6) z  (z + a + 1) %e    + a (a + 1) gamma_incomplete(a, z)
 @end group
 @group
 (%i7) gamma_incomplete(a-2, z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 53.992 KB.
       gamma_incomplete(a, z)    a - 2         z            1
 (%o7) ---------------------- - z      (--------------- + -----)
          (1 - a) (2 - a)               (a - 2) (a - 1)   a - 2
@@ -1000,33 +988,28 @@ Evaluation took 0.0000 seconds (0.0000 elapsed) using 53.992 KB.
 @end group
 @group
 (%i8) gamma_incomplete_lower(2,z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 35.188 KB.
                                       - z
 (%o8)                   1 - (z + 1) %e
 @end group
 @group
 (%i9) gamma_incomplete_lower(3/2,z);
-Evaluation took 0.0000 seconds (0.0100 elapsed) using 45.289 KB.
              sqrt(%pi) erf(sqrt(z))             - z
 (%o9)        ---------------------- - sqrt(z) %e
                        2
 @end group
 @group
 (%i10) gamma_incomplete_lower(a+2,z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 78.383 KB.
 (%o10) a (a + 1) gamma_incomplete_lower(a, z)
                                               a               - z
                                            - z  (z + a + 1) %e
 @end group
 @group
 (%i11) gamma_incomplete_regularized(2,z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 33.891 KB.
                                     - z
 (%o11)                    (z + 1) %e
 @end group
 @group
 (%i12) gamma_incomplete_regularized(3/2,z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 34.430 KB.
                              - z
                  2 sqrt(z) %e
 (%o12)           --------------- + erfc(sqrt(z))
@@ -1034,7 +1017,6 @@ Evaluation took 0.0000 seconds (0.0000 elapsed) using 34.430 KB.
 @end group
 @group
 (%i13) gamma_incomplete_regularized(a+2,z);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 192.938 KB.
         a               - z
        z  (z + a + 1) %e
 (%o13) -------------------- + gamma_incomplete_regularized(a, z)
@@ -2854,13 +2836,9 @@ Examples:
 @c hypergeometric_simp (bar);
 @c ===end===
 @example
-@group
 (%i1) load ("hypergeometric") $
-Evaluation took 0.0300 seconds (0.0300 elapsed) using 6.010 MB.
-@end group
 @group
 (%i2) foo : [hypergeometric([1,1], [2], z), hypergeometric([1/2], [1], z)];
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 1.353 MB.
 (%o2) [hypergeometric([1, 1], [2], z), 
                                                      1
                                      hypergeometric([-], [1], z)]
@@ -2868,19 +2846,16 @@ Evaluation took 0.0000 seconds (0.0000 elapsed) using 1.353 MB.
 @end group
 @group
 (%i3) hypergeometric_simp (foo);
-Evaluation took 0.0300 seconds (0.0300 elapsed) using 2.079 MB.
                  log(1 - z)              z    z/2
 (%o3)         [- ----------, bessel_i(0, -) %e   ]
                      z                   2
 @end group
 @group
 (%i4) bar : hypergeometric([n], [m], z + 1);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 10.102 KB.
 (%o4)            hypergeometric([n], [m], z + 1)
 @end group
 @group
 (%i5) hypergeometric_simp (bar);
-Evaluation took 0.0000 seconds (0.0000 elapsed) using 22.055 KB.
 (%o5)            hypergeometric([n], [m], z + 1)
 @end group
 @end example
