@@ -78,7 +78,7 @@ Changes in Xmaxima:
 
 Changes in the Windows installer:
 ---------------------------------
- * Update Gnuplot, SBCL, wxWidgets and TCL/TK.
+ * Update wxMaxima, Gnuplot, SBCL, wxWidgets and TCL/TK.
  * Compile a recent texinfo for building the installer. Maxima now needs
    texinfo 6.8, but 6.7 is included in the usual build machines for
    nightly builds, etc.
