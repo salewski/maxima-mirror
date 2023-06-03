@@ -166,25 +166,26 @@
 	(when *debug-display-html-help*
 	  (format *debug-io* "topic = ~S~%" topic)
 	  (format *debug-io* "found-it = ~S~%" found-it))
-	(when found-it
-	  (destructuring-bind (base-name . id)
-	      found-it
-	    (let ((url (concatenate 'string
-				    $url_base
-				    "/"
-				    (namestring base-name)
-				    "#index-"
-				    id))
-		  command)
-	      (when *debug-display-html-help*
-		(format *debug-io* "URL: ~S~%" url))
-	      (setf command (ignore-errors (format nil $browser url)))
-	      (cond (command
-		     (when *debug-display-html-help*
-		       (format *debug-io* "Command: ~S~%" command))
-		     ($system command))
-		    (t
-		     (merror "Browser command must contain exactly one ~~A:  ~S" $browser))))))
+	(unless found-it
+	  (merror "Could not find html entry ~S which should exist" x))
+	(destructuring-bind (base-name . id)
+	    found-it
+	  (let ((url (concatenate 'string
+				  $url_base
+				  "/"
+				  (namestring base-name)
+				  "#index-"
+				  id))
+		command)
+	    (when *debug-display-html-help*
+	      (format *debug-io* "URL: ~S~%" url))
+	    (setf command (ignore-errors (format nil $browser url)))
+	    (cond (command
+		   (when *debug-display-html-help*
+		     (format *debug-io* "Command: ~S~%" command))
+		   ($system command))
+		  (t
+		   (merror "Browser command must contain exactly one ~~A:  ~S" $browser)))))
 	topic))))
 
 (defun display-html-topics (wanted)

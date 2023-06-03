@@ -581,10 +581,63 @@
 			 (delete-file file)))))
 	   *temp-files-list*))
 
+(defvar *extra-html-entries* nil
+  "Full list of all the HTML entries that are not in the text entries.
+  Ideally should be empty.")
+
+(defvar *missing-html-entries* nil
+  "Full list of all the text entries that are not the the HTML entries.
+  Ideally should be empty.")
+
+(defun verify-html-index ()
+  (format t "Verifying html index~%")
+  (let (html-entries text-entries)
+    ;; Find all the HTML entries and place in a list.
+    (setf html-entries (loop for topic being the hash-keys of cl-info::*html-index*
+			     collect topic))
+    ;; Find all the text entries and place in a list.
+    (maphash #'(lambda (k v)
+		 (declare (ignore k))
+		 (dolist (table v)
+		   (loop for topic being the hash-keys of table
+			 do (push topic text-entries))))
+	     cl-info::*info-tables*)
+    ;; The text entries are the source of truth about documentation.
+    ;; Print out differences between the html entries and the text
+    ;; entries.
+    (unless (= (length html-entries) (length text-entries))
+      (mwarning (format nil
+			(intl:gettext "Number of HTML entries (~A) does not text entries (~A)~%")
+			(length html-entries) (length text-entries))))
+    ;; If the set of topics differs between HTML and text, print out
+    ;; the differences.
+    (setf *extra-html-entries* (set-difference html-entries text-entries))
+    (setf *missing-html-entries* (set-difference text-entries html-entries))
+    (flet
+	((maybe-print-warning (prefix-msg diffs)
+	   (let ((max-display-length 20))
+	     (when diffs
+	       (let* ((extra-count (length diffs))
+		      (message
+			(with-output-to-string (s)
+			  (format s
+				  "~A: ~{~S~^ ~}"
+				  prefix-msg
+				  (subseq diffs 0 max-display-length))
+			  (when (> extra-count max-display-length)
+			    (format s "... plus ~D more" (- extra-count max-display-length)))
+			  (format s "~%"))))
+		 (mwarning message))))))
+      (maybe-print-warning (intl:gettext "HTML entries not in text entries")
+			   *extra-html-entries*)
+      (maybe-print-warning (intl:gettext "Text entries not in HTML entries")
+			   *missing-html-entries*))))
+
 (defun cl-user::run ()
   "Run Maxima in its own package."
   (in-package :maxima)
   (initialize-runtime-globals)
+  (verify-html-index)
   (let ((input-stream *standard-input*)
 	(batch-flag nil))
     (unwind-protect
