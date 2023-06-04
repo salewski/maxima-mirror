@@ -6,6 +6,8 @@
   documentation.  The key is the topic we're looking for and the value
   is the html file containing the documentation for the topic.")
 
+(defvar *log-file*)
+
 
 ;; This might be rather slow.  Perhaps an alternative solution is to
 ;; leave these alone and have $hdescribe encode any special characters
@@ -19,6 +21,7 @@
 ;; tests showed that compiling didn't make much difference either.  I
 ;; think this is because most of the cost is in pregexp, which is
 ;; compiled.
+#+nil
 (defun handle-special-chars (item)
   "Handle special encoded characters in HTML file.  Texinfo encodes
   special characters to hexadecimal form and this needs to be undone
@@ -82,7 +85,7 @@
 	  ;; it ends with a space followed by digits, we
 	  ;; need to replace the space with "-" again.
 	  (setf item (pregexp::pregexp-replace* " \(\\d+\)$" item "-\\1"))
-	  (setf item (handle-special-chars item))
+	  (setf item (maxima::handle-special-chars item))
 	  (list item item-id))))))
 
 (defun process-one-html-file (file)
@@ -96,7 +99,12 @@
 	     ;; Add entry to the hash table.
 	     ;;
 	     ;; Replace any special chars that texinfo has encoded.
-	     (setf item (handle-special-chars item))
+	     (when (find #\_ item :test #'char=)
+	       (setf item (handle-special-chars item)))
+
+	     ;; Replace HTML entity
+	     (when (find #\& item :test #'char=)
+	       (setf item (pregexp:pregexp-replace* "&rsquo;" item "'")))
 
 	     ;; Check if the entry already exists and print a message.
 	     ;; Presumably, this shouldn't happen, so warn if it does.
@@ -104,6 +112,7 @@
 	       (format t "Already added entry ~S ~S: ~S~%"
 				item (gethash item *html-index*)
 				line))
+	     (format *log-file* "Adding ~S: ~S ~S~%" item file item-id)
 	     (setf (gethash item *html-index*)
 		   (cons file item-id))))
 	     
@@ -183,6 +192,7 @@
 ;; directory that contains the html files to be searched for the
 ;; topics.  For exapmle it can be "<maxima-dir>/doc/info/*.html"
 (defun build-html-index (dir)
+  (setf *log-file* (open "build-html-index.log" :direction :output :if-exists :supersede))
   (clrhash *html-index*)
   ;; entry-regexp searches for entries for functions and variables.
   ;; We're looking for something like
