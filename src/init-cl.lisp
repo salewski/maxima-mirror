@@ -644,7 +644,8 @@
 		    (message
 		      (with-output-to-string (s)
 			(format s
-				"~A: ~{~S~^ ~}"
+				"~D ~A: ~{~S~^ ~}"
+				(length diffs)
 				prefix-msg
 				(subseq diffs 0 max-display-length))
 			(when (> extra-count max-display-length)
