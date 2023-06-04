@@ -595,11 +595,20 @@
   "Full list of all the text entries that are not the the HTML entries.
   Ideally should be empty.")
 
-(defun verify-html-index ()
-  (format t "Verifying html index~%")
-  ;; Find all the HTML entries and place in a list.
-  (setf *html-topics* (loop for topic being the hash-keys of cl-info::*html-index*
-			    collect topic))
+(let ((fixup-regexp (pregexp:pregexp "-\([[:digit:]]\)")))
+  (defun get-html-topics ()
+    ;; Find all the HTML entries and place in a list.
+    (setf *html-topics*
+	  (loop for topic being the hash-keys of cl-info::*html-index*
+		collect topic))
+    ;; The html topics have entries like "labels-1".  This corresponds
+    ;; to the text topic "labels <1>".  For consistency, replace
+    ;; "labels-1" with "labels <1>".
+    (setf *html-topics*
+	  (loop for topic in *html-topics*
+		collect (pregexp:pregexp-replace fixup-regexp topic " <\\1>")))))
+
+(defun get-text-topics ()
   ;; Find all the text entries and place in a list.
   (setf *text-topics* nil)
   (maphash #'(lambda (k v)
@@ -607,7 +616,13 @@
 	       (dolist (table v)
 		 (loop for topic being the hash-keys of table
 		       do (push topic *text-topics*))))
-	   cl-info::*info-tables*)
+	   cl-info::*info-tables*))
+
+(defun verify-html-index ()
+  (format t "Verifying html index~%")
+  (get-html-topics)
+  (get-text-topics)
+  
   ;; The text entries are the source of truth about documentation.
   ;; Print out differences between the html entries and the text
   ;; entries.
