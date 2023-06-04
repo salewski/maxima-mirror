@@ -18,8 +18,8 @@
 
 @c -----------------------------------------------------------------------------
 @anchor{__}
-@defvr {System variable} __
 @vrindex Current input expression
+@defvr {System variable} __
 
 @code{__} is the input expression currently being evaluated.  That is, while an
 input expression @var{expr} is being evaluated, @code{__} is @var{expr}.
@@ -84,8 +84,8 @@ Current input expression = --------------
 
 @c -----------------------------------------------------------------------------
 @anchor{_}
-@defvr {System variable} _
 @vrindex Previous input
+@defvr {System variable} _
 
 @code{_} is the most recent input expression (e.g., @code{%i1}, @code{%i2},
 @code{%i3}, @dots{}).
@@ -176,8 +176,8 @@ Examples:
 
 @c -----------------------------------------------------------------------------
 @anchor{%}
-@defvr {System variable} %
 @vrindex Previous output
+@defvr {System variable} %
 
 @code{%} is the output expression (e.g., @code{%o1}, @code{%o2}, @code{%o3},
 @dots{}) most recently computed by Maxima, whether or not it was displayed.
@@ -198,8 +198,8 @@ See also @mrefcomma{_} @mrefcomma{%%} and @mrefdot{%th}
 
 @c -----------------------------------------------------------------------------
 @anchor{%%}
-@defvr {System variable} %%
 @vrindex Previous result in compound expression
+@defvr {System variable} %%
 
 In compound statements, namely @mrefcomma{block} @mrefcomma{lambda} or
 @code{(@var{s_1}, ..., @var{s_n})}, @code{%%} is the value of the previous
