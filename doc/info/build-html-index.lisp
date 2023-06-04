@@ -36,7 +36,56 @@
 	    (pregexp:pregexp-replace* code item (pregexp:pregexp-quote (string spec-char))))))
   item)
 
-(defun process-one-html-file (file entry-regexp section-regexp fnindex-regexp)
+(let ((entry-regexp (pregexp:pregexp "<dt id=\"index-([^\"]+)\"")))
+  (defun find-entry (line)
+    (let* ((match (pregexp:pregexp-match-positions entry-regexp line)))
+      (when match
+	(let* ((item-id (subseq line
+				(car (elt match 1))
+				(cdr (elt match 1))))
+	       (item (pregexp:pregexp-replace* "005f" item-id "")))
+	  ;; Remove "005f" which texinfo adds before every "_".
+	  #+nil
+	  (format t "item-id = ~A~%" item-id)
+	  (setf item
+		(pregexp:pregexp-replace* "005f" item-id ""))
+	  #+nil
+	  (format t "match = ~S ~A~%" match item)
+	  (list item item-id))))))
+
+(let ((section-regexp
+	   (pregexp:pregexp "<span id=\"\([^\"]+\)\">.*<h3 class=\"section\">[0-9.,]+ *\(.*\)<")))
+  (defun find-section (line)
+    (let ((match (pregexp:pregexp-match-positions section-regexp line)))
+      (when match
+	(let ((item-id (subseq line
+			       (car (elt match 1))
+			       (cdr (elt match 1))))
+	      (item (subseq line
+			    (car (elt match 2))
+			    (cdr (elt match 2)))))
+	  #+nil
+	  (format t "section item = ~A~%" item)
+	  (list item item-id))))))
+
+(let ((fnindex-regexp
+	(pregexp:pregexp "<span id=\"index-\([^\"]+\)\"></span>$")))
+  (defun find-fnindex (line)
+    (let ((match (pregexp:pregexp-match-positions fnindex-regexp line)))
+      (when match
+	(let* ((item-id (subseq line
+				(car (elt match 1))
+				(cdr (elt match 1))))
+	       (item (pregexp::pregexp-replace* "-" item-id " ")))
+	  ;; However if the item ends in digits, we
+	  ;; replaced too many "-" with spaces.  So if
+	  ;; it ends with a space followed by digits, we
+	  ;; need to replace the space with "-" again.
+	  (setf item (pregexp::pregexp-replace* " \(\\d+\)$" item "-\\1"))
+	  (setf item (handle-special-chars item))
+	  (list item item-id))))))
+
+(defun process-one-html-file (file)
   "Process one html file to find all the documentation entries.
   ENTRY-REGEXP is the regexp to use for find function and variable
   items.  SECTION-REGEXP is the regexp to find sections to include."
@@ -64,6 +113,11 @@
 	      do
 		 (let (match)
 		   (cond
+		     ((setf match (find-entry line))
+		      (destructuring-bind (item item-id)
+			  match
+			(add-entry item item-id base-name line)))
+		     #+nil
 		     ((setf match (pregexp:pregexp-match-positions entry-regexp line))
 		      (let ((item-id (subseq line
 					     (car (elt match 1))
@@ -77,6 +131,11 @@
 			#+nil
 			(format t "match = ~S ~A~%" match item)
 			(add-entry item item-id base-name line)))
+		     ((setf match (find-section line))
+		      (destructuring-bind (item item-id)
+			  match
+			(add-entry item item-id base-name line)))
+		     #+nil
 		     ((setf match (pregexp:pregexp-match-positions section-regexp line))
 		      (let ((item-id (subseq line
 					     (car (elt match 1))
@@ -87,6 +146,12 @@
 			#+nil
 			(format t "section item = ~A~%" item)
 			(add-entry item item-id base-name line)))
+
+		     ((setf match (find-fnindex line))
+		      (destructuring-bind (item item-id)
+			  match
+			(add-entry item item-id base-name line)))
+		     #+nil
 		     ((setf match (pregexp:pregexp-match-positions fnindex-regexp line))
 		      (let* ((item-id (subseq line
 					      (car (elt match 1))
@@ -202,7 +267,7 @@
 	;; We want to ignore maxima_singlepage.html for now.
 	(unless (string-equal (pathname-name file)
                               "maxima_singlepage")
-	  (process-one-html-file file entry-regexp section-regexp fnindex-regexp))))))
+	  (process-one-html-file file))))))
 
 (defun build-and-dump-html-index (dir)
   (build-html-index dir)
