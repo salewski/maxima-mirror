@@ -219,68 +219,62 @@
   ;;
   ;; all on one line.  The <id> is is the id we can use to link to
   ;; this item.
-  (let ((entry-regexp (pregexp:pregexp "<dt id=\"index-([^\"]+)\""))
-	(section-regexp
-	  (pregexp:pregexp "<span id=\"\([^\"]+\)\">.*<h3 class=\"section\">[0-9.,]+ *\(.*\)<"))
-	(fnindex-regexp
-	  (pregexp:pregexp "<span id=\"index-\([^\"]+\)\"></span>$")))
+  (let ((files (directory dir)))
 
-    (let ((files (directory dir)))
+    ;; Ensure that the call to SORT below succeeds:
+    ;; the only allowable names are "maxima_toc.html", "maxima.html", or "maxima_nnn.html",
+    ;; where nnn is an integer;
+    ;; also, if a file with an otherwise-allowable name is function and variable index,
+    ;; or a list of documentation categories, exclude it too.
 
-      ;; Ensure that the call to SORT below succeeds:
-      ;; the only allowable names are "maxima_toc.html", "maxima.html", or "maxima_nnn.html",
-      ;; where nnn is an integer;
-      ;; also, if a file with an otherwise-allowable name is function and variable index,
-      ;; or a list of documentation categories, exclude it too.
+    (setf files (remove-if-not #'(lambda (f-path) 
+                                   (let ((f-name (pathname-name f-path)))
+                                     #+nil (format t "BUILD-HTML-INDEX: F-PATH = ~a, F-NAME = ~a.~%" f-path f-name)
+                                     (or
+                                      (string-equal f-name "maxima_toc")
+                                      (string-equal f-name "maxima")
+                                      (and 
+                                       (maxima_nnn-p f-name)
+                                       #+nil
+				       (not (grep-l "<title>(Function and Variable Index|Documentation Cat)" f-path)))
+                                      (format t "BUILD-HTML-INDEX: omit ~S.~%"
+					      (namestring f-path)))))
+			       files))
 
-      (setf files (remove-if-not #'(lambda (f-path) 
-                                     (let ((f-name (pathname-name f-path)))
-                                       #+nil (format t "BUILD-HTML-INDEX: F-PATH = ~a, F-NAME = ~a.~%" f-path f-name)
-                                       (or
-                                         (string-equal f-name "maxima_toc")
-                                         (string-equal f-name "maxima")
-                                         (and 
-                                           (maxima_nnn-p f-name)
-                                           #+nil
-					   (not (grep-l "<title>(Function and Variable Index|Documentation Cat)" f-path)))
-                                         (format t "BUILD-HTML-INDEX: omit ~S.~%"
-						 (namestring f-path)))))
-				 files))
+    ;; Now sort them in numerical order.
+    (setf files
+	  (sort files #'<
+		:key #'(lambda (p)
+			 (let ((name (pathname-name p)))
+			   (cond ((string-equal name "maxima_toc")
+				  ;; maxima_toc.html is first
+				  -1)
+				 ((string-equal name "maxima")
+				  ;; maxima.html is second.
+				  0)
+				 (t
+				  ;; Everything else is the number
+				  ;; in the file name, which starts
+				  ;; with 1.
+				  (if (> (length name) 7)
+				      (parse-integer (subseq name 7))
+				      0)))))))
+    ;; Check if the last 2 files contain the indices.  If they do,
+    ;; we can ignore them.  We do want to ignore these, but if we're
+    ;; wrong, it's not terrible.  We just waste time scanning files
+    ;; that won't have anything to include in the index.
+    (format t "Looking for indices~%")
+    (dolist (file (last files 2))
+      (when (grep-l "<title>(Function and Variable Index|Documentation Cat)" file)
+	(format t "BUILD-HTML-INDEX: omit ~S.~%"
+		(namestring file))
+	(setf files (remove file files))))
 
-      ;; Now sort them in numerical order.
-      (setf files
-	    (sort files #'<
-		  :key #'(lambda (p)
-			   (let ((name (pathname-name p)))
-			     (cond ((string-equal name "maxima_toc")
-				    ;; maxima_toc.html is first
-				    -1)
-				   ((string-equal name "maxima")
-				    ;; maxima.html is second.
-				    0)
-				   (t
-				    ;; Everything else is the number
-				    ;; in the file name, which starts
-				    ;; with 1.
-				    (if (> (length name) 7)
-					(parse-integer (subseq name 7))
-					0)))))))
-      ;; Check if the last 2 files contain the indices.  If they do,
-      ;; we can ignore them.  We do want to ignore these, but if we're
-      ;; wrong, it's not terrible.  We just waste time scanning files
-      ;; that won't have anything to include in the index.
-      (format t "Looking for indices~%")
-      (dolist (file (last files 2))
-	(when (grep-l "<title>(Function and Variable Index|Documentation Cat)" file)
-	  (format t "BUILD-HTML-INDEX: omit ~S.~%"
-		  (namestring file))
-	  (setf files (remove file files))))
-
-      (dolist (file files)
-	;; We want to ignore maxima_singlepage.html for now.
-	(unless (string-equal (pathname-name file)
-                              "maxima_singlepage")
-	  (process-one-html-file file))))))
+    (dolist (file files)
+      ;; We want to ignore maxima_singlepage.html for now.
+      (unless (string-equal (pathname-name file)
+                            "maxima_singlepage")
+	(process-one-html-file file)))))
 
 (defun build-and-dump-html-index (dir)
   (build-html-index dir)
