@@ -171,6 +171,17 @@
 	     (when (find #\& item :test #'char=)
 	       (setf item (pregexp:pregexp-replace* "&rsquo;" item "'")))
 
+	     ;; In texinfo 7.0.3, apostrophes (U+27) are replaced by
+	     ;; right_single_quotation_mark (U+2019) in the info file.
+	     ;; Replace any apostrophes we find.
+	     ;;
+	     ;; BUT it appears to be inconsistent.  This happens for
+	     ;; "Euler's number", but not for "N'th previous output".
+	     #+nil
+	     (when (find #\' item :test #'char=)
+	       (setf item (pregexp:pregexp-replace "'"
+						   item
+						   (string (code-char #x2019)))))
 	     ;; Check if the entry already exists and print a message.
 	     ;; Presumably, this shouldn't happen, so warn if it does.
 	     (when (gethash item *html-index*)
