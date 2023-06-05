@@ -6,7 +6,15 @@
   documentation.  The key is the topic we're looking for and the value
   is the html file containing the documentation for the topic.")
 
-(defvar *log-file*)
+(defvar *log-file* nil
+  "Log file containing a message whenever we add an entry to the html
+  index hashtable.")
+
+(defvar *texinfo-version* nil
+  "The version of texinfo used to build the html docs.  This is an
+  integer.  If the texinfo version is 7.0.3, the version number is
+  70030. Texinfo 6.8 is 60800.  That is each minor version number is
+  assumed to have a max of 99.")
 
 
 ;; This might be rather slow.  Perhaps an alternative solution is to
@@ -83,19 +91,10 @@
   ;;
   (defun find-section (line)
     ;; Try the texinfo 6.8 regex first.
-    (let ((match (pregexp:pregexp-match-positions section-regexp line)))
-      (when match
-	(let ((item-id (subseq line
-			       (car (elt match 1))
-			       (cdr (elt match 1))))
-	      (item (subseq line
-			    (car (elt match 2))
-			    (cdr (elt match 2)))))
-	  #+nil
-	  (format t "section item = ~A~%" item)
-	  (return-from find-section (list item item-id)))))
-    ;; Try the 7.0.3 regex
-    (let ((match (pregexp:pregexp-match-positions section-regexp-7.0.3 line)))
+    (let* ((regexp (if (>= *texinfo-version 70003)
+		       section-regexp-7.0.3
+		       section-regexp))
+	   (match (pregexp:pregexp-match-positions regexp line)))
       (when match
 	(let ((item-id (subseq line
 			       (car (elt match 1))
@@ -125,21 +124,10 @@
   ;;   <dd><a class="index-entry-id" id="index-Logical-conjunction"></a>
   (defun find-fnindex (line)
     ;; Try texinfo 6.8 version
-    (let ((match (pregexp:pregexp-match-positions fnindex-regexp line)))
-      (when match
-	(let* ((item-id (subseq line
-				(car (elt match 1))
-				(cdr (elt match 1))))
-	       (item (pregexp::pregexp-replace* "-" item-id " ")))
-	  ;; However if the item ends in digits, we
-	  ;; replaced too many "-" with spaces.  So if
-	  ;; it ends with a space followed by digits, we
-	  ;; need to replace the space with "-" again.
-	  (setf item (pregexp::pregexp-replace* " \(\\d+\)$" item "-\\1"))
-	  (setf item (maxima::handle-special-chars item))
-	  (list item item-id))))
-    ;; Try texinfo 7.0.3 version
-    (let ((match (pregexp:pregexp-match-positions fnindex-regexp-7.0.3 line)))
+    (let* ((regexp (if (>= *texinfo-version* 70003)
+		       fnindex-regexp-7.0.3
+		       fnindex-regexp))
+	   (match (pregexp:pregexp-match-positions regexp line)))
       (when match
 	(let* ((item-id (subseq line
 				(car (elt match 1))
@@ -271,8 +259,38 @@
   (with-open-file (*log-file* "build-html-index.log" :direction :output :if-exists :supersede)
     (build-html-index-helper dir)))
 
+(defun get-texinfo-version (path)
+  ;; Open maxima_toc.html which must exist.  Search the first 5 lines
+  ;; for the texinfo version, which is normally inserted by texinfo.
+  (let (version-line)
+    (with-open-file (s path :if-does-not-exist :error)
+      (setf version-line
+	    (loop for count from 0 below 5
+		  for line = (read-line s nil nil) then (read-line s nil nil)
+		  while line
+		  when (search "GNU Texinfo" line)
+		    return line)))
+
+    (when version-line
+      (let ((matches
+	      (pregexp:pregexp-match "\([[:digit:]]\)\.\([[:digit:]]\)\(\.\([[:digit:]]\)\)?"
+				     version-line)))
+	(when matches
+	  ;; Matches should like something like
+	  ;;   ("7.0.3" "7" "0" ".3" "3")
+	  ;; or
+	  ;;   ("6.8" "6" "8" nil nil)
+	  (setf *texinfo-version*
+		(+ (* (parse-integer (second matches)) 10000)
+		   (* (parse-integer (third matches)) 100)))
+	  (when (fifth matches)
+	    (incf *texinfo-version*
+		(parse-integer (fifth matches))))))
+      (format t "Texinfo version ~D~%" *texinfo-version*))))
+
 (defun build-html-index-helper (dir)
   (clrhash *html-index*)
+  (get-texinfo-version (merge-pathnames "maxima_toc.html" dir))
   (let ((files (directory dir)))
 
     ;; Ensure that the call to SORT below succeeds:
