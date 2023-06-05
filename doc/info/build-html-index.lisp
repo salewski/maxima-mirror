@@ -40,6 +40,12 @@
   item)
 
 (let ((entry-regexp (pregexp:pregexp "<dt id=\"index-([^\"]+)\"")))
+  ;; entry-regexp searches for entries for functions and variables.
+  ;; We're looking for something like
+  ;;
+  ;;   <dt id="index-<foo>"
+  ;;
+  ;; and extracting "foo".
   (defun find-entry (line)
     (let* ((match (pregexp:pregexp-match-positions entry-regexp line)))
       (when match
@@ -58,6 +64,13 @@
 
 (let ((section-regexp
 	   (pregexp:pregexp "<span id=\"\([^\"]+\)\">.*<h3 class=\"section\">[0-9.,]+ *\(.*\)<")))
+  ;; section-regexp searches for section headings so we can get to
+  ;; things like "Functions and Variables for...".  We're looking for
+  ;;
+  ;;   <span id="<id>">...<h3 class="section">12.2 <heading><
+  ;;
+  ;; where <heading> is the heading we want, and <id> is the id we can
+  ;; use to link to this item.
   (defun find-section (line)
     (let ((match (pregexp:pregexp-match-positions section-regexp line)))
       (when match
@@ -73,6 +86,13 @@
 
 (let ((fnindex-regexp
 	(pregexp:pregexp "<span id=\"index-\([^\"]+\)\"></span>$")))
+  ;; fnindex-regexp searches for id's that are associated with
+  ;; @fnindex.  These look like
+  ;;
+  ;;   <span id="index-<id>"></span>
+  ;;
+  ;; all on one line.  The <id> is is the id we can use to link to
+  ;; this item.
   (defun find-fnindex (line)
     (let ((match (pregexp:pregexp-match-positions fnindex-regexp line)))
       (when match
@@ -197,28 +217,6 @@
 
 (defun build-html-index-helper (dir)
   (clrhash *html-index*)
-  ;; entry-regexp searches for entries for functions and variables.
-  ;; We're looking for something like
-  ;;
-  ;;   <dt id="index-<foo>"
-  ;;
-  ;; and extracting "foo".
-  ;;
-  ;; section-regexp searches for section headings so we can get to
-  ;; things like "Functions and Variables for...".  We're looking for
-  ;;
-  ;;   <span id="<id>">...<h3 class="section">12.2 <heading><
-  ;;
-  ;; where <heading> is the heading we want, and <id> is the id we can
-  ;; use to link to this item.
-  ;;
-  ;; fnindex-regexp searches for id's that are associated with
-  ;; @fnindex.  These look like
-  ;;
-  ;;   <span id="index-<id>"></span>
-  ;;
-  ;; all on one line.  The <id> is is the id we can use to link to
-  ;; this item.
   (let ((files (directory dir)))
 
     ;; Ensure that the call to SORT below succeeds:
