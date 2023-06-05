@@ -611,40 +611,6 @@
 ;; spec-chars-string are the special characters that texinfo converted
 ;; to lower-case hex digits representing the char-code of the
 ;; character.
-#+nil
-(let* ((spec-chars-string ".%$?,<>#=:;*-^+/'()[]!@|`~\\")
-       (regexp-quoted (map 'list
-			   #'(lambda (c)
-			       ;; Bug in pregexp?  If we pregexp-quote
-			       ;; "$" (to "\\$"), when we try to
-			       ;; replace the match with "\\$", we end
-			       ;; up with an empty string.  So don't
-			       ;; quote this character.
-			       (if (char= c #\$)
-				   (string c)
-				   (pregexp:pregexp-quote (string c))))
-			   spec-chars-string))
-       (codes (map 'list #'(lambda (spec-char)
-			     (pregexp:pregexp-quote
-			      (string-downcase
-			       (format nil "_~4,'0x" (char-code spec-char)))))
-		   spec-chars-string)))
-  (defun handle-special-chars (item)
-    "Handle special encoded characters in HTML file.  Texinfo encodes
-    special characters to hexadecimal form and this needs to be undone
-    so we know what the actual character is when looking up the
-    documentation."
-    (map nil
-	 #'(lambda (code replacement)
-	     (when (find #\_ item :test #'char=)
-	       (setf item
-		     (pregexp:pregexp-replace* code item
-					       replacement))
-	       (format t "new ~S~%" item)))
-	 codes
-	 regexp-quoted)
-    item))
-
 (let* ((spec-chars-string ".%$?,<>#=:;*-^+/'()[]!@|`~\\")
        (regexp-quoted (map 'list
 			   #'(lambda (c)
