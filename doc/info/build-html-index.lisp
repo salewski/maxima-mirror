@@ -39,19 +39,22 @@
 	    (pregexp:pregexp-replace* code item (pregexp:pregexp-quote (string spec-char))))))
   item)
 
-(let ((entry-regexp (pregexp:pregexp "<dt id=\"index-([^\"]+)\"")))
+(let ((entry-regexp (pregexp:pregexp "<dt \(class=\"def..\" )?id=\"index-([^\"]+)\"")))
   ;; entry-regexp searches for entries for functions and variables.
   ;; We're looking for something like
   ;;
-  ;;   <dt id="index-<foo>"
+  ;;   <dt id="index-<foo>
   ;;
-  ;; and extracting "foo".
+  ;; and extracting "foo".  That's for texinfo 6.8. For 7.0.3 (and maybe earlier?), it looks like
+  ;;
+  ;;   <dt class="deffn" id="index-<foo>"
+  ;; "deffn" could also be "defvr".  We need to support both styles.
   (defun find-entry (line)
     (let* ((match (pregexp:pregexp-match-positions entry-regexp line)))
       (when match
 	(let* ((item-id (subseq line
-				(car (elt match 1))
-				(cdr (elt match 1))))
+				(car (elt match 2))
+				(cdr (elt match 2))))
 	       (item (pregexp:pregexp-replace* "005f" item-id "")))
 	  ;; Remove "005f" which texinfo adds before every "_".
 	  #+nil
@@ -63,7 +66,9 @@
 	  (list item item-id))))))
 
 (let ((section-regexp
-	   (pregexp:pregexp "<span id=\"\([^\"]+\)\">.*<h3 class=\"section\">[0-9.,]+ *\(.*\)<")))
+	(pregexp:pregexp "<span id=\"\([^\"]+\)\">.*<h3 class=\"section\">[0-9.,]+ *\(.*\)<"))
+      (section-regexp-7.0.3
+	(pregexp:pregexp "<h3 class=\"section\" id=\"\([^\"]+\)\">[0-9.,]+ *\(.*\)<")))
   ;; section-regexp searches for section headings so we can get to
   ;; things like "Functions and Variables for...".  We're looking for
   ;;
@@ -71,7 +76,13 @@
   ;;
   ;; where <heading> is the heading we want, and <id> is the id we can
   ;; use to link to this item.
+  ;;
+  ;; However, for texinfo 7.0.3, the span is gone.  We have something like
+  ;;
+  ;;   <h3 class="section" id="Airy-Functions-1">15.3 Airy Functions</h3>
+  ;;
   (defun find-section (line)
+    ;; Try the texinfo 6.8 regex first.
     (let ((match (pregexp:pregexp-match-positions section-regexp line)))
       (when match
 	(let ((item-id (subseq line
@@ -82,10 +93,24 @@
 			    (cdr (elt match 2)))))
 	  #+nil
 	  (format t "section item = ~A~%" item)
-	  (list item item-id))))))
+	  (return-from find-section (list item item-id)))))
+    ;; Try the 7.0.3 regex
+    (let ((match (pregexp:pregexp-match-positions section-regexp-7.0.3 line)))
+      (when match
+	(let ((item-id (subseq line
+			       (car (elt match 1))
+			       (cdr (elt match 1))))
+	      (item (subseq line
+			    (car (elt match 2))
+			    (cdr (elt match 2)))))
+	  #+nil
+	  (format t "section item = ~A~%" item)
+	  (return-from find-section (list item item-id)))))))
 
 (let ((fnindex-regexp
-	(pregexp:pregexp "<span id=\"index-\([^\"]+\)\"></span>$")))
+	(pregexp:pregexp "<span id=\"index-\([^\"]+\)\"></span>$"))
+      (fnindex-regexp-7.0.3
+	(pregexp:pregexp "<a class=\"index-entry-id\" id=\"index-\([^\"]+\)\">")))
   ;; fnindex-regexp searches for id's that are associated with
   ;; @fnindex.  These look like
   ;;
@@ -93,8 +118,28 @@
   ;;
   ;; all on one line.  The <id> is is the id we can use to link to
   ;; this item.
+  ;;
+  ;; However, for texinfo 7.0.3, these show in in the Function and
+  ;; Variable Index (which we don't search).  They also show up as
+  ;;
+  ;;   <dd><a class="index-entry-id" id="index-Logical-conjunction"></a>
   (defun find-fnindex (line)
+    ;; Try texinfo 6.8 version
     (let ((match (pregexp:pregexp-match-positions fnindex-regexp line)))
+      (when match
+	(let* ((item-id (subseq line
+				(car (elt match 1))
+				(cdr (elt match 1))))
+	       (item (pregexp::pregexp-replace* "-" item-id " ")))
+	  ;; However if the item ends in digits, we
+	  ;; replaced too many "-" with spaces.  So if
+	  ;; it ends with a space followed by digits, we
+	  ;; need to replace the space with "-" again.
+	  (setf item (pregexp::pregexp-replace* " \(\\d+\)$" item "-\\1"))
+	  (setf item (maxima::handle-special-chars item))
+	  (list item item-id))))
+    ;; Try texinfo 7.0.3 version
+    (let ((match (pregexp:pregexp-match-positions fnindex-regexp-7.0.3 line)))
       (when match
 	(let* ((item-id (subseq line
 				(car (elt match 1))
