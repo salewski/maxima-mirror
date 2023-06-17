@@ -756,6 +756,7 @@ inclua @code{X='X} como um argumento para @code{ev}.  Certamente expressões tai
 @c REVIEW FOR ACCURACY AND COMPLETENESS
 @c THIS ITEM IS VERY IMPORTANT !!
 @c NEEDS EXAMPLES
+@anchor{kill}
 @deffn {Função} kill (@var{a_1}, ..., @var{a_n})
 @deffnx {Função} kill (labels)
 @deffnx {Função} kill (inlabels, outlabels, linelabels)
