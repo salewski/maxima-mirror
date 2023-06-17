@@ -3,18 +3,9 @@
 @c 400c5c7ab963bd345661eee17f3fd94c  defstruct.texi
 @c
 @c -----------------------------------------------------------------------------
-@page
-@node Structures,  , Arrays, Data Types and Structures
-@section Structures
-@c -----------------------------------------------------------------------------
-
-@menu
-* Introduction to Structures::       
-* Functions and Variables for Structures::       
-@end menu
 
 @c -----------------------------------------------------------------------------
-@node Introduction to Structures, Functions and Variables for Structures, Structures, Structures
+@node Introduction to Structures, Functions and Variables for Structures, Funções e Variáveis Definidas para Opções Diversas, Top
 @subsection Introduction to Structures
 @c -----------------------------------------------------------------------------
 
@@ -45,7 +36,7 @@ N@~{a}o existe maneira de fazer alguns campos acess@'{i}veis ou bloqueados em co
 todos os campos s@~{a}o sempre vis@'{i}veis.
 
 @c -----------------------------------------------------------------------------
-@node Functions and Variables for Structures,  , Introduction to Structures, Structures
+@node Functions and Variables for Structures,  , Introduction to Structures, Top
 @subsection Functions and Variables for Structures
 @c -----------------------------------------------------------------------------
 
@@ -54,9 +45,10 @@ todos os campos s@~{a}o sempre vis@'{i}veis.
 
 A vari@'{a}vel global @code{structures} @'{e} a lista de estruturas definidas pelo usu@'{a}rio e @'{e} criada por @code{defstruct}.
 
-@opencatbox
-@category{Estruturas} @category{Vari@'{a}veis globais}
-@closecatbox
+@c @opencatbox{Categories:}
+@c @category{Estruturas}
+@c @category{Variáveis globais}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -111,9 +103,9 @@ Exemplos:
 (%o8)             [bar(v, w, x = 123, y = %pi)]
 @end example
 
-@opencatbox
-@category{Estruturas}
-@closecatbox
+@c @opencatbox{Categories:}
+@c @category{Estruturas}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -146,9 +138,9 @@ Exemplos:
 (%o3)            foo(w = 1, x = 2, y = 4, z = 8)
 @end example
 
-@opencatbox
-@category{Estruturas}
-@closecatbox
+@c @opencatbox{Categories:}
+@c @category{Estruturas}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -225,8 +217,9 @@ O nome de campo n@~{a}o @'{e} avaliado.
 (%o8)                          123
 @end example
 
-@opencatbox
-@category{Estruturas} @category{Operadores}
-@closecatbox
+@c @opencatbox{Categories:}
+@c @category{Estruturas}
+@c @category{Operadores}
+@c @closecatbox
 @end deffn
 

@@ -383,6 +383,8 @@ Opções Diversas
 * Introdução a Opções Diversas::  
 * Compartilhado::                       
 * Funções e Variáveis Definidas para Opções Diversas::  
+* Introduction to Structures::       
+* Functions and Variables for Structures::       
 
 Regras e Modelos
 
@@ -730,6 +732,7 @@ zeilberger
 @node Opções Diversas, Regras e Modelos, Ambiente em Tempo de Execução, Top
 @chapter Opções Diversas
 @include Miscellaneous.texi
+@include defstruct.texi
 
 @node Regras e Modelos, Listas, Opções Diversas, Top
 @chapter Regras e Modelos
