@@ -7,6 +7,7 @@
 @node Funções e Variáveis Definidas para Limites,  , Limites, Limites
 @section Funções e Variáveis Definidas para Limites
 
+@anchor{lhospitallim}
 @defvr {Variável de Opção} lhospitallim
 Valor padrão: 4
 
@@ -16,6 +17,7 @@ L'Hospital é usada em @code{limit}.  Isso evita ciclos infinitos em casos como
 
 @end defvr
 
+@anchor{limit}
 @deffn {Função} limit (@var{expr}, @var{x}, @var{val}, @var{dir})
 @deffnx {Função} limit (@var{expr}, @var{x}, @var{val})
 @deffnx {Função} limit (@var{expr})
@@ -52,6 +54,7 @@ Manipulation", tese de Ph.D., MAC TR-92, Outubro de 1971.
 
 @end deffn
 
+@anchor{limsubst}
 @defvr {Variável de Opção} limsubst
 valor padrão: @code{false} - evita que @code{limit} tente substituições sobre
 formas desconhecidas.  Isso é para evitar erros como @code{limit (f(n)/f(n+1), n, inf)}
@@ -60,6 +63,7 @@ substituições.
 
 @end defvr
 
+@anchor{tlimit}
 @deffn {Função} tlimit (@var{expr}, @var{x}, @var{val}, @var{dir})
 @deffnx {Função} tlimit (@var{expr}, @var{x}, @var{val})
 @deffnx {Função} tlimit (@var{expr})
@@ -67,6 +71,7 @@ Retorna @code{limit} com @code{tlimswitch} escolhido para @code{true}.
 
 @end deffn
 
+@anchor{tlimswitch}
 @defvr {Variável de Opção} tlimswitch
 Valor padrão: @code{false}
 
