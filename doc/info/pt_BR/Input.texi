@@ -66,6 +66,7 @@ e
 @node Funções e Variáveis Definidas para Entrada e Saída,  , Arquivos, Entrada e Saída
 @section Funções e Variáveis Definidas para Entrada e Saída de Dados
 
+@anchor{__}
 @defvr {Variável de sistema} __
 @ifinfo
 @vrindex Expressão de entrada atual
@@ -119,6 +120,7 @@ Expressão atual de entrada = --------------
 
 @end defvr
 
+@anchor{_}
 @defvr {Variável de sistema} _
 @ifinfo
 @vrindex Entrada anterior
@@ -185,6 +187,7 @@ Exemplos:
 
 @end defvr
 
+@anchor{%}
 @defvr {Variável de sistema} %
 @ifinfo
 @vrindex Saída anterior
@@ -205,6 +208,7 @@ Veja também @code{_}, @code{%%}, e @code{%th}
 
 @end defvr
 
+@anchor{%%}
 @defvr {Variável de sistema} %%
 @ifinfo
 @vrindex Resultado anterior em expressão composta
@@ -253,6 +257,7 @@ Veja também @code{%}.
 
 @end defvr
 
+@anchor{%edispflag}
 @defvr {Variável de opção} %edispflag
 Valor padrão: @code{false}
 
@@ -262,6 +267,7 @@ Por exemplo, @code{%e^-x} é mostrado como @code{1/%e^x}.
 
 @end defvr
 
+@anchor{%th}
 @deffn {Função} %th (@var{i})
 @ifinfo
 @fnindex N'ésima saída anterior
@@ -291,6 +297,7 @@ Veja também @code{%}.
 
 @end deffn
 
+@anchor{?}
 @deffn {Símbolo especial} ?
 @ifinfo
 @fnindex Consulta documentação
@@ -307,6 +314,7 @@ de outra forma o ponto de interrogação não é reconhecido com um pedido de do
 
 @end deffn
 
+@anchor{??}
 @deffn {Símbolo especial} ??
 @ifinfo
 @fnindex Consulta documentação (busca inexata)
@@ -319,6 +327,7 @@ de outra forma não é reconhecido com um pedido de documentação.
 
 @end deffn
 
+@anchor{absboxchar}
 @defvr {Variável de opção} absboxchar
 Valor padrão: @code{!}
 
@@ -327,6 +336,7 @@ absoluto em torno de expressões que são maiores que uma linha de altura.
 
 @end defvr
 
+@anchor{file_output_append}
 @defvr {Variável de opção} file_output_append
 Valor padrão: @code{false}
 
@@ -344,6 +354,7 @@ e @code{tex} e @code{appendfile} sempre anexam ao final.
 
 @end defvr
 
+@anchor{appendfile}
 @deffn {Função} appendfile (@var{nomearquivo})
 Adiciona ao final de @var{nomearquivo} uma transcrição do console.
 @code{appendfile} é o mesmo que @code{writefile}, 
@@ -356,6 +367,7 @@ exceto que o arquivo transcrito, se já existe, terá sempre alguma coisa adicio
 @c batch CAN TAKE 'test AS AN OPTIONAL ARGUMENT IN WHICH CASE IT CALLS test-batch
 @c (SAME AS run_testsuite) -- SHOULD DOCUMENT batch (file, 'test)
 @c FIX BUG WHICH CAUSES batch (<file>, 'test) TO FAIL, THEN DOCUMENT IT HERE
+@anchor{batch}
 @deffn {Função} batch (@var{nomearquivo})
 Lê expressões Maxima do arquivo @var{nomearquivo} e as avalia.
 @code{batch} procura pelo arquivo @var{nomearquivo} na lista @code{file_search_maxima}.
@@ -399,6 +411,7 @@ Veja também @code{load}, @code{batchload}, e @code{demo}.
 @end deffn
 
 @c RECOMMEND CUTTING THIS ITEM, AS THE load SUBSUMES FUNCTIONALITY OF batchload
+@anchor{batchload}
 @deffn {Função} batchload (@var{nomearquivo})
 Lê expressões Maxima de @var{nomearquivo} e as avalia,
 sem mostrar a entrada ou expressões de saída
@@ -419,12 +432,14 @@ Veja também @code{batch} e @code{load}.
 
 @end deffn
 
+@anchor{closefile}
 @deffn {Função} closefile ()
 Fecha o arquivo transcrito aberto por @code{writefile} ou @code{appendfile}.
 
 @end deffn
 
 @c NEEDS CLARIFICATION !!!
+@anchor{collapse}
 @deffn {Função} collapse (@var{expr})
 Reduz @var{expr} fazendo com que todas as suas
 subexpressões comuns (i.e., iguais)  sejam compartilhadas (i.e., usam a mesma células),
@@ -437,6 +452,7 @@ diminuir os elementos de um array @code{A} fazendo
 
 @end deffn
 
+@anchor{concat}
 @deffn {Função} concat (@var{arg_1}, @var{arg_2}, ...)
 Concatena seus argumentos.
 Os argumentos devem obrigatóriamente serem avaliados para atomos.
@@ -483,6 +499,7 @@ Note que embora @code{concat (1, 2)} seja visto como números no console, na rea
 
 @end deffn
 
+@anchor{sconcat}
 @deffn {Função} sconcat (@var{arg_1}, @var{arg_2}, ...)
 
 Concatena seus argumentos em uma seq@"{u}ência de caracteres.
@@ -514,6 +531,7 @@ O resultado é uma seq@"{u}ência de caracteres no format do Lisp.
 @c @end defvar
 
 @c REPHRASE, NEEDS EXAMPLES
+@anchor{disp}
 @deffn {Função} disp (@var{expr_1}, @var{expr_2}, ...)
 é como @code{display} mas somente os valores dos
 argumentos são mostrados em lugar de equações.  A função @code{disp} é útil para
@@ -524,6 +542,7 @@ do argumento é de interesse e não o nome.
 
 @c HMM, THIS NEXT ITEM IS DEFINED IN A SHARE FILE (itensor.lisp); 
 @c DOES ITS DESCRIPTION WANT TO BE ELSEWHERE ???
+@anchor{dispcon}
 @deffn {Função} dispcon (@var{tensor_1}, @var{tensor_2}, ...)
 @deffnx {Função} dispcon (all)
 Mostra as propriedades de contração de
@@ -533,6 +552,7 @@ propriedades de contração que foram definidas.
 @end deffn
 
 @c REPHRASE, MORE EXAMPLES
+@anchor{display}
 @deffn {Função} display (@var{expr_1}, @var{expr_2}, ...)
 Mostra equações cujo lado esquerdo é
 @var{expr_i} não avaliado, e cujo lado direito é o valor da expressão
@@ -551,6 +571,7 @@ chamadas de função.  Veja também @code{disp}.
 
 @end deffn
 
+@anchor{display2d}
 @defvr {Variável de opção} display2d
 Valor padrão: @code{true}
 
@@ -560,6 +581,7 @@ forma bidimensional.
 
 @end defvr
 
+@anchor{display_format_internal}
 @defvr {Variável de opção} display_format_internal
 Valor padrão: @code{false}
 
@@ -589,6 +611,7 @@ X*4/3;    ---        - X
 
 @c IS THIS FUNCTION STILL USEFUL ???
 @c REPHRASE, NEEDS EXAMPLES
+@anchor{dispterms}
 @deffn {Função} dispterms (@var{expr})
 Mostra @var{expr} em partes uma abaixo da outra.
 Isto é, primeiro o operador de @var{expr} é mostrado, então cada parcela em
@@ -604,6 +627,7 @@ caso de @code{A^^B}).
 
 @end deffn
 
+@anchor{error_size}
 @defvr {Variável de opção} error_size
 Valor padrão: 10
 
@@ -659,6 +683,7 @@ Expressão exemplo é --------------
 
 @end defvr
 
+@anchor{error_syms}
 @defvr {Variável de opção} error_syms
 Valor padrão: @code{[errexp1, errexp2, errexp3]}
 
@@ -677,6 +702,7 @@ Veja também @code{error} e @code{error_size}.
 
 @end defvr
 
+@anchor{expt}
 @deffn {Função} expt (@var{a}, @var{b})
 Se uma expressão exponencial é muito alta para ser mostrada
 cmo @code{@var{a}^@var{b}} isso aparece como @code{expt (@var{a}, @var{b})} (ou como @code{ncexpt (@var{a}, @var{b})} no caso de
@@ -688,6 +714,7 @@ cmo @code{@var{a}^@var{b}} isso aparece como @code{expt (@var{a}, @var{b})} (ou 
 
 @end deffn
 
+@anchor{exptdispflag}
 @defvr {Variável de opção} exptdispflag
 Valor padrão: @code{true}
 
@@ -697,6 +724,7 @@ com expoente negativo usando quocientes, e.g., @code{X^(-1)} como @code{1/X}.
 @end defvr
 
 @c NEEDS EXAMPLES
+@anchor{filename_merge}
 @deffn {Função} filename_merge (@var{path}, @var{nomearquivo})
 Constroem um caminho modificado de @var{path} e @var{nomearquivo}.
 Se o componente final de @var{path} é da forma @code{###.@var{algumacoisa}},
@@ -707,6 +735,7 @@ De outra forma, o componente final é simplesmente substituído por @var{nomearq
 @c SAY SOMETHING ABOUT RETURN TYPE
 @end deffn
 
+@anchor{file_search}
 @deffn {Função} file_search (@var{nomearquivo})
 @deffnx {Função} file_search (@var{nomearquivo}, @var{listacaminho})
 
@@ -748,6 +777,9 @@ como diretórios de busca.
 
 @end deffn
 
+@anchor{file_search_maxima}
+@anchor{file_search_lisp}
+@anchor{file_search_demo}
 @defvr {Variável de opção} file_search_maxima
 @defvrx {Variável de opção} file_search_lisp
 @defvrx {Variável de opção} file_search_demo
@@ -792,6 +824,7 @@ expande em @code{/home/wfs/neumann.lisp}, @code{/home/gcj/neumann.lisp}, @code{/
 
 @end defvr
 
+@anchor{file_type}
 @deffn {Função} file_type (@var{nomearquivo})
 Retorna uma suposta informação sobre o conteúdo de @var{nomearquivo},
 baseada na extensão do arquivo.
@@ -805,6 +838,7 @@ Se nenhum dos acima, @code{file_type} retorna @code{object}.
 
 @end deffn
 
+@anchor{grind}
 @deffn {Função} grind (@var{expr})
 @deffnx {Variável de opção} grind
 A função @code{grind} imprime @var{expr}
@@ -929,6 +963,7 @@ n do (for j from i+1 thru n do L[i,j]:0),L)
 
 @end deffn
 
+@anchor{ibase}
 @defvr {Variável de opção} ibase
 Valor padrão: 10
 
@@ -951,6 +986,7 @@ Veja também @code{obase}.
 @c NEED EXAMPLES HERE
 @end defvr
 
+@anchor{inchar}
 @defvr {Variável de opção} inchar
 Valor padrão: @code{%i}
 
@@ -972,6 +1008,7 @@ Veja também @code{labels}.
 
 @end defvr
 
+@anchor{ldisp}
 @deffn {Função} ldisp (@var{expr_1}, ..., @var{expr_n})
 Mostra expressões @var{expr_1}, ..., @var{expr_n} para o console
 como saída impressa na tela.
@@ -1005,6 +1042,7 @@ Veja também @code{disp}.
 
 @end deffn
 
+@anchor{ldisplay}
 @deffn {Função} ldisplay (@var{expr_1}, ..., @var{expr_n})
 Mostra expressões @var{expr_1}, ..., @var{expr_n} para o console
 como saída impressa na tela.
@@ -1042,6 +1080,7 @@ Veja também @code{display}.
 
 @end deffn
 
+@anchor{linechar}
 @defvr {Variável de opção} linechar
 Valor padrão: @code{%t}
 
@@ -1055,6 +1094,7 @@ See @code{programmode} e @code{labels}.
 
 @end defvr
 
+@anchor{linel}
 @defvr {Variável de opção} linel
 Valor padrão: 79
 
@@ -1067,6 +1107,7 @@ não são afetadas por @code{linel}.
 
 @end defvr
 
+@anchor{lispdisp}
 @defvr {Variável de opção} lispdisp
 Valor padrão: @code{false}
 
@@ -1094,6 +1135,7 @@ Exemplos:
 
 @end defvr
 
+@anchor{load}
 @deffn {Função} load (@var{nomearquivo})
 Avalia expressões em @var{nomearquivo}, 
 dessa forma conduzindo variáveis, funções, e outros objetos dentro do Maxima.
@@ -1126,6 +1168,7 @@ Veja @code{file_search} para mais detalhes sobre o mecanismo de busca de arquivo
 @end deffn
 
 @c RECOMMEND CUTTING THIS ITEM, AS THE load SUBSUMES FUNCTIONALITY OF loadfile
+@anchor{loadfile}
 @deffn {Função} loadfile (@var{nomearquivo})
 Avalia expressões Lisp em @var{nomearquivo}.
 @code{loadfile} não invoca @code{file_search}, então @code{nomearquivo} deve obrigatóriamente incluir
@@ -1138,6 +1181,7 @@ O usuário pode achar isso mais conveniente para usar @code{load} em lugar de @c
 
 @c loadprint DOESN'T EXACTLY WORK LIKE THIS, BUT IT HARDLY SEEMS WORTH FIXING
 @c I GUESS THIS COULD BE UPDATED TO DESCRIBE THE WAY IT ACTUALLY WORKS
+@anchor{loadprint}
 @defvr {Variável de opção} loadprint
 Valor padrão: @code{true}
 
@@ -1159,6 +1203,7 @@ Quando @code{loadprint} é @code{false}, nunca imprime uma mensagem.
 
 @end defvr
 
+@anchor{obase}
 @defvr {Variável de opção} obase
 Valor padrão: 10
 
@@ -1176,6 +1221,7 @@ Veja também @code{ibase}.
 @c NEED EXAMPLES HERE
 @end defvr
 
+@anchor{outchar}
 @defvr {Variável de opção} outchar
 Valor padrão: @code{%o}
 
@@ -1198,6 +1244,7 @@ Veja também @code{labels}.
 @end defvr
 
 @c STILL EXISTS, NEEDS CLARIFICATION !!!
+@anchor{packagefile}
 @defvr {Variável de opção} packagefile
 Valor padrão: @code{false}
 
@@ -1215,6 +1262,7 @@ init do Maxima.
 
 @end defvr
 
+@anchor{pfeformat}
 @defvr {Variável de opção} pfeformat
 Valor padrão: @code{false}
 
@@ -1242,6 +1290,7 @@ e um denominador inteiro @code{n}
 
 @end defvr
 
+@anchor{print}
 @deffn {Função} print (@var{expr_1}, ..., @var{expr_n})
 Avalia e mostra @var{expr_1}, ..., @var{expr_n}
 uma após a outra, da esquerda para a direita,
@@ -1282,6 +1331,7 @@ Para mostrar o conteúdo de um arquivo, veja @code{printfile}.
 @c $tcl_output IS NEVER CALLED WITHIN MAXIMA SOURCE,
 @c AND THIS EXTREMELY NARROW, LIMITED FUNCTIONALITY ISN'T USEFUL TO USERS
 @c AND IT'S BROKEN: INCORRECT OUTPUT FOR CLISP, DIES ON GCL
+@anchor{tcl_output}
 @deffn {Função} tcl_output (@var{list}, @var{i0}, @var{skip})
 @deffnx {Função} tcl_output (@var{list}, @var{i0})
 @deffnx {Função} tcl_output ([@var{list_1}, ..., @var{list_n}], @var{i})
@@ -1336,6 +1386,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{read}
 @deffn {Função} read (@var{expr_1}, ..., @var{expr_n})
 Imprime @var{expr_1}, ..., @var{expr_n}, então lê uma expressão do console
 e retorna a expressão avaliada.
@@ -1355,6 +1406,7 @@ foo is 42  -- enter new value.
 
 @end deffn
 
+@anchor{readonly}
 @deffn {Função} readonly (@var{expr_1}, ..., @var{expr_n})
 Imprime @var{expr_1}, ..., @var{expr_n}, então lê uma expressão do console
 e retorna a expressão (sem avaliação).
@@ -1377,6 +1429,7 @@ Veja também @code{read}.
 
 @end deffn
 
+@anchor{reveal}
 @deffn {Função} reveal (@var{expr}, @var{depth})
 Substitue partes de @var{expr} no inteiro especificado @var{depth}
 com sumário descritivo.
@@ -1443,6 +1496,7 @@ Exemplo:
 
 @end deffn
 
+@anchor{rmxchar}
 @defvr {Variável de opção} rmxchar
 Valor padrão: @code{]}
 
@@ -1453,6 +1507,7 @@ Veja também @code{lmxchar}.
 @end defvr
 
 @c NEEDS EXAMPLES
+@anchor{save}
 @deffn {Função} save (@var{nomearquivo}, @var{nome_1}, @var{nome_2}, @var{nome_3}, ...)
 @deffnx {Função} save (@var{nomearquivo}, values, functions, labels, ...)
 @deffnx {Função} save (@var{nomearquivo}, [@var{m}, @var{n}])
@@ -1510,6 +1565,7 @@ veja @code{myoptions}.
 @end deffn
 
 @c NEEDS MORE WORK !!!
+@anchor{savedef}
 @defvr {Variável de opção} savedef
 Valor padrão: @code{true}
 
@@ -1525,6 +1581,7 @@ removidos da lista de @code{funções}.
 
 @c THIS FUNCTION IS IN THE SHARE PACKAGE itensor.lisp
 @c MOVE THIS DESCRIPTION TO Itensor.texi
+@anchor{show}
 @deffn {Função} show (@var{expr})
 Mostra @code{expr} com os objetos indexados
 tendo índices covariantes como subscritos, índices contravariantes como
@@ -1533,6 +1590,7 @@ separados dos índices covariantes por uma vírgula.
 
 @end deffn
 
+@anchor{showratvars}
 @deffn {Função} showratvars (@var{expr})
 Retorna uma lista de variáveis expressão racional canônica (CRE) na expressão @code{expr}.
 
@@ -1540,6 +1598,7 @@ Veja também @code{ratvars}.
 
 @end deffn
 
+@anchor{stardisp}
 @defvr {Variável de opção} stardisp
 Valor padrão: @code{false}
 
@@ -1549,6 +1608,7 @@ mostrada com um asterisco @code{*} entre os operandos.
 @end defvr
 
 @c NEEDS CLARIFICATION AND EXAMPLES
+@anchor{string}
 @deffn {Função} string (@var{expr})
 Converte @code{expr} para a notação linear do Maxima
 apenas como se tivesse sido digitada.
@@ -1558,8 +1618,7 @@ e dessa forma não pode ser usada em um cálculo.
 
 @end deffn
 
-@c SHOULD BE WRITTEN WITH LEADING ? BUT THAT CONFUSES CL-INFO SO WORK AROUND
-@c @defvr {Variãvel de opção} stringdisp
+@anchor{stringdisp}
 @defvr {Variãvel de opção} stringdisp
 Valor padrão: @code{false}
 
@@ -1593,6 +1652,7 @@ Exemplos:
 
 @end defvr
 
+@anchor{stringout}
 @deffn {Função} stringout (@var{nomearquivo}, @var{expr_1}, @var{expr_2}, @var{expr_3}, ...)
 @deffnx {Função} stringout (@var{nomearquivo}, [@var{m}, @var{n}])
 @deffnx {Função} stringout (@var{nomearquivo}, input)
@@ -1638,6 +1698,7 @@ variáveis como declarações de atribuição.
 
 @end deffn
 
+@anchor{tex}
 @deffn {Função} tex (@var{expr})
 @deffnx {Função} tex (@var{rótulo})
 @deffnx {Função} tex (@var{expr}, @var{momearquivo})
@@ -1690,6 +1751,7 @@ $$-\cos x$$
 
 @end deffn
 
+@anchor{texput}
 @deffn {Função} texput (@var{a}, @var{s})
 @deffnx {Função} texput (@var{a}, @var{s}, @var{operator_type})
 @deffnx {Função} texput (@var{a}, [@var{s_1}, @var{s_2}], matchfix)
@@ -1866,6 +1928,7 @@ $$ \langle a \, | \,b \rangle $$
 @end deffn
 
 @c NEEDS CLARIFICATION
+@anchor{system}
 @deffn {Função} system (@var{comando})
 Executa @var{comando} como um processo separado.
 O comando é passado ao shell padrão para execução.
@@ -1892,6 +1955,7 @@ system("(xgraph -bar -brw .7 -nl < _hist.out;  rm -f _hist.out)&")
 
 @end deffn
 
+@anchor{ttyoff}
 @defvr {Variável de opção} ttyoff
 Valor padrão: @code{false}
 
@@ -1903,6 +1967,7 @@ não são afetadas por @code{ttyoff}.
 
 @end defvr
 
+@anchor{with_stdout}
 @deffn {Função} with_stdout (@var{nomearquivo}, @var{expr_1}, @var{expr_2}, @var{expr_3}, ...)
 Abre @var{nomearquivo} e então avalia @var{expr_1}, @var{expr_2}, @var{expr_3}, ....
 Os valores dos argumentos não são armazenados em @var{nomearquivo},
@@ -1949,6 +2014,7 @@ Veja também @code{writefile}.
 
 @end deffn
 
+@anchor{writefile}
 @deffn {Função} writefile (@var{nomearquivo})
 Começa escrevendo uma transcrição da sessão Maxima para @var{nomearquivo}.
 Toda interação entre o usuário e Maxima é então gravada nesse arquivo,
