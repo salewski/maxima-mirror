@@ -180,7 +180,6 @@ Pacotes Adicionais
 * ggf::                         Função geradora para sequências.
 * grobner::                     Funções para trabalhar com as bases de Groebner.
 * impdiff::                     Derivadas implícitas.
-* implicit_plot::               Gráficos implítos.
 * interpol::                    Pacote de interpolação.
 * lbfgs::                       L-BFGS pacote de minimização não limitada.
 * lindstedt::                   Pacote Lindstedt.
@@ -250,7 +249,12 @@ Simplificação
 
 Montando Gráficos
 
+* Introduction to Plotting::
+* Plotting Formats::
 * Funções e Variáveis Definidas para Montagem de Gráficos::    
+* Plotting Options::
+* Gnuplot Options::
+* Gnuplot_pipes Format Functions::
 
 Entrada e Saída
 
@@ -481,10 +485,6 @@ grobner
 impdiff
 
 * Funções e Variáveis Definidas para impdiff::
-
-implicit_plot
-
-* Funções e Variáveis Definidas para implicit_plot::
 
 interpol
 
@@ -806,15 +806,11 @@ zeilberger
 @chapter grobner
 @include grobner.texi
 
-@node impdiff, implicit_plot, grobner, Top
+@node impdiff, interpol, grobner, Top
 @chapter impdiff
 @include impdiff.texi
 
-@node implicit_plot, interpol, impdiff, Top
-@chapter implicit_plot
-@include implicit_plot.texi
-
-@node interpol, lbfgs, implicit_plot, Top
+@node interpol, lbfgs, impdiff, Top
 @chapter interpol
 @include interpol.texi
 

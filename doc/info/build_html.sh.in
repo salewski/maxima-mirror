@@ -53,11 +53,20 @@ if [ -d tmp_html ]; then
     rm -rf tmp_html
 fi
 mkdir tmp_html
-cp -r @abs_srcdir@/figures tmp_html
-# "make distcheck" write-protects the source tree. We don't want our
-# figures to inherit that attribute as we want to delete the temp folder
-# again, later.
-chmod -R u+w tmp_html
+if [ "$language" = "en" ]
+then
+    cp -r @abs_srcdir@/figures tmp_html
+    # "make distcheck" write-protects the source tree. We don't want our
+    # figures to inherit that attribute as we want to delete the temp folder
+    # again, later.
+    chmod -R u+w tmp_html
+else
+    # IT IS ASSUMED THAT $LANGUAGEDIR DOES NOT CONTAIN A FOLDER NAMED "FIGURES"
+    rm -rf figures
+    # make figures directory a sibling to tmp_html.
+    cp -r @abs_srcdir@/figures $languagedir
+    chmod -R u+w $languagedir/figures
+fi
 
 cat include-maxima.texi > tmp_html/include-maxima.texi
 
