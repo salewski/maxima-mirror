@@ -365,28 +365,52 @@ is in share/colnew/ex1.
 
 @noindent The differential equation is
 
-@center @math{(x^3 u'@w{}')'@w{}' = x^3 u'@w{}'@w{}'@w{}' + 6 x^2 u'@w{}'@w{}' + 6x u'@w{}' = 1} over @math{1 ≤ x  ≤ 2}
+
+m4_displaymath(
+<<<(x^3 u'')'' = x^3u'''' + 6x^2u''' + 6xu'' = 1 \quad {\rm over} \quad 1 \le x \le 2>>>,
+<<<@center @math{(x^3 u'@w{}')'@w{}' = x^3 u'@w{}'@w{}'@w{}' + 6 x^2 u'@w{}'@w{}' + 6x u'@w{}' = 1} over @math{1 ≤ x  ≤ 2}>>>)
 
 @noindent with boundary conditions
 
-@center @math{u(1) = 0, u'@w{}'(1) = 0, u(2) = 0, u'@w{}'(2) = 0}
+m4_displaymath(
+<<<\eqalign{
+u(1) &= 0 \cr
+u''(1) &= 0 \cr
+u(2) &= 0 \cr
+u''(2) &= 0}>>>,
+<<<@center @math{u(1) = 0, u'@w{}'(1) = 0, u(2) = 0, u'@w{}'(2) = 0}>>>)
 
 @noindent The exact solution is
 
-@center @math{u(x) = (1/4) (10 ln(2) - 3) (1-x) + (1/2) (1/x + (3+x) ln(x) - x)}
+m4_displaymath(
+<<<u(x) = {{10\log 2 - 3}\over 4}(1-x) + {1\over 2}\left({1\over x} + (3+x)\log x - x\right)>>>,
+<<<@center @math{u(x) = (1/4) (10 ln(2) - 3) (1-x) + (1/2) (1/x + (3+x) ln(x) - x)}>>>)
 
 @noindent There is @var{nconc} = 1 differential equation of fourth order. The list of orders
 @var{m} = [4] and @var{mstar} = sum(m[j]) = 4.
 
 @noindent The unknown vector of length @var{mstar} is
 
+m4_displaymath(
+<<<
+\eqalign{
+z(x) &= [z_1(x),z_2(x),z_3(x),z_4(x)] \cr
+     &= [u(x),u'(x),u''(x),u'''(x)]
+}>>>,
+<<<
 @center @math{z(x) = [z_1(x),z_2(x),z_3(x),z_4(x)]}
 
-@center @math{=[u(x),u'(x),u'@w{}'(x),u'@w{}'@w{}'(x)]}.
+@center @math{=[u(x),u'(x),u'@w{}'(x),u'@w{}'@w{}'(x)]}
+>>>)
 
 @noindent The differential equation is expressed as
 
+m4_displaymath(
+<<<
+u''''(x) = F(x,z_1,z_2,z_3,z_4) = 1 - 6 x^2 z_3 - 6x z_2>>>,
+<<<
 @center @math{u'@w{}'@w{}'@w{}'(x) = F(x,z_1,z_2,z_3,z_4) = 1 - 6 x^2 z_3 - 6x z_2}
+>>>)
 
 There are @var{mstar=4} boundary conditions. They are given by a
 function @math{G(z_1,z_2,z_3,z_4)} that returns a list of length mstar.
