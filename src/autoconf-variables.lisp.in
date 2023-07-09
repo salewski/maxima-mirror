@@ -20,5 +20,6 @@
 ;; This will be T if this was a lisp-only build
 (defparameter *autoconf-lisp-only-build* (eq t '@lisp_only_build@))
  
-(defparameter *maxima-source-root* "@expanded_top_srcdir@")
+(defparameter *maxima-src-root* "@expanded_top_srcdir@")
+(defparameter *maxima-build-root* "@expanded_top_builddir@")
 (defparameter *maxima-default-layout-autotools* "@default_layout_autotools@")

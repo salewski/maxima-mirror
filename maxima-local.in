@@ -12,6 +12,9 @@ MAXIMA_OBJDIR="@abs_top_builddir@/binary"
 export MAXIMA_OBJDIR
 MAXIMA_HTMLDIR=${MAXIMA_DOC_PREFIX}
 export MAXIMA_HTMLDIR
+CLISP_RUNTIME_PATH="@CLISP_RUNTIME_PATH@"
+export CLISP_RUNTIME_PATH
+PATH=${PATH}:${CLISP_RUNTIME_PATH%/*}
 
 # report the compiled in Lisp versions
 if [ x"$1" = "x--list-avail" ]; then

@@ -42,6 +42,8 @@ setup_vars() {
   if [ -z "$MAXIMA_LISP" ]; then
     MAXIMA_LISP=$MAXIMA_DEFAULT_LISP
   fi
+  CLISP_RUNTIME_PATH="@CLISP_RUNTIME_PATH@"
+  PATH=${PATH}:${CLISP_RUNTIME_PATH%/*}
 }
 
 unsetup_vars () {
@@ -168,7 +170,7 @@ if [ "$MAXIMA_LISP" = "clisp" ]; then
       if [ -x "$MAXIMA_IMAGESDIR/binary-$MAXIMA_LISP/maxima" ]; then
         exec "$MAXIMA_IMAGESDIR/binary-$MAXIMA_LISP/maxima" $MAXIMA_LISP_OPTIONS -q "" -- "$@"
       else
-	exec "$MAXIMA_IMAGESDIR/binary-$MAXIMA_LISP/@CLISP_RUNTIME@" $MAXIMA_LISP_OPTIONS -q -M "$maxima_image_base.mem" "" -- "$@"
+        exec "@CLISP_RUNTIME_PATH@" $MAXIMA_LISP_OPTIONS -q -M "$maxima_image_base.mem" "" -- "$@"
       fi
     else
       if [ -x "$maxima_image_base" ]; then

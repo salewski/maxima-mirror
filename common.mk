@@ -23,22 +23,27 @@ insttestsdir = $(verpkgdatadir)/tests
 
 install-data-local: install-datafiles
 install-datafiles: $(genericdirDATA)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(genericdir)
-	@list='$(genericdirDATA)'; for p in $$list; do \
-	  if test -f $(srcdir)/$$p; then \
-            if test ! -d `dirname $(DESTDIR)$(genericdir)/$$p`; then \
-              $(mkinstalldirs) `dirname $(DESTDIR)$(genericdir)/$$p`; \
-            fi; \
-	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(genericdir)/$$p"; \
-	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(genericdir)/$$p; \
-	  else if test -f $$p; then \
-            if test ! -d `dirname $(DESTDIR)$(genericdir)/$$p`; then \
-              $(mkinstalldirs) `dirname $(DESTDIR)$(genericdir)/$$p`; \
-            fi; \
-	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(genericdir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(DESTDIR)$(genericdir)/$$p; \
-	  fi; fi; \
+       @d=$(DESTDIR)$(genericdir); \
+       test -d $$d && $(mkinstalldirs) $$d; \
+       list="$^"; for p in $$list; do \
+         b=$${p#$(builddir)/}; \
+         s=$${p#$(srcdir)/}; \
+         if test -f $(builddir)/$$b; then \
+           t=`dirname $$d/$$b`; \
+            test -d $$t || $(mkinstalldirs) $$t; \
+           echo " $(INSTALL_DATA) BUILDDIR/$$b $$d/$$b"; \
+           $(INSTALL_DATA) $(builddir)/$$b $$d/$$b; \
+         elif test -f $(srcdir)/$$s; then \
+           t=`dirname $$d/$$s`; \
+            test -d $$t || $(mkinstalldirs) $$t; \
+           echo " $(INSTALL_DATA) SRCDIR/$$s $$d/$$s"; \
+           $(INSTALL_DATA) $(srcdir)/$$s $$d/$$s; \
+         elif test -f $$p; then \
+           t=`dirname $$d/$$p`; \
+            test -d $$t || $(mkinstalldirs) $$t; \
+           echo " $(INSTALL_DATA) $$p $$d/$$p"; \
+           $(INSTALL_DATA) $$p $$d/$$p; \
+         fi; \
 	done
 
 uninstall-local: uninstall-datafiles
