@@ -732,7 +732,7 @@ uninstall-maxima-index: maxima-index.lisp maxima-index-html.lisp
 	rm -f "$(DESTDIR)$(infodir)/maxima-index.lisp"
 	rm -f "$(DESTDIR)$(infodir)/maxima-index-html.lisp"
 
-clean-local: clean-info clean-html
+clean-local: clean-info clean-html clean-texi
 
 clean-info:
 	rm -f $(wildcard maxima.info* maxima-index.lisp maxima-index-html.lisp)
@@ -742,7 +742,23 @@ clean-html:
 	rm -f $(wildcard maxima*.html) \
 	      $(wildcard $(addprefix $(srcdir),maxima*.html))
 
-EXTRA_DIST = manual.css texi2html.init maxima.texi dlmf-ref-macros.texi \
+clean-texi:
+       rm -f $(wildcard *.texi)
+
+if CHM
+install-chm: maxima.chm
+       $(MKDIR_P) "$(DESTDIR)$(docchmdir)"
+       $(INSTALL_DATA) maxima.chm "$(DESTDIR)$(docchmdir)/maxima.chm"
+
+uninstall-chm:
+       rm -f "$(DESTDIR)$(docchmdir)"
+
+clean-chm:
+       rm -f maxima.chm
+       rm -rf chm
+endif
+
+EXTRA_DIST = manual.css texi2html.init maxima.texi \
     $(genericdirDATA) $(pdffigures) $(macfiles) $(maxima_TEXINFOS) $(figurefiles) \
     create_index build_index.pl maxima-index.lisp maxima-index-html.lisp docdraw.mac \
     extract_categories1.awk extract_categories1.sed check_tab fix_tab \

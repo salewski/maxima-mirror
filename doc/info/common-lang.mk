@@ -1,4 +1,5 @@
 info_TEXINFOS = maxima.texi
+MAKEINFOFLAGS += --no-split
 
 all-local: maxima-index.lisp maxima-index-html.lisp maxima_toc.html
 
@@ -13,7 +14,7 @@ maxima-index.lisp: maxima.info $(srcdir)/../build_index.pl
 # This includes the indices, maxima_singlepage.html and any other html
 # file that doesn't start with "maxima".
 maxima-index-html.lisp : maxima_toc.html
-	../../../maxima-local --batch-lisp=../build-html-index.lisp
+	../../../maxima-local --batch-lisp=$(srcdir)/../build-html-index.lisp
 
 maxima_singlepage.html maxima_toc.html: maxima.texi $(maxima_TEXINFOS)
 	../build_html.sh -l $(lang)
