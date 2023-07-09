@@ -25,12 +25,12 @@ if [ x"$1" = "x--list-avail" ]; then
 fi;
 
 # quick fix for plotting with plot_format=openmath (bug 3052)
-if [ ! -d "@abs_top_srcdir@/bin" ]; then
-    mkdir -p "@abs_top_srcdir@/bin"
-    ln -sf "@abs_top_srcdir@/xmaxima-local" "@abs_top_srcdir@/bin/xmaxima"
-    ln -sf "@abs_top_srcdir@/doc" "@abs_top_srcdir@/bin/doc"
-    ln -sf "@abs_top_srcdir@/src" "@abs_top_srcdir@/bin/src"
-    ln -sf "@abs_top_srcdir@/interfaces" "@abs_top_srcdir@/bin/interfaces"
+if [ ! -d "@abs_top_builddir@/bin" ]; then
+    mkdir -p "@abs_top_builddir@/bin"
+    ln -sf "@abs_top_builddir@/xmaxima-local" "@abs_top_builddir@/bin/xmaxima"
+    ln -sf "@abs_top_builddir@/doc" "@abs_top_builddir@/bin/doc"
+    ln -sf "@abs_top_builddir@/src" "@abs_top_builddir@/bin/src"
+    ln -sf "@abs_top_builddir@/interfaces" "@abs_top_builddir@/bin/interfaces"
 fi
 
 POSIX_SHELL=@POSIX_SHELL@
