@@ -121,8 +121,6 @@ clisplib_SCRIPTS = $(CLISP_MAXIMA_EXE)
 clispexeflag = :EXECUTABLE t
 CLISP_MAXIMA +=  $(CLISP_MAXIMA_EXE)
 else
-CLISP_MAXIMA_MEM = binary-clisp/maxima.mem
-clisplib_DATA = $(CLISP_MAXIMA_MEM)
 clispexeflag =
 ## Rather crazily, we install an extra copy of clisp. Maybe there's a
 ## more sensible approach than this?!
