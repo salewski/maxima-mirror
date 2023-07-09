@@ -743,19 +743,19 @@ clean-html:
 	      $(wildcard $(addprefix $(srcdir),maxima*.html))
 
 clean-texi:
-       rm -f $(wildcard *.texi)
+	rm -f $(wildcard *.texi)
 
 if CHM
 install-chm: maxima.chm
-       $(MKDIR_P) "$(DESTDIR)$(docchmdir)"
-       $(INSTALL_DATA) maxima.chm "$(DESTDIR)$(docchmdir)/maxima.chm"
+	$(MKDIR_P) "$(DESTDIR)$(docchmdir)"
+	$(INSTALL_DATA) maxima.chm "$(DESTDIR)$(docchmdir)/maxima.chm"
 
 uninstall-chm:
-       rm -f "$(DESTDIR)$(docchmdir)"
+	rm -f "$(DESTDIR)$(docchmdir)"
 
 clean-chm:
-       rm -f maxima.chm
-       rm -rf chm
+	rm -f maxima.chm
+	rm -rf chm
 endif
 
 EXTRA_DIST = manual.css texi2html.init maxima.texi \
