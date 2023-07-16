@@ -118,8 +118,10 @@ Infraestrutura do Maxima
                                 sessão do Maxima.
 * Linha de Comando::            Sintaxe de linha de comando do Maxima.
 * Operadores::                  Operadores usados em expressões do Maxima.
+* Evaluação::                   Evaluação de expressões no Maxima.
 * Expressões::                  Expressões no Maxima.
 * Simplificação::               Simplificando expressões.
+* Maxima's Database::           Declarations, Contexts, Facts, and Properties.
 * Montando Gráficos::           Saídas gráficas em 2D e 3D.
 * Entrada e Saída::             Entrada e saída de arquivos.
 * Ponto Flutuante::             Rotinas numéricas de baixo nível.
@@ -227,13 +229,17 @@ Linha de Comando
 
 Operadores
 
-* N-Argumentos::                        
-* Operador não fixado::                       
-* Operador Pósfixado::                     
-* Operador Préfixado::                      
-* Operadores Aritméticos::    
-* Operadores Relacionais::   
-* Operadores Geral::
+* Introdução a Operadores::      
+* Operadores Aritméticos::
+* Operadores Relacionais::
+* Operadores Lógicos::
+* Operators for Equations::
+* Assignment operators::
+* User defined operators::
+
+Evaluação
+
+* Funções e Variáveis Definidas para Evaluação
 
 Expressões
 
@@ -246,6 +252,13 @@ Expressões
 Simplificação
 
 * Funções e Variáveis Definidas para Simplificação::  
+
+Maxima's Database
+
+* Introduction to Maxima's Database::
+* Functions and Variables for Properties::
+* Functions and Variables for Facts::
+* Functions and Variables for Predicates::
 
 Montando Gráficos
 
@@ -607,19 +620,27 @@ zeilberger
 @chapter Linha de Comando
 @include Command.texi
 
-@node Operadores, Expressões, Linha de Comando, Top
+@node Operadores, Evaluação, Linha de Comando, Top
 @chapter Operadores
 @include Operators.texi
 
-@node Expressões, Simplificação, Operadores, Top
+@node Evaluação, Expressões, Operadores, Top
+@chapter Evaluação
+@include Evaluation.texi
+
+@node Expressões, Simplificação, Evaluação, Top
 @chapter Expressões
 @include Expressions.texi
 
-@node Simplificação, Montando Gráficos, Expressões, Top
+@node Simplificação, Maxima's Database, Expressões, Top
 @chapter Simplificação
 @include Simplification.texi
 
-@node Montando Gráficos, Entrada e Saída, Simplificação, Top
+@node Maxima's Database, Montando Gráficos, Simplificação, Top
+@chapter Maxima's Database
+@include Database.texi
+
+@node Montando Gráficos, Entrada e Saída, Maxima's Database, Top
 @chapter Montando Gráficos
 @include Plotting.texi
 

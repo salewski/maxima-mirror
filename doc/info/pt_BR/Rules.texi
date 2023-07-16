@@ -29,6 +29,7 @@ e para álgebra comutativa e não comutativa no pacote @code{affine}.
 @section Funções e Variáveis Definidas para Regras e Modelos
 
 @c NEEDS CLARIFICATION AND EXAMPLES
+@anchor{apply1}
 @deffn {Função} apply1 (@var{expr}, @var{rule_1}, ..., @var{rule_n})
 Repetidamente aplica @var{rule_1} a
 @var{expr} até que isso falhe, então repetidamente aplica a mesma regra a todas
@@ -46,6 +47,7 @@ Veja também @code{applyb1}, @code{apply2}, e @code{let}.
 @end deffn
 
 @c NEEDS CLARIFICATION AND EXAMPLES
+@anchor{apply2}
 @deffn {Função} apply2 (@var{expr}, @var{rule_1}, ..., @var{rule_n})
 Se @var{rule_1} falhar sobre uma dada subexpressão, então @var{rule_2} é
 repetidamente aplicada, etc.  Somente se todas as regras falharem sobre uma dada
@@ -61,6 +63,7 @@ Veja também @code{apply1} e @code{let}.
 @end deffn
 
 @c NEEDS CLARIFICATION AND EXAMPLES
+@anchor{applyb1}
 @deffn {Função} applyb1 (@var{expr}, @var{rule_1}, ..., @var{rule_n})
 Repetidamente aplica @var{rule_1} para a subexpressão mais distante de @var{expr} até falhar,
 então repetidamente aplica a mesma regra um nível mais acima (i.e., subexpressãos mais larga),
@@ -79,6 +82,7 @@ Veja também @code{apply1}, @code{apply2}, e @code{let}.
 
 @end deffn
 
+@anchor{current_let_rule_package}
 @defvr {Variável de opção} current_let_rule_package
 Valor padrão: @code{default_let_rule_package}
 
@@ -94,6 +98,7 @@ e o valor de @code{current_let_rule_package} não é alterado.
 
 @end defvr
 
+@anchor{default_let_rule_package}
 @defvr {Variável de opção} default_let_rule_package
 @c DEFAULT BINDING OF default_let_rule_package IS default_let_rule_package (BOUND TO ITSELF)
 Valor padrão: @code{default_let_rule_package}
@@ -105,6 +110,7 @@ não for explicitamente escolhido pelo usuário com @code{let} ou através de al
 
 @end defvr
 
+@anchor{defmatch}
 @deffn {Função} defmatch (@var{prognome}, @var{modelo}, @var{x_1}, ..., @var{x_n})
 @deffnx {Função} defmatch (@var{prognome}, @var{modelo})
 Define uma função @code{@var{prognome}(@var{expr}, @var{x_1}, ..., @var{x_n})}
@@ -236,6 +242,7 @@ para ver se essa expressão é uma integral definida.
 @end deffn
 
 @c NEEDS CLARIFICATION AND EXAMPLES
+@anchor{defrule}
 @deffn {Função} defrule (@var{nomeregra}, @var{modelo}, @var{substituição})
 Define e nomeia uma
 regra de substituição para o modelo dado.  Se a regra nomeada @var{nomeregra} for
@@ -253,6 +260,7 @@ Se a coincidência falhar, a função da regra retorna @code{false}.
 @end deffn
 
 @c NEEDS EXAMPLES
+@anchor{disprule}
 @deffn {Função} disprule (@var{nomeregra_1}, ..., @var{nomeregra_2})
 @deffnx {Função} disprule (all)
 Mostra regras com os nomes @var{nomeregra_1}, ..., @var{nomeregra_n},
@@ -298,6 +306,7 @@ Examples:
 
 @end deffn
 
+@anchor{let}
 @deffn {Função} let (@var{prod}, @var{repl}, @var{prednome}, @var{arg_1}, ..., @var{arg_n})
 @deffnx {Função} let ([@var{prod}, @var{repl}, @var{prednome}, @var{arg_1}, ..., @var{arg_n}], @var{nome_pacote})
 Define uma regra de substituição para @code{letsimp} tal que @var{prod} é substituído por @var{repl}.
@@ -386,6 +395,7 @@ Se não especificado de outra forma,
 @c NEEDS ADDITIONAL EXAMPLES
 @end deffn
 
+@anchor{letrat}
 @defvr {Variável de opção} letrat
 Valor padrão: @code{false}
 
@@ -415,6 +425,7 @@ o numerador, o denominador, e seu quocienten são simplificados nessa ordem.
 @end defvr
 
 @c NEEDS EXAMPLES
+@anchor{letrules}
 @deffn {Função} letrules ()
 @deffnx {Função} letrules (@var{nome_pacote})
 Mostra as regras em um pacote de regras.
@@ -430,6 +441,7 @@ Veja também @code{disprule}, que mostra regras defindas por @code{tellsimp} e @
 
 @end deffn
 
+@anchor{letsimp}
 @deffn {Função} letsimp (@var{expr})
 @deffnx {Função} letsimp (@var{expr}, @var{nome_pacote})
 @deffnx {Função} letsimp (@var{expr}, @var{nome_pacote_1}, ..., @var{nome_pacote_n})
@@ -448,6 +460,7 @@ seguido por @code{letsimp (%, @var{nome_pacote_2})}, e assim sucessivamente.
 @c NEEDS EXAMPLES
 @end deffn
 
+@anchor{let_rule_packages}
 @defvr {Variável de opção} let_rule_packages
 Valor padrão: @code{[default_let_rule_package]}
 
@@ -456,6 +469,7 @@ mais o pacote padrão @code{default_let_rule_package}.
 
 @end defvr
 
+@anchor{matchdeclare}
 @deffn {Função} matchdeclare (@var{a_1}, @var{pred_1}, ..., @var{a_n}, @var{pred_n})
 Associa um predicado @var{pred_k} 
 com uma variável ou lista de variáveis @var{a_k}
@@ -661,137 +675,8 @@ As funções @code{propvars} e @code{printprops} retornam informações sobre va
 
 @end deffn
 
-@deffn {Função} matchfix (@var{delimitador_e}, @var{delimitador_d})
-@deffnx {Função} matchfix (@var{delimitador_e}, @var{delimitador_d}, @var{arg_pos}, @var{pos})
-Declara um operador @code{matchfix} com delimitadores esquerdo e direito @var{delimitador_e} e @var{delimitador_d}.
-Os delimitadores são especificados como seq@"{u}êcias de caracteres.
-
-Um operador "matchfix" é uma função que aceita qualquer número de argumentos,
-tal que os argumentos ocorram entre os delimitadores correspondentes esquerdo e direito.
-Os delimitadores podem ser quaisquer seq@"{u}êcias de caracteres, contanto que o analisador de expressões do Maxima possa
-disting@"{u}ir os delimitadores dos operandos 
-e de outras expressões e operadores.
-Na prática essas regras excluem delimitadores não analisáveis tais como
-@code{%}, @code{,}, @code{$} e @code{;}, 
-e pode ser necessário isolar os delimitadores com espaços em branco.
-O delimitador da direita pode ser o mesmo ou diferente do delimitador da esquerda.
-
-Um delimitador esquerdo pode ser associado com somente um delimitador direito;
-dois diferentes operadores @code{matchfix} não podem ter o mesmo delimitador esquerdo.
-
-Um operador existente pode ser redeclarado com um operador @code{matchfix}
-sem alterar suas outras propriedades.
-Particularmente, operadores internos tais como adição @code{+} podem
-ser declarados @code{matchfix},
-mas funções operadores não podem ser definidas para operadores internos.
-
-@code{matchfix (@var{delimitador_e}, @var{delimitador_d}, @var{arg_pos}, @var{pos})} 
-declara o argumento @var{arg_pos} como sendo um entre: expressão lógica,
-expressão comum do Maxima mas que não seja do tipo anterior, e qualquer outro
-tipo de expressão que não esteja incluída nos dois primeiros tipos.
-Essa declaração resulta em @var{pos} sendo um entre: expressão lógica,
-expressão comum do Maxima mas que não seja do tipo anterior, e qualquer outro
-tipo de expressão que não esteja incluída nos dois primeiros tipos 
-e os delimitadores @var{delimitador_e} e @var{delimitador_d}.
-
-@c DUNNO IF WE REALLY NEED TO MENTION BINDING POWER HERE -- AS NOTED IT'S IRRELEVANT
-@c An operator declared by @code{matchfix} is assigned a low binding power.
-@c Since a matchfix operator must be evaluated before any expression
-@c which contains it,
-@c binding power is effectively irrelevant
-@c to the declaration of a matchfix operator.
-
-A função para realizar uma operação @code{matchfix} é uma função
-comum definida pelo usuário.
-A função operador é definida
-da forma usual
-com o operador de definição de função @code{:=} ou @code{define}.
-Os argumentos podem ser escritos entre os delimitadores,
-ou com o delimitador esquerdo com uma seq@"{u}ência de caracteres com apóstrofo e os argumentos
-seguindo entre parêntesis.
-@code{dispfun (@var{delimitador_e})} mostra a definição da função operador.
-
-O único operador interno @code{matchfix} é o construtor de listas @code{[ ]}.
-Parêntesis @code{( )} e aspas duplas @code{" "} 
-atuam como operadores @code{matchfix},
-mas não são tratados como tal pelo analisador do Maxima.
-
-@code{matchfix} avalia seus argumentos.
-@code{matchfix} retorna seu primeiro argumento, @var{delimitador_e}.
-@c HOW TO TAKE AWAY THE MATCHFIX PROPERTY ??
-
-Exemplos:
-
-@itemize @bullet
-@item
-Delimitadores podem ser quase quaisquer seq@"{u}ência de caracteres.
-@end itemize
-@c ===beg===
-@c matchfix ("@@", "~");
-@c @@ a, b, c ~;
-@c matchfix (">>", "<<");
-@c >> a, b, c <<;
-@c matchfix ("foo", "oof");
-@c foo a, b, c oof;
-@c >> w + foo x, y oof + z << / @@ p, q ~;
-@c ===end===
-@example
-(%i1) matchfix ("@@@@", "~");
-(%o1)                          @@@@
-(%i2) @@@@ a, b, c ~;
-(%o2)                      @@@@a, b, c~
-(%i3) matchfix (">>", "<<");
-(%o3)                          >>
-(%i4) >> a, b, c <<;
-(%o4)                      >>a, b, c<<
-(%i5) matchfix ("foo", "oof");
-(%o5)                          foo
-(%i6) foo a, b, c oof;
-(%o6)                     fooa, b, coof
-(%i7) >> w + foo x, y oof + z << / @@@@ p, q ~;
-                     >>z + foox, yoof + w<<
-(%o7)                ----------------------
-                            @@@@p, q~
-@end example
-
-@itemize @bullet
-@item
-Operadores @code{matchfix} são funções comuns definidas pelo usuário.
-@end itemize
-@example
-(%i1) matchfix ("!-", "-!");
-(%o1)                         "!-"
-(%i2) !- x, y -! := x/y - y/x;
-                                    x   y
-(%o2)                   !-x, y-! := - - -
-                                    y   x
-(%i3) define (!-x, y-!, x/y - y/x);
-                                    x   y
-(%o3)                   !-x, y-! := - - -
-                                    y   x
-(%i4) define ("!-" (x, y), x/y - y/x);
-                                    x   y
-(%o4)                   !-x, y-! := - - -
-                                    y   x
-(%i5) dispfun ("!-");
-                                    x   y
-(%t5)                   !-x, y-! := - - -
-                                    y   x
-
-(%o5)                         done
-(%i6) !-3, 5-!;
-                                16
-(%o6)                         - --
-                                15
-(%i7) "!-" (3, 5);
-                                16
-(%o7)                         - --
-                                15
-@end example
-
-@end deffn
-
 @c NEEDS CLARIFICATION AND EXAMPLES
+@anchor{remlet}
 @deffn {Função} remlet (@var{prod}, @var{nome})
 @deffnx {Função} remlet ()
 @deffnx {Função} remlet (all)
@@ -814,6 +699,7 @@ Veja também @code{remrule}, que remove uma regra definida através de @code{tel
 
 @end deffn
 
+@anchor{remrule}
 @deffn {Função} remrule (@var{op}, @var{nomeregra})
 @deffnx {Função} remrule (@var{op}, all)
 Remove regras definidas por @code{tellsimp}, ou @code{tellsimpafter}.
@@ -881,6 +767,7 @@ Examples:
 @end deffn
 
 @c NEEDS EXPANSION OR MAYBE JUST APPROPRIATE REFS TO tellsimpafter
+@anchor{tellsimp}
 @deffn {Função} tellsimp (@var{pattern}, @var{replacement})
 é similar a @code{tellsimpafter} mas coloca
 nova informação antes da antiga de forma que essa nova regra seja aplicada antes das regras
@@ -945,6 +832,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{tellsimpafter}
 @deffn {Função} tellsimpafter (@var{modelo}, @var{substituição})
 Define a uma regra de simplificação que o simplificador do Maxima
 aplica após as regras de simplificação internas.
@@ -1214,6 +1102,7 @@ Um exemplo trabalhado: multiplicação anticomutativa.
 
 @end deffn
 
+@anchor{clear_rules}
 @deffn {Função} clear_rules ()
 Executa @code{kill (rules)} e então re-escolhe o próximo número de regra para 1
 para adição @code{+}, multiplicação @code{*}, e exponenciação @code{^}.

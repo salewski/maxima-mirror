@@ -3,19 +3,19 @@
 @c 7c21c62201e67b87f01e60715413bfaf  Database.texi
 @c
 @menu
-* Introduction to Maximas Database::
+* Introduction to Maxima's Database::
 * Functions and Variables for Properties::
 * Functions and Variables for Facts::
 * Functions and Variables for Predicates::
 @end menu
 
 @c -----------------------------------------------------------------------------
-@node Introduction to Maximas Database, Functions and Variables for Properties, Maximas Database, Maximas Database
-@section Introduction to Maximas Database
+@node Introduction to Maxima's Database, Functions and Variables for Properties, Maxima's Database, Maxima's Database
+@section Introduction to Maxima's Database
 @c -----------------------------------------------------------------------------
 
 @c -----------------------------------------------------------------------------
-@node Functions and Variables for Properties, Functions and Variables for Facts, Introduction to Maximas Database, Maximas Database
+@node Functions and Variables for Properties, Functions and Variables for Facts, Introduction to Maxima's Database, Maxima's Database
 @section Functions and Variables for Properties
 @c -----------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ A propriedade @code{alphabetic} @'{e} um tipo de propriedade reconhecido por @mr
 A express@~{a}o @code{declare(@var{s}, alphabetic)} diz ao Maxima para reconhecer
 como alfab@'{e}ticos tos os caracteres em @var{s}, que deve ser uma sequ@^{e}ncia de caracteres.
 
-Veja tamb@'{e}m @ref{Identifiers}.
+Veja tamb@'{e}m @ref{Identificadores}.
 
 Exemplo:
 
@@ -48,9 +48,9 @@ Exemplo:
 (%o4)                  [@@yy`xx, `xx@@@@yy~]
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -109,9 +109,9 @@ Exemplo:
 (%o4)                         false
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias} @category{Constantes}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias} @category{Constantes}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -161,9 +161,9 @@ Exemplos:
 (%i8) 
 @end example
 
-@opencatbox
-@category{Fun@,{c}@~{o}es predicado} @category{Constantes}
-@closecatbox
+@c @opencatbox
+@c @category{Fun@,{c}@~{o}es predicado} @category{Constantes}
+@c @closecatbox
 @end deffn
 
 @c NEEDS EXPANSION, CLARIFICATION, AND EXAMPLES
@@ -321,9 +321,9 @@ Diz ao Maxima para considerar @var{a_i} uma vari@'{a}vel escalar.
 Exemplos de usodas propriedades est@~{a}o dispon@'{i}veis nadocumenta@,{c}@~{a}o
 de cada descri@,{c}@~{a}o separada de uma propriedade.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -351,9 +351,9 @@ Exemplo:
 (%o4)                         true
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -382,9 +382,9 @@ Exemplo:
 (%o4)                         false
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c NEEDS EXPANSION AND CLARIFICATION
@@ -427,9 +427,9 @@ Veja tamb@'{e}m @mref{declare} e @mrefdot{features}
 (%o2)                           true
 @end example
 
-@opencatbox
-@category{Fun@,{c}@~{o}es predicado} @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Fun@,{c}@~{o}es predicado} @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -485,9 +485,9 @@ Exemplo:
 (%o3)                         true
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -536,9 +536,9 @@ x is not numeric.
 (%o6)     [transcendental, [algebraic, transcendental]]
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -563,9 +563,9 @@ Exemplo:
 (%o3)                          no
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -590,9 +590,9 @@ Exemplo:
 (%o3)                       %e
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -626,9 +626,9 @@ Exemplo:
                                 x
 @end example
 
-@opencatbox
-@category{Express@~{o}es}
-@closecatbox
+@c @opencatbox
+@c @category{Express@~{o}es}
+@c @closecatbox
 @end deffn
 
 @c NEEDS CLARIFICATION AND EXAMPLES
@@ -641,9 +641,9 @@ Faz com que @'{a}tomos comportem-se como se faz com uma lista ou uma matriz com 
 
 Veja tamb@'{e}m @mrefdot{declare}
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias} @category{Vectors} @category{Matrices}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias} @category{Vectors} @category{Matrices}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -655,9 +655,9 @@ Retorna @code{true} se @var{expr} for um n@~{a}o escalar, i.e., se contiver
 
 Veja tamb@'{e}m a fun@,{c}@~{a}o de predicado @mref{scalarp} e @mrefdot{declare}
 
-@opencatbox
-@category{Fun@,{c}@~{o}es predicado} @category{Vectors} @category{Matrices}
-@closecatbox
+@c @opencatbox
+@c @category{Fun@,{c}@~{o}es predicado} @category{Vectors} @category{Matrices}
+@c @closecatbox
 @end deffn
 
 @c NEEDS EXAMPLES
@@ -671,9 +671,9 @@ O comando @code{is (f(x) > 0)} retorna @code{true}.
 
 Veja tamb@'{e}m @mrefdot{declare}
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias} @category{Operadores}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias} @category{Operadores}
+@c @closecatbox
 @end defvr
 
 @c NEEDS WORK ESPECIALLY EXAMPLES
@@ -692,9 +692,9 @@ todos os @'{a}tomos com a dada propriedade ir@~{a}o ser usados.  Por exemplo,
 n@~{a}o puderem ser mostradas de outra forma, i.e.  para @mrefcomma{atvalue}@w{}
 @mrefcomma{atomgrad} @mrefcomma{gradef} e @mrefdot{matchdeclare}
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias} @category{Fun@,{c}@~{o}es de exibi@,{c}@~{a}o}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias} @category{Fun@,{c}@~{o}es de exibi@,{c}@~{a}o}
+@c @closecatbox
 @end deffn
 
 @c CROSS REF TO WHICH FUNCTION OR FUNCTIONS ESTABLISH PROPERTIES !! (VERY IMPORTANT)
@@ -707,9 +707,9 @@ n@~{a}o puderem ser mostradas de outra forma, i.e.  para @mrefcomma{atvalue}@w{}
 Retorna uma lista de nomes de todas as propriedades associadas ao @'{a}tomo
 @var{a}.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c CROSS REF TO WHICH FUNCTION OR FUNCTIONS ESTABLISH PROPERTIES !! (VERY IMPORTANT)
@@ -726,9 +726,9 @@ mencionadas em @mrefcomma{infolists} tais como as especificadas atrav@'{e}s de @
 @mrefcomma{matchdeclare} etc., bem como propriedades especificadas na
 fun@,{c}@~{a}o @mref{declare}.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias} @category{Vari@'{a}veis globais}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias} @category{Vari@'{a}veis globais}
+@c @closecatbox
 @end defvr
 
 @c CROSS REF TO WHICH FUNCTION OR FUNCTIONS ESTABLISH PROPERTIES !! (VERY IMPORTANT)
@@ -742,9 +742,9 @@ Retorna uma lista daqueles @'{a}tomos na lista @mref{props} que
 possuem a propriedade indicada por @var{prop}.  Dessa forma @code{propvars (atvalue)}
 retorna uma lista de @'{a}tomos que possuem atvalues.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c CROSS REF TO OTHER FUNCTIONS WHICH PUT/GET PROPERTIES !! (VERY IMPORTANT)
@@ -784,9 +784,9 @@ Exemplos:
 (%o5)                         Hello
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -819,9 +819,9 @@ Exemplo:
 (%o9)                          bar
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -835,9 +835,9 @@ Maxima para reconhecer @var{a} como uma vari@'{a}vel real racional ou irracional
 
 Veja tamb@'{e}m @mrefdot{declare}
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -854,9 +854,9 @@ uma vari@'{a}vel imagin@'{a}ria pura, ou uma vari@'{a}vel complexa.
 
 Veja tamb@'{e}m @mrefdot{declare}
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c CROSS REF TO OTHER FUNCTIONS WHICH PUT/GET PROPERTIES !! (VERY IMPORTANT)
@@ -874,9 +874,9 @@ A fun@,{c}@~{a}o @code{rem} reverte o efeito de @mrefdot{put}
 A fun@,{c}@~{a}o @code{rem} retorna @code{done} se @var{atom} tiver a propriedade @var{indicador}
 quando @code{rem} for chamada, ou @code{false} se o @var{atom} n@~{a}o tiver tal propriedade.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c CROSS REF TO OTHER FUNCTIONS WHICH PUT/GET PROPERTIES !! (VERY IMPORTANT)
@@ -933,9 +933,9 @@ especificada.  Esse comportamento @'{e} diferente das fun@,{c}@~{o}es de remo@,{
 A fun@,{c}@~{a}o @code{remove} n@~{a}o avalia seus argumentos (coloca ap@'{o}strofo inicial).
 
 @c IN SERIOUS NEED OF EXAMPLES HERE
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -947,9 +947,9 @@ escalar.
 
 Veja tamb@'{e}m @mrefdot{declare}
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c NEEDS CLARIFICATION AND EXAMPLES
@@ -964,13 +964,13 @@ constantes, e vari@'{a}veis escalares, mas n@~{a}o contendo matrizes ou listas.
 
 Veja tamb@'{e}m fun@,{c}@~{a}o predicado @mrefdot{nonscalarp}
 
-@opencatbox
-@category{Fun@,{c}@~{o}es predicado} @category{Vectors} @category{Matrices}
-@closecatbox
+@c @opencatbox
+@c @category{Fun@,{c}@~{o}es predicado} @category{Vectors} @category{Matrices}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
-@node Functions and Variables for Facts, Functions and Variables for Predicates, Functions and Variables for Properties, Maximas Database
+@node Functions and Variables for Facts, Functions and Variables for Predicates, Functions and Variables for Properties, Maxima's Database
 @section Functions and Variables for Facts
 @c -----------------------------------------------------------------------------
 
@@ -986,9 +986,9 @@ Os fatos nesses contextos n@~{a}o s@~{a}o listados por @code{facts ()}.
 A vari@'{a}vel @mref{activecontexts} @'{e} a lista
 de contextos que est@'{a} ativa por meio da fun@,{c}@~{a}o @code{activate}.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1000,9 +1000,9 @@ A vari@'{a}vel de sistema @code{activecontexts} @'{e} uma lista de contextos que
 por meio da fun@,{c}@~{a}o @mref{activate}, em oposi@,{c}@~{a}o aos que est@~{a}o ativos por
 serem subcontextos do contexto atual.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c THERE IS PROBABLY MORE TO THE STORY THAN WHAT IS INDICATED HERE ...
@@ -1027,9 +1027,9 @@ Os comandos @code{askinteger (@var{expr}, even)} e @code{askinteger (@var{expr},
 da mesma forma tentam determinar se @var{expr} @'{e} um inteiro par ou um inteiro @'{i}mpar,
 respectivamente.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c THERE IS PROBABLY MORE TO THE STORY THAN WHAT IS INDICATED HERE ...
@@ -1045,9 +1045,9 @@ do usu@'{a}rio s@~{a}o gravadas na base de dados enquanto durar o
 c@'{a}lculo atual.  O valor de retorna de @code{asksign} @'{e} um entre @code{pos},
 @code{neg}, ou @code{zero}.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1123,9 +1123,9 @@ Exemplos:
 (%o10)                       unknown
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1153,9 +1153,9 @@ express@~{o}es ir@~{a}o comportar-se como n@~{a}o escalares.
 Quando @code{assumescalar} for @code{all}, tais express@~{o}es ir@~{a}o comportar-se como
 escalares para todos os operadores listados acima.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -1190,9 +1190,9 @@ mesmo quando @code{assume_pos} for @code{true} e @code{assume_pos_pred} for
 uma fun@,{c}@~{a}o que retorna @code{true} para todos os argumentos.
 
 @c NEED EXAMPLES HERE
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -1281,9 +1281,9 @@ p;
 (%o11)                         neg
 @end example
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -1303,9 +1303,9 @@ O contexto especificado @'{e} ativado automaticamente.
 
 Veja @mref{contexts} para uma descri@,{c}@~{a}o geral do mecanismo de contexto.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c UMM, I'M HAVING TROUBLE GETTING THE CONTEXT-SWITCHING STUFF TO BEHAVE AS EXPECTED
@@ -1343,9 +1343,9 @@ Veja tamb@'{e}m @mrefcomma{facts} @mrefcomma{newcontext} @mrefcomma{supcontext}@
 @mrefcomma{killcontext} @mrefcomma{activate} @mrefcomma{deactivate}@w{}
 @mrefcomma{assume} e @mrefdot{forget}
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -1354,9 +1354,9 @@ Veja tamb@'{e}m @mrefcomma{facts} @mrefcomma{newcontext} @mrefcomma{supcontext}@
 
 Desativa os contextos especificados @var{context_1}, @dots{}, @var{context_n}.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1373,9 +1373,9 @@ est@~{a}o ativos, mas em um contexto diferente, n@~{a}o s@~{a}o listados.
 
 O comando @code{facts ()} (i.e., sem argumentos) lista o contexto atual.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1390,9 +1390,9 @@ a) outros previamente assumidos.
 O comando @code{forget (@var{L})}, onde @var{L} @'{e} uma lista de predicados,
 esquece cada item na lista.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1473,9 +1473,9 @@ a > 0
 (%o5)                        unknown
 @end example
 
-@opencatbox
-@category{Fun@,{c}@~{o}es predicado} @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Fun@,{c}@~{o}es predicado} @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1497,9 +1497,9 @@ atual, ou pelo uso da fun@,{c}@~{a}o @mrefdot{activate}
 A fun@,{c}@~{a}o @code{killcontext} avalia seus argumentos.
 A fun@,{c}@~{a}o @code{killcontext} retorna @code{done}.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1535,9 +1535,9 @@ Exemplos:
 (%o3)                         true
 @end example
 
-@opencatbox
-@category{Fun@,{c}@~{o}es predicado} @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Fun@,{c}@~{o}es predicado} @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1551,9 +1551,9 @@ torna-se o contexto ativo atual.
 A fun@,{c}@~{a}o @code{newcontext} avalia seus argumentos.
 A fun@,{c}@~{a}o @code{newcontext} retorna @var{nome}.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1566,9 +1566,9 @@ base de dados atual.  Retorna uma das seguintes respostas: @code{pos}
 @code{nz} (negativo ou zero), @code{pn} (positivo ou negativo), ou @code{pnz}
 (positivo, negativo, ou zero, i.e. nada se pode afirmar).
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1581,13 +1581,13 @@ subcontexto.  O @var{ctxto} deve existir.
 
 Se @var{ctxto} n@~{a}o for especificado, o contexto atual @'{e} usado.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
-@node Functions and Variables for Predicates, , Functions and Variables for Facts, Maximas Database
+@node Functions and Variables for Predicates, , Functions and Variables for Facts, Maxima's Database
 @section Functions and Variables for Predicates
 @c -----------------------------------------------------------------------------
 
@@ -1617,9 +1617,9 @@ Exemplos:
 (%o4)                       [0, 1, 0]
 @end example
 
-@opencatbox
-@category{Fun@,{c}@~{o}es matem@'{a}ticas}
-@closecatbox
+@c @opencatbox
+@c @category{Fun@,{c}@~{o}es matem@'{a}ticas}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1671,9 +1671,9 @@ seus argumentos possuem um ou mais elementos; dessa forma
 @c IT IS NOT QUITE TRUE, WHAT ABOUT x=0 ?
 O dom@'{i}nio real de @code{acos (x^2 + 1)} @'{e} vazio.
 
-@opencatbox
-@category{Declara@,{c}@~{o}es e infer@^{e}ncias}
-@closecatbox
+@c @opencatbox
+@c @category{Declara@,{c}@~{o}es e infer@^{e}ncias}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1829,9 +1829,9 @@ Devido a @code{not @var{expr}} fazer com que ocorra avalia@,{c}@~{a}o de @var{ex
 (%o2)                         true
 @end example
 
-@opencatbox
-@category{Operadores}
-@closecatbox
+@c @opencatbox
+@c @category{Operadores}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1877,9 +1877,9 @@ Exemplos:
 (%o10)                        true
 @end example
 
-@opencatbox
-@category{Operadores}
-@closecatbox
+@c @opencatbox
+@c @category{Operadores}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -1889,9 +1889,9 @@ Exemplos:
 Retorna @code{true} se e somente se @var{expr} contiver um operador ou fun@,{c}@~{a}o
 n@~{a}o reconhecida pelo simplificador do Maxima.
 
-@opencatbox
-@category{Fun@,{c}@~{o}es predicado} @category{Simplification functions}
-@closecatbox
+@c @opencatbox
+@c @category{Fun@,{c}@~{o}es predicado} @category{Simplification functions}
+@c @closecatbox
 @end deffn
 
 @c THIS FUNCTION APPEARS TO BE A HACK; SEE 4'TH ITEM BELOW
@@ -1927,8 +1927,8 @@ Por exemplo @code{zeroequiv (sin(2 * x) - 2 * sin(x) * cos(x), x)} retorna
 Por outro lado @code{zeroequiv (log(a * b) - log(a) - log(b), a)} retorna 
 @code{dontknow} devido @`{a} presen@,{c}a de um par@^{a}metro extra @code{b}.
 
-@opencatbox
-@category{Fun@,{c}@~{o}es predicado}
-@closecatbox
+@c @opencatbox
+@c @category{Fun@,{c}@~{o}es predicado}
+@c @closecatbox
 @end deffn
 

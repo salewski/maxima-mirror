@@ -32,6 +32,7 @@ Veja @code{Funções e Variáveis Definidas para Séries}.
 @c in this file. Otherwise DESCRIBE returns the FFT text (because
 @c POLARTORECT, etc are list in the heading of FFT with @defunx).
 
+@anchor{polartorect}
 @deffn {Função} polartorect (@var{magnitude_array}, @var{phase_array})
 
 Traduz valores complexos da forma @code{r %e^(%i t)} para a forma @code{a + b %i}.
@@ -54,6 +55,7 @@ O tamanho do array não deve ser uma potência de 2.
 
 @end deffn
 
+@anchor{recttopolar}
 @deffn {Função} recttopolar (@var{real_array}, @var{imaginary_array})
 
 Traduz valores complexos da forma @code{a + b %i} para a forma @code{r %e^(%i t)}.
@@ -78,6 +80,7 @@ O tamanho do array não deve ser uma potência de 2.
 
 @end deffn
 
+@anchor{ift}
 @deffn {Função} ift (@var{real_array}, @var{imaginary_array})
 
 Transformação rápida inversa discreta de Fourier . @code{load ("fft")} chama essa função
@@ -94,6 +97,7 @@ Veja @code{fft} para maiores detalhes.
 
 @end deffn
 
+@anchor{fft}
 @deffn {Função} fft (@var{real_array}, @var{imaginary_array})
 @deffnx {Função} ift (@var{real_array}, @var{imaginary_array})
 @deffnx {Função} recttopolar (@var{real_array}, @var{imaginary_array})
@@ -168,6 +172,7 @@ para a forma @code{a + b %i}. Veja @code{polartorect}.
 
 @end deffn
 
+@anchor{fortindent}
 @defvr {Variável de opção} fortindent
 Valor padrão: 0
 
@@ -178,6 +183,7 @@ expressões sejam mostrados mais além para a direita.
 
 @end defvr
 
+@anchor{fortran}
 @deffn {Função} fortran (@var{expr})
 Mostra @var{expr} como uma declaração Fortran.
 A linha de saída é indentada com espaços.
@@ -234,6 +240,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{fortspaces}
 @defvr {Variável de opção} fortspaces
 Valor padrão: @code{false}
 
@@ -242,6 +249,7 @@ cada linha mostrada com espaços em branco até completar 80 columas.
 
 @end defvr
 
+@anchor{horner}
 @deffn {Função} horner (@var{expr}, @var{x})
 @deffnx {Função} horner (@var{expr})
 Retorna uma representação rearranjada de @var{expr} como
@@ -273,6 +281,7 @@ To reenable the Lisp debugger set *debugger-hook* to nil.
 @end deffn
 
 @c NEEDS WORK
+@anchor{find_root}
 @deffn {Função} find_root (@var{f}(@var{x}), @var{x}, @var{a}, @var{b})
 @deffnx {Função} find_root (@var{f}, @var{a}, @var{b})
 Encontra a raíz da função @var{f} com a variável @var{x} percorrendo o intervalo @code{[@var{a}, @var{b}]}.
@@ -340,6 +349,7 @@ Examples:
 
 @end deffn
 
+@anchor{find_root_abs}
 @defvr {Variável de opção} find_root_abs
 Valor padrão: 0.0
 
@@ -354,6 +364,7 @@ com a precisão aritmética simples que tivermos.
 
 @end defvr
 
+@anchor{find_root_error}
 @defvr {Variável de opção} find_root_error
 Valor padrão: @code{true}
 
@@ -369,6 +380,7 @@ pode ser escolhida para 0.0.
 
 @end defvr
 
+@anchor{find_root_rel}
 @defvr {Variável de opção} find_root_rel
 Valor padrão: 0.0
 
@@ -383,6 +395,7 @@ com a precisão aritmética simples que tivermos.
 
 @end defvr
 
+@anchor{newton}
 @deffn {Função} newton (@var{expr}, @var{x}, @var{x_0}, @var{eps})
 Retorna uma solução aproximada de @code{@var{expr} = 0} através do método de Newton,
 considerando @var{expr} como sendo uma função de uma variável, @var{x}.
@@ -431,6 +444,7 @@ Exemplos:
 @section Funções e Variáveis Definidas para Séries de Fourier
 
 @c REPHRASE
+@anchor{equalp}
 @deffn {Função} equalp (@var{x}, @var{y})
 Retorna @code{true} se @code{equal (@var{x}, @var{y})} de outra forma @code{false} (não fornece uma
 mensagem de erro como @code{equal (x, y)} poderia fazer nesse caso).
@@ -438,6 +452,7 @@ mensagem de erro como @code{equal (x, y)} poderia fazer nesse caso).
 @c NEEDS EXAMPLES
 @end deffn
 
+@anchor{remfun}
 @deffn {Função} remfun (@var{f}, @var{expr})
 @deffnx {Função} remfun (@var{f}, @var{expr}, @var{x})
 @code{remfun (@var{f}, @var{expr})}
@@ -450,6 +465,7 @@ somente se @var{arg} contiver a variável @var{x}.
 @c NEEDS EXAMPLES
 @end deffn
 
+@anchor{funp}
 @deffn {Função} funp (@var{f}, @var{expr})
 @deffnx {Função} funp (@var{f}, @var{expr}, @var{x})
 @code{funp (@var{f}, @var{expr})}
@@ -462,6 +478,7 @@ retorna @code{true} se @var{expr} contém a função @var{f} e a variável
 @c NEEDS EXAMPLES
 @end deffn
 
+@anchor{absint}
 @deffn {Função} absint (@var{f}, @var{x}, @var{halfplane})
 @deffnx {Função} absint (@var{f}, @var{x})
 @deffnx {Função} absint (@var{f}, @var{x}, @var{a}, @var{b})
@@ -482,6 +499,7 @@ retorna a integral definida de @var{f} com relação a @var{x} de @var{a} até @
 @end deffn
 
 @c NEEDS EXPANSION
+@anchor{fourier}
 @deffn {Função} fourier (@var{f}, @var{x}, @var{p})
 Retorna uma lista de coeficientes de Fourier de @code{@var{f}(@var{x})} definidos
 sobre o intervalo @code{[-p, p]}.
@@ -490,6 +508,7 @@ sobre o intervalo @code{[-p, p]}.
 @end deffn
 
 @c NEES EXPANSION. WHAT IS THE ARGUMENT l ??
+@anchor{foursimp}
 @deffn {Função} foursimp (@var{l})
 Simplifica @code{sin (n %pi)} para 0 se @code{sinnpiflag} for @code{true} e
 @code{cos (n %pi)} para @code{(-1)^n} se @code{cosnpiflag} for @code{true}.
@@ -497,6 +516,7 @@ Simplifica @code{sin (n %pi)} para 0 se @code{sinnpiflag} for @code{true} e
 @c NEEDS EXAMPLES
 @end deffn
 
+@anchor{sinnpiflag}
 @defvr {Variável de opção} sinnpiflag
 Valor padrão: @code{true}
 
@@ -504,6 +524,7 @@ Veja @code{foursimp}.
 
 @end defvr
 
+@anchor{cosnpiflag}
 @defvr {Variável de opção} cosnpiflag
 Valor padrão: @code{true}
 
@@ -512,6 +533,7 @@ Veja @code{foursimp}.
 @end defvr
 
 @c NEEDS EXPANSION. EXPLAIN x AND p HERE (DO NOT REFER SOMEWHERE ELSE)
+@anchor{fourexpand}
 @deffn {Função} fourexpand (@var{l}, @var{x}, @var{p}, @var{limit})
 Constrói e retorna a série de Fourier partindo da lista de
 coeficientes de Fourier @var{l} até (up through) @var{limit} termos (@var{limit}
@@ -522,6 +544,7 @@ pode ser @code{inf}). @var{x} e @var{p} possuem o mesmo significado que em
 @end deffn
 
 @c NEEDS EXPANSION. WHAT IS THE ARGUMENT p ??
+@anchor{fourcos}
 @deffn {Função} fourcos (@var{f}, @var{x}, @var{p})
 Retorna os coeficientes do cosseno de Fourier para @code{@var{f}(@var{x})} definida sobre @code{[0, %pi]}.
 
@@ -529,6 +552,7 @@ Retorna os coeficientes do cosseno de Fourier para @code{@var{f}(@var{x})} defin
 @end deffn
 
 @c NEEDS EXPANSION
+@anchor{foursin}
 @deffn {Função} foursin (@var{f}, @var{x}, @var{p})
 Retorna os coeficientes do seno de Fourier para @code{@var{f}(@var{x})} definida sobre @code{[0, @var{p}]}.
 
@@ -536,6 +560,7 @@ Retorna os coeficientes do seno de Fourier para @code{@var{f}(@var{x})} definida
 @end deffn
 
 @c NEEDS EXPANSION
+@anchor{totalfourier}
 @deffn {Função} totalfourier (@var{f}, @var{x}, @var{p})
 Retorna @code{fourexpand (foursimp (fourier (@var{f}, @var{x}, @var{p})), @var{x}, @var{p}, 'inf)}.
 
@@ -543,6 +568,7 @@ Retorna @code{fourexpand (foursimp (fourier (@var{f}, @var{x}, @var{p})), @var{x
 @end deffn
 
 @c NEEDS EXPANSION
+@anchor{fourint}
 @deffn {Função} fourint (@var{f}, @var{x})
 Constrói e retorna uma lista de coeficientes de integral de Fourier de @code{@var{f}(@var{x})}
 definida sobre @code{[minf, inf]}.
@@ -551,6 +577,7 @@ definida sobre @code{[minf, inf]}.
 @end deffn
 
 @c NEEDS EXPANSION
+@anchor{fourintcos}
 @deffn {Função} fourintcos (@var{f}, @var{x})
 Retorna os coeficientes da integral do cosseno de Fourier para @code{@var{f}(@var{x})} on @code{[0, inf]}.
 
@@ -558,6 +585,7 @@ Retorna os coeficientes da integral do cosseno de Fourier para @code{@var{f}(@va
 @end deffn
 
 @c NEEDS EXPANSION
+@anchor{fourintsin}
 @deffn {Função} fourintsin (@var{f}, @var{x})
 Retorna os coeficientes da integral do seno de Fourier para @code{@var{f}(@var{x})} on @code{[0, inf]}.
 

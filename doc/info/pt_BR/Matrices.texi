@@ -90,24 +90,28 @@ e @code{similaritytransform}.
 @node Funções e Variáveis Definidas para Matrizes e Álgebra Linear,  , Introdução a Matrizes e Álgebra Linear, Matrizes e Álgebra Linear
 @section Funções e Variáveis Definidas para Matrizes e Álgebra Linear
 
+@anchor{addcol}
 @deffn {Função} addcol (@var{M}, @var{list_1}, ..., @var{list_n})
 Anexa a(s) coluna(s) dadas por uma
 ou mais listas (ou matrizes) sobre a matriz @var{M}.
 
 @end deffn
 
+@anchor{addrow}
 @deffn {Função} addrow (@var{M}, @var{list_1}, ..., @var{list_n})
 Anexa a(s) linha(s) dadas por uma ou
 mais listas (ou matrizes) sobre a matriz @var{M}.
 
 @end deffn
 
+@anchor{adjoint}
 @deffn {Função} adjoint (@var{M})
 Retorna a matriz adjunta da matriz @var{M}.
 A matriz adjunta é a transposta da matriz dos cofatores de @var{M}.
 
 @end deffn
 
+@anchor{augcoefmatrix}
 @deffn {Função} augcoefmatrix ([@var{eqn_1}, ..., @var{eqn_m}], [@var{x_1}, ..., @var{x_n}])
 Retorna a matriz dos coeficientes
 aumentada para as variáveis @var{x_1}, ..., @var{x_n} do sistema de equações lineares
@@ -125,6 +129,7 @@ os termos independentes em cada equação (i.e., esses termos não dependem de
 
 @end deffn
 
+@anchor{charpoly}
 @deffn {Função} charpoly (@var{M}, @var{x})
 Retorna um polinômio característico para a matriz @var{M}
 em relação à variável @var{x}.  Que é,
@@ -165,6 +170,7 @@ em relação à variável @var{x}.  Que é,
 
 @end deffn
 
+@anchor{coefmatrix}
 @deffn {Função} coefmatrix ([@var{eqn_1}, ..., @var{eqn_m}], [@var{x_1}, ..., @var{x_n}])
 Retorna a matriz dos coeficientes para as
 variáveis @var{x_1}, ..., @var{x_n} do sistema de equações lineares
@@ -179,6 +185,7 @@ variáveis @var{x_1}, ..., @var{x_n} do sistema de equações lineares
 
 @end deffn
 
+@anchor{col}
 @deffn {Função} col (@var{M}, @var{i})
 Reorna a @var{i}'ésima coluna da matriz @var{M}.
 O valor de retorno é uma matriz.
@@ -186,6 +193,7 @@ O valor de retorno é uma matriz.
 
 @end deffn
 
+@anchor{columnvector}
 @deffn {Função} columnvector (@var{L})
 @deffnx {Função} covect (@var{L})
 Retorna uma matriz de uma coluna e @code{length (@var{L})} linhas,
@@ -219,6 +227,7 @@ Warning - you are redefining the Macsyma function autovetores
 
 @end deffn
 
+@anchor{conjugate}
 @deffn {Função} conjugate (@var{x})
 Retorna o conjugado complexo de @var{x}.
 
@@ -249,6 +258,7 @@ Retorna o conjugado complexo de @var{x}.
 
 @end deffn
 
+@anchor{copymatrix}
 @deffn {Função} copymatrix (@var{M})
 Retorna uma cópia da matriz @var{M}.  Esse é o único
 para fazer uma copia separada copiando @var{M} elemento a elemento.
@@ -261,6 +271,7 @@ criando uma cópia com @code{copymatrix} e então usando atribução cria uma se
 @c NEED EXAMPLE HERE
 @end deffn
 
+@anchor{determinant}
 @deffn {Função} determinant (@var{M})
 Calcula o determinante de @var{M} por um método similar à
 eliminação de Gauss.
@@ -277,6 +288,7 @@ determinantes esparsos que é chamada quando os comutadores
 @c EXAMPLES NEEDED HERE
 @end deffn
 
+@anchor{detout}
 @defvr {Variável} detout
 Valor padrão: @code{false}
 
@@ -309,6 +321,7 @@ Exemplo:
 
 @end defvr
 
+@anchor{diagmatrix}
 @deffn {Função} diagmatrix (@var{n}, @var{x})
 Retorna uma matriz diagonal de tamanho @var{n} por @var{n} com os
 elementos da diagonal todos iguais a @var{x}.
@@ -322,6 +335,7 @@ Se @var{x} é uma matriz, isso não é copiado; todos os elementos da diagonal r
 @c NEED EXAMPLE HERE
 @end deffn
 
+@anchor{doallmxops}
 @defvr {Variável} doallmxops
 Valor padrão: @code{true}
 
@@ -334,6 +348,7 @@ comutadores individuais @code{dot} governam quais operações são executadas.
 @c NEED EXAMPLES HERE
 @end defvr
 
+@anchor{domxexpt}
 @defvr {Variável} domxexpt
 Valor padrão: @code{true}
 
@@ -371,6 +386,7 @@ Exemplo:
 
 @end defvr
 
+@anchor{domxmxops}
 @defvr {Variável de opção} domxmxops
 Valor padrão: @code{true}
 
@@ -382,6 +398,7 @@ escalar-matriz); se esse comutador é @code{false} tais operações não são.
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{domxnctimes}
 @defvr {Variável de opção} domxnctimes
 Valor padrão: @code{false}
 
@@ -392,6 +409,7 @@ matrizes são realizados.
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{dontfactor}
 @defvr {Variável de opção} dontfactor
 Valor padrão: @code{[]}
 
@@ -403,6 +421,7 @@ que essas na lista @code{dontfactor}.
 
 @end defvr
 
+@anchor{doscmxops}
 @defvr {Variável de opção} doscmxops
 Valor padrão: @code{false}
 
@@ -413,6 +432,7 @@ realizadas.
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{doscmxplus}
 @defvr {Variável de opção} doscmxplus
 Valor padrão: @code{false}
 
@@ -423,6 +443,7 @@ uma matriz resultado.  Esse comutador não é subsomado sob @code{doallmxops}.
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{dot0nscsimp}
 @defvr {Variável de opção} dot0nscsimp
 Valor padrão: @code{true}
 
@@ -433,6 +454,7 @@ e um termo não escalar é simplificado para um produto comutativo.
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{dot0simp}
 @defvr {Variável de opção} dot0simp
 Valor padrão: @code{true}
 
@@ -444,6 +466,7 @@ um termo escalar é simplificado para um produto não comutativo.
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{dot1simp}
 @defvr {Variável de opção} dot1simp
 Valor padrão: @code{true}
 
@@ -455,6 +478,7 @@ outro termo é simplificado para um produto comutativo.
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{dotassoc}
 @defvr {Variável de opção} dotassoc
 Valor padrão: @code{true}
 
@@ -465,6 +489,7 @@ Quando @code{dotassoc} é @code{true}, uma expresão @code{(A.B).C} simplifica p
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{dotconstrules}
 @defvr {Variável de opção} dotconstrules
 Valor padrão: @code{true}
 
@@ -477,6 +502,7 @@ Ativando esse sinalizador efetivamente ativamos @code{dot0simp}, @code{dot0nscsi
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{dotdistrib}
 @defvr {Variável de opção} dotdistrib
 Valor padrão: @code{false}
 
@@ -485,6 +511,7 @@ Quando @code{dotdistrib} é @code{true}, uma expresão @code{A.(B + C)} simplifi
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{dotexptsimp}
 @defvr {Variável de opção} dotexptsimp
 Valor padrão: @code{true}
 
@@ -493,6 +520,7 @@ Quando @code{dotexptsimp} é @code{true}, uma expresão @code{A.A} simplifica pa
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{dotident}
 @defvr {Variável de opção} dotident
 Valor padrão: 1
 
@@ -502,6 +530,7 @@ Valor padrão: 1
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{dotscrules}
 @defvr {Variável de opção} dotscrules
 Valor padrão: @code{false}
 
@@ -512,6 +541,7 @@ para @code{SC*A} e @code{A.(SC*B)} simplifica para @code{SC*(A.B)}.
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{echelon}
 @deffn {Função} echelon (@var{M})
 Retorna a forma escalonada da matriz @var{M},
 como produzido através da eliminação de Gauss.
@@ -550,6 +580,7 @@ mas não normaliza o elemento líder não nulo em cada linha.
 
 @end deffn
 
+@anchor{eigenvalues}
 @deffn {Função} eigenvalues (@var{M})
 @deffnx {Função} eivals (@var{M})
 @c eigen.mac IS AUTOLOADED IF eigenvalues OR eigenvectors IS REFERENCED; EXTEND THAT TO ALL FUNCTIONS ??
@@ -587,6 +618,7 @@ Após ser chamado, todas as funções e variáveis no pacote estarão disponíve
 @c NEED EXAMPLES HERE
 @end deffn
 
+@anchor{eigenvectors}
 @deffn {Função} eigenvectors (@var{M})
 @deffnx {Função} eivects (@var{M})
 pegam uma matriz @var{M} como seu argumento e retorna uma lista
@@ -627,6 +659,7 @@ com o sinalizador @code{knowneigvals} escolhido para @code{true}.
 
 @end deffn
 
+@anchor{ematrix}
 @deffn {Função} ematrix (@var{m}, @var{n}, @var{x}, @var{i}, @var{j})
 Retorna uma matriz @var{m} por @var{n}, todos os elementos da qual
 são zero exceto para o elemento @code{[@var{i}, @var{j}]} que é @var{x}.
@@ -634,6 +667,7 @@ são zero exceto para o elemento @code{[@var{i}, @var{j}]} que é @var{x}.
 
 @end deffn
 
+@anchor{entermatrix}
 @deffn {Função} entermatrix (@var{m}, @var{n})
 Retorna uma matriz @var{m} por @var{n}, lendo os elementos interativamente.
 
@@ -676,6 +710,7 @@ Matriz entered.
 
 @end deffn
 
+@anchor{genmatrix}
 @deffn {Função} genmatrix (@var{a}, @var{i_2}, @var{j_2}, @var{i_1}, @var{j_1})
 @deffnx {Função} genmatrix (@var{a}, @var{i_2}, @var{j_2}, @var{i_1})
 @deffnx {Função} genmatrix (@var{a}, @var{i_2}, @var{j_2})
@@ -751,6 +786,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{gramschmidt}
 @deffn {Função} gramschmidt (@var{x})
 @deffnx {Função} gschmit (@var{x})
 Realiza o algorítmo de ortonalização de Gram-Schmidt sobre @var{x},
@@ -797,11 +833,13 @@ Warning - you are redefining the Macsyma function autovetores
 
 @end deffn
 
+@anchor{ident}
 @deffn {Função} ident (@var{n})
 Retorna uma matriz identidade @var{n} por @var{n}.
 
 @end deffn
 
+@anchor{innerproduct}
 @deffn {Função} innerproduct (@var{x}, @var{y})
 @deffnx {Função} inprod (@var{x}, @var{y})
 Retorna o produto interno (também chamado produto escalar ou produto do ponto) de @var{x} e @var{y},
@@ -817,6 +855,7 @@ onde @code{.} é o operador de multiplicação não comutativa.
 @end deffn
 
 @c THIS DESCRIPTION NEEDS WORK
+@anchor{invert}
 @deffn {Função} invert (@var{M})
 Retorna a inversa da matriz @var{M}.
 A inversa é calculada pelo método adjunto.
@@ -852,6 +891,7 @@ Veja @code{^^} (expoente não comutativo) para outro método de inverter uma mat
 @c NEED EXAMPLE HERE
 @end deffn
 
+@anchor{lmxchar}
 @defvr {Variável de opção} lmxchar
 Valor padrão: @code{[}
 
@@ -873,6 +913,7 @@ Exemplo:
 
 @end defvr
 
+@anchor{matrix}
 @deffn {Função} matrix (@var{row_1}, ..., @var{row_n})
 Retorna uma matriz retangular que tem as linhas @var{row_1}, ..., @var{row_n}.
 Cada linha é uma lista de expressões.
@@ -1066,6 +1107,7 @@ se existir.
 
 @end deffn
 
+@anchor{matrixmap}
 @deffn {Função} matrixmap (@var{f}, @var{M})
 Retorna uma matriz com elemento @code{i,j} igual a @code{@var{f}(@var{M}[i,j])}.
 
@@ -1074,11 +1116,13 @@ Veja também @code{map}, @code{fullmap}, @code{fullmapl}, e @code{apply}.
 @c NEED EXAMPLE HERE
 @end deffn
 
+@anchor{matrixp}
 @deffn {Função} matrixp (@var{expr})
 Retorna @code{true} se @var{expr} é uma matriz, de outra forma retorna @code{false}.
 
 @end deffn
 
+@anchor{matrix_element_add}
 @defvr {Variável de opção} matrix_element_add
 Valor padrão: @code{+}
 
@@ -1115,6 +1159,7 @@ Exemplo:
 
 @end defvr
 
+@anchor{matrix_element_mult}
 @defvr {Variável de opção} matrix_element_mult
 Valor padrão: @code{*}
 
@@ -1161,6 +1206,7 @@ Exemplo:
 
 @end defvr
 
+@anchor{matrix_element_transpose}
 @defvr {Variável de opção} matrix_element_transpose
 Valor padrão: @code{false}
 
@@ -1215,6 +1261,7 @@ Exemplos:
 @end defvr
 
 @c IS THIS THE ONLY MATRIX TRACE FUNCTION ??
+@anchor{mattrace}
 @deffn {Função} mattrace (@var{M})
 Retorna o traço (que é, a soma dos elementos sobre a diagonal principal) da
 matriz quadrada @var{M}.  
@@ -1227,12 +1274,14 @@ uma alternativa para @code{charpoly} do Maxima.
 
 @end deffn
 
+@anchor{minor}
 @deffn {Função} minor (@var{M}, @var{i}, @var{j})
 Retorna o @var{i}, @var{j} menor do elemento localizado na linha @var{i} coluna @var{j} da matriz @var{M}.  Que é @var{M}
 com linha @var{i} e coluna @var{j} ambas removidas.
 
 @end deffn
 
+@anchor{ncexpt}
 @deffn {Função} ncexpt (@var{a}, @var{b})
 Se uma expressão exponencial não comutativa é muito
 alta para ser mostrada como @code{@var{a}^^@var{b}} aparecerá como @code{ncexpt (@var{a},@var{b})}.
@@ -1242,6 +1291,7 @@ o nome somente aparece em saídas, e não é reconhecido em entradas.
 
 @end deffn
 
+@anchor{ncharpoly}
 @deffn {Função} ncharpoly (@var{M}, @var{x})
 Retorna o polinômio característico da matriz @var{M}
 com relação a @var{x}.  Essa é uma alternativa para @code{charpoly} do Maxima.
@@ -1260,6 +1310,7 @@ desde que isso evite inteiramente a aritmética polinomial.
 
 @end deffn
 
+@anchor{newdet}
 @deffn {Função} newdet (@var{M}, @var{n})
 Calcula o determinante de uma matriz ou array @var{M} pelo
 algorítmo da árvore menor de Johnson-Gentleman.
@@ -1269,24 +1320,28 @@ O argumento @var{n} é a ordem; isso é opcional se @var{M} for uma matriz.
 @end deffn
 
 @c NEEDS CLARIFICATION AND EXAMPLES
+@anchor{nonscalar}
 @defvr {Declaração} nonscalar
 Faz átomos ser comportarem da mesma forma que uma lista ou matriz em relação ao
 operador do ponto.
 
 @end defvr
 
+@anchor{nonscalarp}
 @deffn {Função} nonscalarp (@var{expr})
 Retorna @code{true} se @var{expr} é um não escalar, i.e., isso contém
 átomos declarados como não escalares, listas, ou matrizes.
 
 @end deffn
 
+@anchor{permanent}
 @deffn {Função} permanent (@var{M}, @var{n})
 Calcula o permanente da matriz @var{M}.  Um permanente
 é como um determinante mas sem mudança de sinal.
 
 @end deffn
 
+@anchor{rank}
 @deffn {Função} rank (@var{M})
 Calcula o posto da matriz @var{M}.  Que é, a ordem do
 mais largo determinante não singular de @var{M}.
@@ -1298,6 +1353,7 @@ equivalente a zero é realmente isso.
 
 @end deffn
 
+@anchor{ratmx}
 @defvr {Variável de opção} ratmx
 Valor padrão: @code{false}
 
@@ -1314,12 +1370,14 @@ o que pode não ser desejado sempre.
 
 @end defvr
 
+@anchor{row}
 @deffn {Função} row (@var{M}, @var{i})
 retorna a @var{i}'ésima linha da matriz @var{M}.
 O valor de retorno é uma matriz.
 
 @end deffn
 
+@anchor{scalarmatrixp}
 @defvr {Variável de opção} scalarmatrixp
 Valor padrão: @code{true}
 
@@ -1335,6 +1393,7 @@ Quando @code{scalarmatrixp} é @code{false}, matrizes 1 x 1 não são simplifica
 @end defvr
 
 @c I WONDER WHAT THIS IS ABOUT
+@anchor{scalefactors}
 @deffn {Função} scalefactors (@var{coordinatetransform})
 Aqui coordinatetransform
 avalia para a forma [[expresão1, expresão2, ...],
@@ -1354,6 +1413,7 @@ corrente , existe uma função com uso da forma
 
 @end deffn
 
+@anchor{setelmx}
 @deffn {Função} setelmx (@var{x}, @var{i}, @var{j}, @var{M})
 Atribue @var{x} para o (@var{i}, @var{j})'ésimo elemento da matriz @var{M},
 e retorna a matriz alterada.
@@ -1363,6 +1423,7 @@ mas retorna @var{x} em lugar de @var{M}.
 
 @end deffn
 
+@anchor{similaritytransform}
 @deffn {Função} similaritytransform (@var{M})
 @deffnx {Função} simtran (@var{M})
 @code{similaritytransform} calcula uma transformação homotética da matriz @code{M}.
@@ -1390,6 +1451,7 @@ estar habilitado para a forma @code{rightmatrix}.
 
 @end deffn
 
+@anchor{sparse}
 @defvr {Variável de opção} sparse
 Valor padrão: @code{false}
 
@@ -1398,6 +1460,7 @@ usará rotinas especiais para calcular determinantes esparsos.
 
 @end defvr
 
+@anchor{submatrix}
 @deffn {Função} submatrix (@var{i_1}, ..., @var{i_m}, @var{M}, @var{j_1}, ..., @var{j_n})
 @deffnx {Função} submatrix (@var{i_1}, ..., @var{i_m}, @var{M})
 @deffnx {Função} submatrix (@var{M}, @var{j_1}, ..., @var{j_n})
@@ -1406,6 +1469,7 @@ matrix @var{M} com linhas @var{i_1}, ..., @var{i_m} excluídas, e colunas @var{j
 
 @end deffn
 
+@anchor{transpose}
 @deffn {Função} transpose (@var{M})
 Retorna a transposta de @var{M}.
 
@@ -1420,6 +1484,7 @@ e o valor de retorno é uma expressão substantiva @code{'transpose (@var{M})}.
 
 @end deffn
 
+@anchor{triangularize}
 @deffn {Função} triangularize (@var{M})
 Retorna a maior forma triangular da matriz @code{M}, como produzido através da eliminação de Gauss.
 O valor de retorno é o mesmo que @code{echelon},
@@ -1448,6 +1513,7 @@ exceto que o o coeficiente lider não nulo em cada linha não é normalizado par
 
 @end deffn
 
+@anchor{uniteigenvectors}
 @deffn {Função} uniteigenvectors (@var{M})
 @deffnx {Função} ueivects (@var{M})
 Calcula autovetores unitários da matriz @var{M}.
@@ -1479,6 +1545,7 @@ dimensão apropriada.
 
 @end deffn
 
+@anchor{unitvector}
 @deffn {Função} unitvector (@var{x})
 @deffnx {Função} uvect (@var{x})
 Retorna @math{@var{x}/norm(@var{x})};
@@ -1491,6 +1558,7 @@ isso é um vetor unitário na mesma direção que @var{x}.
 @end deffn
 
 @c NEEDS A LOT OF WORK: MAKE SURE THAT ALL VECTOR SIMPLIFICATION FLAGS HAVE A DESCRIPTION HERE
+@anchor{vectorsimp}
 @deffn {Função} vectorsimp (@var{expr})
 Aplica simplificações e expansões conforme
 os seguintes sinalizadores globais:
@@ -1532,6 +1600,7 @@ Esses sinalizadores foram todos declarados @code{evflag}.
 
 @end deffn
 
+@anchor{vect_cross}
 @defvr {Variável de opção} vect_cross
 Valor padrão: @code{false}
 
@@ -1541,11 +1610,13 @@ Quando @code{vect_cross} é @code{true}, isso permite DIFF(X~Y,T) trabalhar onde
 
 @end defvr
 
+@anchor{zeromatrix}
 @deffn {Função} zeromatrix (@var{m}, @var{n})
 Retorna um matriz @var{m} por @var{n}, com todos os elementos sendo zero.
 
 @end deffn
 
+@anchor{[}
 @defvr {Símbolo especial} [
 @defvrx {Símbolo especial} ]
 @ifinfo

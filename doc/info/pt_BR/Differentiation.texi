@@ -9,6 +9,7 @@
 @node Funções e Variáveis Definidas para Diferenciação,  , Diferenciação, Diferenciação
 @section Funções e Variáveis Definidas para Diferenciação
 
+@anchor{antid}
 @deffn {Função} antid (@var{expr}, @var{x}, @var{u(x)}) 
 Retorna uma lista de dois elementos,
 tais que uma antiderivada de @var{expr} com relação a @var{x}
@@ -79,6 +80,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{antidiff}
 @deffn {Função} antidiff (@var{expr}, @var{x}, @var{u}(@var{x}))
 Retorna uma antiderivada de @var{expr} com relação a @var{x}.
 A expressão @var{expr} pode conter uma função desconhecida @var{u} e suas derivadas.
@@ -144,6 +146,7 @@ Exemplos:
 @end deffn
 
 @c I SUSPECT THERE IS MORE TO BE SAID HERE
+@anchor{atomgrad}
 @defvr propriedade atomgrad
 
 @code{atomgrad} é a propriedade do gradiente atômico de uma expressão.
@@ -152,6 +155,7 @@ Essa propriedade é atribuída por @code{gradef}.
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{atvalue}
 @deffn {Função} atvalue (@var{expr}, [@var{x_1} = @var{a_1}, ..., @var{x_m} = @var{a_m}], @var{c})
 @deffnx {Função} atvalue (@var{expr}, @var{x_1} = @var{a_1}, @var{c})
 Atribui o valor @var{c} a @var{expr} no ponto @code{@var{x} = @var{a}}.
@@ -225,6 +229,7 @@ Exemplos:
 @c LOOKS LIKE cartan IS THE NAME OF A PACKAGE AND NOT A FUNCTION OR VARIABLE
 @c PROBABLY SHOULD SPLIT OUT cartan AND ITS CONTENTS INTO ITS OWN TEXINFO FILE
 @c ext_diff AND lie_diff NOT DOCUMENTED (OTHER THAN HERE)
+@anchor{cartan}
 @deffn {Função} cartan  -
 O cálculo exterior de formas diferenciais é uma ferramenta básica
 de geometria diferencial desenvolvida por Elie Cartan e tem importantes
@@ -240,6 +245,7 @@ descrição desses comandos juntamente com exemplos.
 
 @end deffn
 
+@anchor{del}
 @deffn {Função} del (@var{x})
 @code{del (@var{x})} representa a diferencial da variável @math{x}.
 
@@ -267,6 +273,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{delta}
 @deffn {Função} delta (@var{t})
 A função Delta de Dirac.
 
@@ -285,6 +292,7 @@ p;
 
 @end deffn
 
+@anchor{dependencies}
 @defvr {Variável} dependencies
 Valor padrão: @code{[]}
 
@@ -297,6 +305,7 @@ Veja @code{depends} e @code{gradef}.
 
 @end defvr
 
+@anchor{depends}
 @deffn {Função} depends (@var{f_1}, @var{x_1}, ..., @var{f_n}, @var{x_n})
 Declara dependêcias funcionais entre variáveis para o propósito de calcular derivadas.
 Na ausência de dependêcias declaradas,
@@ -371,6 +380,7 @@ a menos que explicitamente representada como @code{integrate (f(x), x)}.
 
 @end deffn
 
+@anchor{derivabbrev}
 @defvr {Variável de opção} derivabbrev
 Valor padrão: @code{false}
 
@@ -382,6 +392,7 @@ De outra forma, derivadas são mostradas na notação de Leibniz @code{dy/dx}.
 @end defvr
 
 @c SEEMS LIKE THIS STATEMENT COULD BE LESS CLUMSY
+@anchor{derivdegree}
 @deffn {Função} derivdegree (@var{expr}, @var{y}, @var{x})
 Retorna o maior grau de uma derivada
 da variável dependente @var{y} com relação à variável independente
@@ -405,12 +416,14 @@ Exemplo:
 @end deffn
 
 @c I HAVE NO IDEA WHAT THIS DOES
+@anchor{derivlist}
 @deffn {Função} derivlist (@var{var_1}, ..., @var{var_k})
 Causa somente diferenciações com relação às
 variáveis indicadas, dentro do comando @code{ev}.
 
 @end deffn
 
+@anchor{derivsubst}
 @defvr {Variável de opção} derivsubst
 Valor padrão: @code{false}
 
@@ -419,6 +432,7 @@ Quando @code{derivsubst} for @code{true}, uma substiruíção não sintática ta
 
 @end defvr
 
+@anchor{diff}
 @deffn {Função} diff (@var{expr}, @var{x_1}, @var{n_1}, ..., @var{x_m}, @var{n_m})
 @deffnx {Função} diff (@var{expr}, @var{x}, @var{n})
 @deffnx {Função} diff (@var{expr}, @var{x})
@@ -505,6 +519,7 @@ acima.
 @end deffn
 
 @c MERGE THIS INTO @defun diff
+@anchor{diff}
 @defvr {Símbolo especial} diff
 
 Quando @code{diff} está presente como um @code{evflag} em chamadas para @code{ev},
@@ -514,6 +529,7 @@ Todas as diferenciações indicadas em @code{expr} são realizdas.
 @end defvr
 
 @c NOT SURE HOW THIS IS SUPPOSED TO WORK
+@anchor{dscalar}
 @deffn {Função} dscalar (@var{f})
 Aplica o d'Alembertiano escalar para a função escalar @var{f}.
 
@@ -541,6 +557,7 @@ Aplica o d'Alembertiano escalar para a função escalar @var{f}.
 
 @end deffn
 
+@anchor{express}
 @deffn {Função} express (@var{expr})
 @c HERE IS THE PREVIOUS TEXT. WHAT IS THE POINT ABOUT depends ?? I'M NOT GETTING IT
 @c The result uses the noun form of any
@@ -650,6 +667,7 @@ Exemplos:
 @c
 @c @end defun
 
+@anchor{gradef}
 @deffn {Função} gradef (@var{f}(@var{x_1}, ..., @var{x_n}), @var{g_1}, ..., @var{g_m})
 @deffnx {Função} gradef (@var{a}, @var{x}, @var{expr})
 Define as derivadas parciais (i.e., os componentes do gradiente) da função @var{f}
@@ -693,6 +711,7 @@ derivadas de ordem superior.
 @c NEED EXAMPLES HERE
 @end deffn
 
+@anchor{gradefs}
 @defvr {Variável de sistema} gradefs
 Valor padrão: @code{[]}
 
@@ -703,6 +722,7 @@ para as quais derivadas parciais foram deinidas por @code{gradef}.
 
 @end defvr
 
+@anchor{laplace}
 @deffn {Função} laplace (@var{expr}, @var{t}, @var{s})
 Tenta calcular a transformada de Laplace de @var{expr} com relação a uma variável @var{t}
 e parâmetro de transformação @var{s}.

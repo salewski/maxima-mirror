@@ -7,6 +7,7 @@
 @node Funções e Variáveis Definidas para Arrays,  , Arrays, Arrays
 @section Funções e Variáveis Definidas para Arrays
 
+@anchor{array}
 @deffn {Função} array (@var{name}, @var{dim_1}, ..., @var{dim_n})
 @deffnx {Função} array (@var{name}, @var{type}, @var{dim_1}, ..., @var{dim_n})
 @deffnx {Função} array ([@var{nome_1}, ..., @var{nome_m}], @var{dim_1}, ..., @var{dim_n})
@@ -43,6 +44,7 @@ declarado.
 
 @end deffn
 
+@anchor{arrayapply}
 @deffn {Função} arrayapply (@var{A}, [@var{i_1}, ..., @var{i_n}])
 Avalia @code{@var{A} [@var{i_1}, ..., @var{i_n}]},
 quando @var{A} for um array e @var{i_1}, ..., @var{i_n} são inteiros.
@@ -51,6 +53,7 @@ Ela é remanescente de @code{apply}, exceto o primeiro argumento que é um array
 
 @end deffn
 
+@anchor{arrayinfo}
 @deffn {Função} arrayinfo (@var{A})
 Retorna informações sobre o array @var{A}.
 O argumento @var{A} pode ser um array declarado, uma array não declarado ( que sofreu um hash),
@@ -180,6 +183,7 @@ Examples:
 @end example
 @end deffn
 
+@anchor{arraymake}
 @deffn {Função} arraymake (@var{A}, [@var{i_1}, ..., @var{i_n}])
 Retorna a expressão @code{@var{A}[@var{i_1}, ..., @var{i_n}]}.
 O resultado é uma referência a um array não avaliado.
@@ -245,6 +249,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{arrays}
 @defvr {Variável de sistema} arrays
 Valor padrão: @code{[]}
 
@@ -286,6 +291,7 @@ Exemplos:
 
 @end defvr
 
+@anchor{bashindices}
 @deffn {Função} bashindices (@var{expr})
 Transforma a expressão @var{expr} dando a cada
 somatório e a cada produto um único índice.  Isso dá a @code{changevar} grande
@@ -296,6 +302,7 @@ exemplo, @code{gensumnum:0$} reseta isso.
 
 @end deffn
 
+@anchor{fillarray}
 @deffn {Função} fillarray (@var{A}, @var{B})
 Preenche o array @var{A} com @var{B}, que é uma lista ou um array.
 
@@ -374,6 +381,7 @@ Arrays multi-dimensionais são preenchidos em ordem de maior fileira.
 
  @end deffn
 
+@anchor{listarray}
 @deffn {Função} listarray (@var{A})
 Retorna uma lista dos elementos do array @var{A}.
 O argumento @var{A} pode ser um array declarado, um array não declarado (desordenado - hashed),
@@ -500,6 +508,7 @@ Exemplos:
 @end deffn
 
 @c NEEDS CLARIFICATION
+@anchor{make_array}
 @deffn {Função} make_array (@var{type}, @var{dim_1}, ..., @var{dim_n})
 Cria e retorna um array de Lisp.  @var{type} pode
 ser @code{any}, @code{flonum}, @code{fixnum}, @code{hashed} ou
@@ -574,6 +583,7 @@ Exemplos:
 @end deffn
 
 @c DOES THIS MODIFY A OR DOES IT CREATE A NEW ARRAY ??
+@anchor{rearray}
 @deffn {Função} rearray (@var{A}, @var{dim_1}, ..., @var{dim_n})
 Altera as dimenções de um array.  
 O novo array será preenchido com os elementos do antigo em
@@ -585,6 +595,7 @@ alterado.
 
 @end deffn
 
+@anchor{remarray}
 @deffn {Função} remarray (@var{A_1}, ..., @var{A_n})
 @deffnx {Função} remarray (all)
 Remove arrays e funções associadas
@@ -600,6 +611,7 @@ desejado para redefinir os valores em um array desordenado.
 @code{remarray} retorna a lista dos arrays removidos.
 
 @end deffn
+@anchor{subvar}
 @deffn {Função} subvar (@var{x}, @var{i})
 Avalia a expressão subscrita @code{@var{x}[@var{i}]}.
 
@@ -646,6 +658,7 @@ Exemplos:
 @end deffn
 
 @c THIS IS REALLY CONFUSING
+@anchor{use_fast_arrays}
 @defvr {Variável de pção} use_fast_arrays
 - Se @code{true} somente dois tipos de arrays são reconhecidos.  
 

@@ -193,6 +193,7 @@ completar a computação
 @node Funções e Variáveis Definidas para Depuração, , Comandos Palavra Chave, Depurando
 @section Funções e Variáveis Definidas para Depuração
 
+@anchor{refcheck}
 @defvr {Variável de opção} refcheck
 Valor padrão: @code{false}
 
@@ -202,6 +203,7 @@ computação.
 
 @end defvr
 
+@anchor{setcheck}
 @defvr {Variável de opção} setcheck
 Valor padrão: @code{false}
 
@@ -237,6 +239,7 @@ variável na lista @code{setcheck} for atribuída a sí mesma, e.g., @code{X: 'X
 
 @end defvr
 
+@anchor{setcheckbreak}
 @defvr {Variável de opção} setcheckbreak
 Valor padrão: @code{false}
 
@@ -252,6 +255,7 @@ Veja também @code{setcheck} e @code{setval}.
 
 @end defvr
 
+@anchor{setval}
 @defvr {Variável de sistema} setval
 Mantém o valor para o qual a variável está para ser escolhida quando
 um @code{setcheckbreak} ocorrer.
@@ -261,6 +265,7 @@ Veja também @code{setcheck} e @code{setcheckbreak}.
 
 @end defvr
 
+@anchor{timer}
 @deffn {Função} timer (@var{f_1}, ..., @var{f_n})
 @deffnx {Função} timer (all)
 @deffnx {Função} timer ()
@@ -291,6 +296,7 @@ Se @code{trace(f)} está vigorando, então @code{timer(f)} não tem efeito; @cod
 Veja também @code{timer_devalue}.
 
 @end deffn
+@anchor{untimer}
 @deffn {Função} untimer (@var{f_1}, ..., @var{f_n})
 @deffnx {Função} untimer ()
 Dadas as funções @var{f_1}, ..., @var{f_n},
@@ -307,6 +313,7 @@ e coloca @code{f} na lista de funções estatisticamente monitoradas novamente.
 
 @end deffn
 
+@anchor{timer_devalue}
 @defvr {Variável de opção} timer_devalue
 Valor Padrão: @code{false}
 
@@ -320,6 +327,7 @@ Veja também @code{timer} e @code{timer_info}.
 
 @end defvr
 
+@anchor{timer_info}
 @deffn {Função} timer_info (@var{f_1}, ..., @var{f_n})
 @deffnx {Função} timer_info ()
 Dadas as funções @var{f_1}, ..., @var{f_n},
@@ -343,6 +351,7 @@ Veja também @code{timer}.
 
 @end deffn
 
+@anchor{trace}
 @deffn {Função} trace (@var{f_1}, ..., @var{f_n})
 @deffnx {Função} trace (all)
 @deffnx {Função} trace ()
@@ -373,6 +382,7 @@ Se @code{timer (f)} estiver em efeito, então @code{trace (f)} não está agindo
 
 @end deffn
 
+@anchor{trace_options}
 @deffn {Função} trace_options (@var{f}, @var{option_1}, ..., @var{option_n})
 @deffnx {Função} trace_options (@var{f})
 Escolhe as opções de @code{trace} para a função @var{f}.
@@ -443,6 +453,7 @@ sobre um predicado:
 
 @end deffn
 
+@anchor{untrace}
 @deffn {Função} untrace (@var{f_1}, ..., @var{f_n})
 @deffnx {Função} untrace ()
 Dadas as funções @var{f_1}, ..., @var{f_n},

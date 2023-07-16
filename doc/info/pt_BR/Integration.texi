@@ -28,6 +28,7 @@ integrais em termos de funções desconhecidas tais como @code{g(x)} e @code{h(x
 @node Funções e Variáveis Definidas para Integração, Introdução a QUADPACK, Introdução a Integração, Integração
 @section Funções e Variáveis Definidas para Integração
 @c NEEDS WORK
+@anchor{changevar}
 @deffn {Função} changevar (@var{expr}, @var{f(x,y)}, @var{y}, @var{x})
 Faz a mudança de variável dada por
 @code{@var{f(x,y)} = 0} em todas as integrais que ocorrem em @var{expr} com integração em
@@ -90,6 +91,7 @@ função de grau mais alto.  E.g.,
 
 @c THIS ITEM IS A MESS, BUT DON'T BOTHER TO CLEAN IT UP:
 @c THE GAUSS-KRONROD FUNCTIONS (QUADPACK) MAKE THIS OBSOLETE
+@anchor{dblint}
 @deffn {Função} dblint (@var{f}, @var{r}, @var{s}, @var{a}, @var{b})
 Uma rotina de integral dupla que foi escrita no 
 alto-nível do Maxima e então traduzida e compilada para linguagem de máquina.
@@ -138,6 +140,7 @@ magnitude de melhoramentos de velocidade sobre o código interpretado em muitos 
 
 @end deffn
 
+@anchor{defint}
 @deffn {Função} defint (@var{expr}, @var{x}, @var{a}, @var{b})
 Tenta calcular uma integral definida.
 @code{defint} é chamada por @code{integrate} quando limites de integração são especificados,
@@ -152,12 +155,14 @@ Veja @code{quad_qag} e funções rellacionadas para aproximação numérica de i
 @end deffn
 
 @c NEEDS EXPANSION AND EXAMPLES
+@anchor{erf}
 @deffn {Função} erf (@var{x})
 Representa a função de erro, cuja derivada é:
 @code{2*exp(-x^2)/sqrt(%pi)}.
 
 @end deffn
 
+@anchor{erfflag}
 @defvr {Variável de opção} erfflag
 Valor padrão: @code{true}
 
@@ -168,6 +173,7 @@ começar.
 @end defvr
 
 @c NEEDS WORK
+@anchor{ilt}
 @deffn {Função} ilt (@var{expr}, @var{t}, @var{s})
 Calcula a transformação inversa de Laplace de @var{expr} em
 relação a @var{t} e parâmetro @var{s}.  @var{expr} deve ser uma razão de
@@ -215,6 +221,7 @@ pos;
 
 @end deffn
 
+@anchor{integrate}
 @deffn {Função} integrate (@var{expr}, @var{x})
 @deffnx {Função} integrate (@var{expr}, @var{x}, @var{a}, @var{b})
 Tenta símbolicamente calcular a integral de @var{expr} em relação a @var{x}.
@@ -403,6 +410,7 @@ e o resultado transforme-se no corpo de @code{f_2}.
 
 @end deffn
 
+@anchor{integration_constant_counter}
 @defvr {Variável de sistema} integration_constant_counter
 Valor padrão: 0
 
@@ -414,6 +422,7 @@ constante de integração (nomeada pelo Maxima, e.g., @code{integrationconstant1
 
 @end defvr
 
+@anchor{integrate_use_rootsof}
 @defvr {Variável de opção} integrate_use_rootsof
 Valor padrão: @code{false}
 
@@ -468,6 +477,7 @@ Algumas vezes isso ajudará Maxima a obter resultados mais úteis.
 @end defvr
 
 @c NEEDS EXAMPLES
+@anchor{ldefint}
 @deffn {Função} ldefint (@var{expr}, @var{x}, @var{a}, @var{b})
 Tenta calcular a integral definida de @var{expr} pelo uso de 
 @code{limit} para avaliar a integral indefinida @var{expr} em relação a @var{x}
@@ -485,6 +495,7 @@ enquanto @code{integrate} pode utilizar várias heurísticas e pode reconhecer a
 
 @c UMM, IS THERE SOME TEXT MISSING HERE ???
 @c WHAT IS THIS ABOUT EXACTLY ??
+@anchor{potential}
 @deffn {Função} potential (@var{givengradient})
 O cálculo faz uso da variável global @code{potentialzeroloc[0]}
 que deve ser @code{nonlist} ou da forma
@@ -502,6 +513,7 @@ para 0.
 
 @end deffn
 
+@anchor{residue}
 @deffn {Função} residue (@var{expr}, @var{z}, @var{z_0})
 Calcula o resíduo no plano complexo da
 expressão @var{expr} quando a variável @var{z} assumes o valor @var{z_0}.  O
@@ -522,6 +534,7 @@ para @var{expr}.
 
 @end deffn
 
+@anchor{risch}
 @deffn {Função} risch (@var{expr}, @var{x})
 Integra @var{expr} em relação a @var{x} usando um
 caso transcendental do algorítmo de Risch.  (O caso algébrico do
@@ -549,6 +562,7 @@ começar.
 @end deffn
 
 @c NEEDS EXPANSION, CLARIFICATION, AND EXAMPLES
+@anchor{tldefint}
 @deffn {Função} tldefint (@var{expr}, @var{x}, @var{a}, @var{b})
 Equivalente a @code{ldefint} com @code{tlimswitch} escolhido para @code{true}.
 
@@ -642,6 +656,7 @@ que possuírem o ponto @math{x = c}.
 
 @c THERE ARE OPTIONAL ARGUMENTS WHICH MAKES LISTING THE VARIANTS A LITTLE TEDIOUS
 @c NEED A MORE CONVENIENT (AND NONAMBIGUOUS) NOTATION FOR OPTIONAL ARGUMENTS
+@anchor{quad_qag}
 @deffn {Função} quad_qag (@var{f(x)}, @var{x}, @var{a}, @var{b}, @var{chave}, @var{epsrel}, @var{limite})
 @deffnx {Função} quad_qag (@var{f}, @var{x}, @var{a}, @var{b}, @var{chave}, @var{epsrel}, @var{limite})
 
@@ -726,6 +741,7 @@ Exemplos:
 
 @c THERE ARE OPTIONAL ARGUMENTS WHICH MAKES LISTING THE VARIANTS A LITTLE TEDIOUS
 @c NEED A MORE CONVENIENT (AND NONAMBIGUOUS) NOTATION FOR OPTIONAL ARGUMENTS
+@anchor{quad_qags}
 @deffn {Função} quad_qags (@var{f(x)}, @var{x}, @var{a}, @var{b}, @var{epsrel}, @var{limite})
 @deffnx {Função} quad_qags (@var{f}, @var{x}, @var{a}, @var{b}, @var{epsrel}, @var{limite})
 
@@ -803,6 +819,7 @@ Note que @code{quad_qags} é mais preciso e eficiente que @code{quad_qag} para e
 
 @c THERE ARE OPTIONAL ARGUMENTS WHICH MAKES LISTING THE VARIANTS A LITTLE TEDIOUS
 @c NEED A MORE CONVENIENT (AND NONAMBIGUOUS) NOTATION FOR OPTIONAL ARGUMENTS
+@anchor{quad_qagi}
 @deffn {Função} quad_qagi (@var{f(x)}, @var{x}, @var{a}, @var{inftype}, @var{epsrel}, @var{limite})
 @deffnx {Função} quad_qagi (@var{f}, @var{x}, @var{a}, @var{inftype}, @var{epsrel}, @var{limite})
 
@@ -914,6 +931,7 @@ Exemplos:
 
 @c THERE ARE OPTIONAL ARGUMENTS WHICH MAKES LISTING THE VARIANTS A LITTLE TEDIOUS
 @c NEED A MORE CONVENIENT (AND NONAMBIGUOUS) NOTATION FOR OPTIONAL ARGUMENTS
+@anchor{quad_qawc}
 @deffn {Função} quad_qawc (@var{f(x)}, @var{x}, @var{c}, @var{a}, @var{b}, @var{epsrel}, @var{limite})
 @deffnx {Função} quad_qawc (@var{f}, @var{x}, @var{c}, @var{a}, @var{b}, @var{epsrel}, @var{limite})
 
@@ -1005,6 +1023,7 @@ Principal Value
 
 @c THERE ARE OPTIONAL ARGUMENTS WHICH MAKES LISTING THE VARIANTS A LITTLE TEDIOUS
 @c NEED A MORE CONVENIENT (AND NONAMBIGUOUS) NOTATION FOR OPTIONAL ARGUMENTS
+@anchor{quad_qawf}
 @deffn {Função} quad_qawf (@var{f(x)}, @var{x}, @var{a}, @var{omega}, @var{trig}, @var{epsabs}, @var{limit}, @var{maxp1}, @var{limlst})
 @deffnx {Função} quad_qawf (@var{f}, @var{x}, @var{a}, @var{omega}, @var{trig}, @var{epsabs}, @var{limit}, @var{maxp1}, @var{limlst})
 
@@ -1106,6 +1125,7 @@ Exemplos:
 
 @c THERE ARE OPTIONAL ARGUMENTS WHICH MAKES LISTING THE VARIANTS A LITTLE TEDIOUS
 @c NEED A MORE CONVENIENT (AND NONAMBIGUOUS) NOTATION FOR OPTIONAL ARGUMENTS
+@anchor{quad_qawo}
 @deffn {Função} quad_qawo (@var{f(x)}, @var{x}, @var{a}, @var{b}, @var{omega}, @var{trig}, @var{epsabs}, @var{limite}, @var{maxp1}, @var{limlst})
 @deffnx {Função} quad_qawo (@var{f}, @var{x}, @var{a}, @var{b}, @var{omega}, @var{trig}, @var{epsabs}, @var{limite}, @var{maxp1}, @var{limlst})
 
@@ -1209,6 +1229,7 @@ Exemplos:
 
 @c THERE ARE OPTIONAL ARGUMENTS WHICH MAKES LISTING THE VARIANTS A LITTLE TEDIOUS
 @c NEED A MORE CONVENIENT (AND NONAMBIGUOUS) NOTATION FOR OPTIONAL ARGUMENTS
+@anchor{quad_qaws}
 @deffn {Função} quad_qaws (@var{f(x)}, @var{x}, @var{a}, @var{b}, @var{alpha}, @var{beta}, @var{wfun}, @var{epsabs}, @var{limite})
 @deffnx {Função} quad_qaws (@var{f}, @var{x}, @var{a}, @var{b}, @var{alpha}, @var{beta}, @var{wfun}, @var{epsabs}, @var{limite})
 

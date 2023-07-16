@@ -3,12 +3,12 @@
 @c c5181d78c350f6d11ca36f72ef6ac503  Evaluation.texi
 @c
 @menu
-* Functions and Variables for Evaluation::
+* Funções e Variáveis Definidas para Evaluação::
 @end menu
 
 @c -----------------------------------------------------------------------------
-@node Functions and Variables for Evaluation,  , Evaluation, Evaluation
-@section Functions and Variables for Evaluation
+@node Funções e Variáveis Definidas para Evaluação,  , Evaluação, Evaluação
+@section Funções e Variáveis Definidas para Evaluação
 @c -----------------------------------------------------------------------------
 
 @c NEEDS EXAMPLES
@@ -200,9 +200,9 @@ ap@'{o}strofo.
 (%i14)
 @end example
 
-@opencatbox
-@category{Avalia@,{c}@~{a}o} @category{Operadores}
-@closecatbox
+@c @opencatbox
+@c @category{Avalia@,{c}@~{a}o} @category{Operadores}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -393,9 +393,9 @@ ap@'{o}strofo @code{'}.
                     3    3    2    2    1    1
 @end example
 
-@opencatbox
-@category{Avalia@,{c}@~{a}o} @category{Operadores}
-@closecatbox
+@c @opencatbox
+@c @category{Avalia@,{c}@~{a}o} @category{Operadores}
+@c @closecatbox
 @end deffn
 
 @c NEEDS CLARIFICATION
@@ -591,9 +591,9 @@ Solution
 (%o11)                               true
 @end example
 
-@opencatbox
-@category{Avalia@,{c}@~{a}o}
-@closecatbox
+@c @opencatbox
+@c @category{Avalia@,{c}@~{a}o}
+@c @closecatbox
 @end deffn
 
 @c -----------------------------------------------------------------------------
@@ -625,9 +625,9 @@ Exemplo:
 (%o5)                                  e
 @end example
 
-@opencatbox
-@category{Sinalizadores de avalia@,{c}@~{a}o}
-@closecatbox
+@c @opencatbox
+@c @category{Sinalizadores de avalia@,{c}@~{a}o}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -715,9 +715,9 @@ Exemplos:
 (%o12)                         YES
 @end example
 
-@opencatbox
-@category{Sinalizadores de avalia@,{c}@~{a}o} @category{Simplification flags and variables}
-@closecatbox
+@c @opencatbox
+@c @category{Sinalizadores de avalia@,{c}@~{a}o} @category{Simplification flags and variables}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -816,9 +816,9 @@ Exemplos:
 (%o15)                      G(F(cc))
 @end example
 
-@opencatbox
-@category{Sinalizadores de avalia@,{c}@~{a}o}
-@closecatbox
+@c @opencatbox
+@c @category{Sinalizadores de avalia@,{c}@~{a}o}
+@c @closecatbox
 @end defvr
 
 @c NEEDS WORK
@@ -833,9 +833,9 @@ seja avaliada fora desse modo, simplesmente inclua @code{X='X} como um argumeto 
 @code{ev}.  Certamente express@~{o}es tais como @code{ev (X, X=X+1, infeval)} ir@~{a}o
 gerar um la@,{c}o imfinito.
 
-@opencatbox
-@category{Sinalizadores de avalia@,{c}@~{a}o}
-@closecatbox
+@c @opencatbox
+@c @category{Sinalizadores de avalia@,{c}@~{a}o}
+@c @closecatbox
 @end defvr
 
 @c NEEDS CLARIFICATION, EXAMPLES
@@ -849,9 +849,9 @@ O s@'{i}mbolo especial @code{noeval} suprime a fase d avalia@,{c}@~{a}o de @mref
 juntamente com outros comutadores e faz com que express@~{o}es
 sejam resimplificadas sem serem reavaliadas.
 
-@opencatbox
-@category{Sinalizadores de avalia@,{c}@~{a}o}
-@closecatbox
+@c @opencatbox
+@c @category{Sinalizadores de avalia@,{c}@~{a}o}
+@c @closecatbox
 @end defvr
 
 @c NEEDS CLARIFICATION, EXAMPLES
@@ -865,9 +865,9 @@ O s@'{i}mbolo especial @code{nouns} possui a propriedade @mrefdot{evflag}  Quand
 sendo trabalhado por  @code{ev} em "verbos", i.e., avalia essas formas substantivas que ocorrem na express@~{a}o.  Veja tamb@'{e}m
 @mrefcomma{noun} @mrefcomma{nounify} @code{verb}, e @mrefdot{verbify} @footnote{Nota do tradutor: n@~{a}o existe nenhuma se@,{c}@~{a}o especial sobre @code{verb}.}
 
-@opencatbox
-@category{Sinalizadores de avalia@,{c}@~{a}o} @category{Substantivos e verbos}
-@closecatbox
+@c @opencatbox
+@c @category{Sinalizadores de avalia@,{c}@~{a}o} @category{Substantivos e verbos}
+@c @closecatbox
 @end defvr
 
 @c -----------------------------------------------------------------------------
@@ -891,8 +891,8 @@ Exemplo:
 (%o2)                                true
 @end example
 
-@opencatbox
-@category{Sinalizadores de avalia@,{c}@~{a}o}
-@closecatbox
+@c @opencatbox
+@c @category{Sinalizadores de avalia@,{c}@~{a}o}
+@c @closecatbox
 @end defvr
 

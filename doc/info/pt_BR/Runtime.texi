@@ -67,43 +67,6 @@ retorne ao primeiro plano e continue a partir do ponto no qual foi interrompido.
 @node Funções e Variáveis Definidas para Ambiente em Tempo de Execução,  , Interrupções, Ambiente em Tempo de Execução
 @section Funções e Variáveis Definidas para Ambiente em Tempo de Execução
 
-@c NEEDS EXPANSION AND CLARIFICATION
-@anchor{feature}
-@defvr {Declaração} feature
-Maxima compreende dois tipos distintos de recurso,
-recursos do sistema e recursos aplicados a expressões matemáticas.
-Veja Também @code{status} para informações sobre recursos do sistema.
-Veja Também @code{features} e @code{featurep} para informações sobre recursos matemáticos.
-@c PROPERTIES, DECLARATIONS FALL UNDER THIS HEADING AS WELL
-@c OTHER STUFF ??
-
-@code{feature} por si mesmo não é o nome de uma função ou variável.
-
-@end defvr
-
-@c NEEDS CLARIFICATION, ESPECIALLY WRT THE EXTENT OF THE FEATURE SYSTEM
-@c (I.E. WHAT KINDS OF THINGS ARE FEATURES ACCORDING TO featurep)
-@anchor{featurep}
-@deffn {Função} featurep (@var{a}, @var{f})
-Tenta determinar se o objeto @var{a} tem o
-recurso @var{f} na base dos fatos dentro base de dados corrente.  Se possue,
-é retornado @code{true}, de outra forma é retornado @code{false}.
-
-Note que @code{featurep} retorna @code{false} quando nem @var{f}
-nem a negação de @var{f} puderem ser estabelecidas.
-
-@code{featurep} avalia seus argumentos.
-
-Veja também @code{declare} e @code{features}.
-       
-@example
-(%i1) declare (j, even)$
-(%i2) featurep (j, integer);
-(%o2)                           true
-@end example
-
-@end deffn
-
 @anchor{maxima_tempdir}
 @defvr {Variável de sistema} maxima_tempdir
 

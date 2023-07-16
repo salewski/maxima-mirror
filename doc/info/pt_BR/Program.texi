@@ -15,6 +15,7 @@ primitivas tais como @code{go}.
 @node Funções e Variáveis Definidas para Fluxo de Programa,  , Introdução a Fluxo de Programa, Fluxo de Programa
 @section Funções e Variáveis Definidas para Fluxo de Programa
 
+@anchor{backtrace}
 @deffn {Função} backtrace ()
 @deffnx {Função} backtrace (@var{n})
 Imprime a pilha de chamadas, que é, a lista de funções que
@@ -75,6 +76,7 @@ funções, incluindo a função correntemente ativa.
 
 @end deffn
 
+@anchor{do}
 @deffn {Operador especial} do
 A declaração @code{do} é usada para executar iteração.  Devido à sua
 grande generalidade a declaração @code{do} será  descrita em duas partes.
@@ -286,6 +288,7 @@ expressão não atômica, e partes sucessivas são usadas.)
 
 @end deffn
 
+@anchor{errcatch}
 @deffn {Função} errcatch (@var{expr_1}, ..., @var{expr_n})
 Avalia @var{expr_1}, ..., @var{expr_n} uma por uma e
 retorna @code{[@var{expr_n}]} (uma lista) se nenhum erro ocorrer.  Se um
@@ -299,6 +302,7 @@ terminará o @code{batch} se o erro não for detectado.
 
 @end deffn
 
+@anchor{error}
 @deffn {Função} error (@var{expr_1}, ..., @var{expr_n})
 @deffnx {Variável de sistema} error
 Avalia e imprime @var{expr_1}, ..., @var{expr_n},
@@ -315,6 +319,7 @@ Isso efetivamente reimprime a mais recente mensagem de erro.
 
 @end deffn
 
+@anchor{errormsg}
 @deffn {Função} errormsg ()
 Reimprime a mais recente mensagem de erro.
 A variável @code{error} recebe a mensagem,
@@ -324,12 +329,14 @@ e @code{errormsg} formata e imprime essa mensagem.
 
 @c REPHRASE
 @c AT LEAST SHOULD LIST VARIANTS HERE
+@anchor{for}
 @deffn {Operador especial} for
 Usado em iterações.  Veja @code{do} para uma descrição das
 facilidades de iteração do Maxima.
 
 @end deffn
 
+@anchor{go}
 @deffn {Função} go (@var{tag})
 é usada dentro de um @code{block} para transferir o controle para a declaração
 do bloco que for identificada com o argumento para @code{go}.  Para identificar uma
@@ -348,6 +355,7 @@ o próprio contendo o @code{go}.
 
 @c NEEDS CLARIFICATION, EXPANSION, EXAMPLES
 @c THIS ITEM IS IMPORTANT
+@anchor{if}
 @deffn {Operador especial} if
 Representa avaliação condicional. Várias formas de expressões @code{if} são reconhecidas.
 @code{if @var{cond_1} then @var{expr_1} else @var{expr_0}}
@@ -406,6 +414,7 @@ não                  not         prefixo lógico
 
 @c NEEDS CLARIFICATION
 @c THIS ITEM IS IMPORTANT
+@anchor{map}
 @deffn {Função} map (@var{f}, @var{expr_1}, ..., @var{expr_n})
 Retorna uma expressão cujo operador principal
 é o mesmo que o das expressões
@@ -446,6 +455,7 @@ exaustão de espaço da lista de armazenamento no decorrer da computação.
 @end example
 @end deffn
 
+@anchor{mapatom}
 @deffn {Função} mapatom (@var{expr})
 Retorna @code{true} se e somente se @var{expr} for tratada pelas rotinas de
 mapeamento como um átomo.  "Mapatoms" são átomos, números
@@ -455,6 +465,7 @@ mapeamento como um átomo.  "Mapatoms" são átomos, números
 @end deffn
 
 @c NEEDS CLARIFICATION
+@anchor{maperror}
 @defvr {Variável de opção} maperror
 Valor padrão: @code{true}
 
@@ -475,6 +486,7 @@ Se @code{maperror} for @code{true} então uma ,mensagem de erro
 @end defvr
 
 @c NEEDS CLARIFICATION
+@anchor{maplist}
 @deffn {Função} maplist (@var{f}, @var{expr_1}, ..., @var{expr_n})
 Retorna uma lista de aplicações de @var{f}
 em todas as partes das expressões @var{expr_1}, ..., @var{expr_n}.
@@ -487,6 +499,7 @@ que retorna uma expressão com o mesmo operador principal que @var{expr_i} tem
 @end deffn
 
 @c NEEDS CLARIFICATION
+@anchor{prederror}
 @defvr {Variável de opção} prederror
 Valor padrão: @code{true}
 
@@ -503,6 +516,7 @@ Veja também @code{is} e @code{maybe}.
 
 @end defvr
 
+@anchor{return}
 @deffn {Função} return (@var{valor})
 Pode ser usada para sair explicitamente de um bloco, levando
 seu argumento.  Veja @code{block} para mais informação.
@@ -510,6 +524,7 @@ seu argumento.  Veja @code{block} para mais informação.
 @end deffn
 
 @c NEEDS CLARIFICATION
+@anchor{scanmap}
 @deffn {Função} scanmap (@var{f}, @var{expr})
 @deffnx {Função} scanmap (@var{f}, @var{expr}, bottomup)
 Recursivamente aplica @var{f} a @var{expr}, de cima
@@ -560,6 +575,7 @@ caminhos.
 
 @end deffn
 
+@anchor{throw}
 @deffn {Função} throw (@var{expr})
 Avalia @var{expr} e descarta o valor retornado para o mais recente
 @code{catch}.  @code{throw} é usada com @code{catch} como um mecanismo de retorno
@@ -569,11 +585,13 @@ não local.
 
 @c NEED MORE HERE !!
 @c AT LEAST SHOULD LIST ACCEPTABLE VARIANTS
+@anchor{while}
 @deffn {Operador especial} while
 Veja @code{do}.
 
 @end deffn
 
+@anchor{outermap}
 @deffn {Função} outermap (@var{f}, @var{a_1}, ..., @var{a_n})
 Aplica a função @var{f} para cada um dos elementos do produto externo
 @var{a_1} vezes @var{a_2} ... vezes @var{a_n}.

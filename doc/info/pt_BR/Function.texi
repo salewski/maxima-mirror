@@ -167,6 +167,7 @@ o qual remove também remove a definição da função de array.
 @node Macros, Funções e Variáveis para Definição de Função, Função, Definição de Função
 @section Macros
 
+@anchor{buildq}
 @deffn {Função} buildq (@var{L}, @var{expr})
 Substitue variáveis nomeadas pela lista @var{L} dentro da expressão @var{expr},
 paralelamente,
@@ -283,6 +284,7 @@ e seus valores sobre o lado direito.
 
 @end deffn
 
+@anchor{macroexpand}
 @deffn {Função} macroexpand (@var{expr})
 Retorna a expansão da macro de @var{expr} sem avaliar a expressão,
 quando @code{expr} for uma chamada de função de macro.
@@ -327,6 +329,7 @@ Exemplos
 
 @end deffn
 
+@anchor{macroexpand1}
 @deffn {Função} macroexpand1 (@var{expr})
 Retorna a expansão de macro de @var{expr} sem avaliar a expressão,
 quando @code{expr} for uma chamada de função de macro.
@@ -369,6 +372,7 @@ Exemplos
 
 @end deffn
 
+@anchor{macros}
 @defvr {Global variable} macros
 Default value: @code{[]}
 
@@ -380,6 +384,7 @@ Veja também @code{infolists}.
 
 @end defvr
 
+@anchor{splice}
 @deffn {Função} splice (@var{a})
 Une como se fosse um elo de ligação (interpola) a lista nomeada através do átomo @var{a} em uma expressão,
 mas somente se @code{splice} aparecer dentro de @code{buildq};
@@ -427,6 +432,7 @@ Exemplos
 @node Funções e Variáveis para Definição de Função,  , Macros, Definição de Função
 @section Funções e Variáveis para Definição de Função
 
+@anchor{apply}
 @deffn {Função} apply (@var{F}, [@var{x_1}, ..., @var{x_n}])
 Constrói e avalia uma expressãp @code{@var{F}(@var{arg_1}, ..., @var{arg_n})}.
 
@@ -511,6 +517,7 @@ Improper name or value in functional position.
 @end deffn
 
 
+@anchor{block}
 @deffn {Função} block ([@var{v_1}, ..., @var{v_m}], @var{expr_1}, ..., @var{expr_n})
 @deffnx {Função} block (@var{expr_1}, ..., @var{expr_n})
 @code{block} avalia @var{expr_1}, ..., @var{expr_n} em seq@"{u}ência
@@ -561,6 +568,7 @@ mas podem ser usados em outros lugares também.
 @end deffn
 
 @c REPHRASE, NEEDS EXAMPLE
+@anchor{break}
 @deffn {Função} break (@var{expr_1}, ..., @var{expr_n})
 Avalia e imprime @var{expr_1}, ..., @var{expr_n} e então
 causa uma parada do Maxima nesse ponto e o usuário pode examinar e alterar
@@ -570,6 +578,7 @@ seu ambiente.  Nessa situação digite @code{exit;} para que o cálculo seja ret
 
 @c FOR SOME REASON throw IS IN SOME OTHER FILE.  MOVE throw INTO THIS FILE.
 @c NEEDS CLARIFICATION
+@anchor{catch}
 @deffn {Função} catch (@var{expr_1}, ..., @var{expr_n})
 Avalia @var{expr_1}, ..., @var{expr_n} uma por uma; se qualquer avaliação
 levar a uma avaliação de uma expressão da
@@ -598,6 +607,7 @@ primeiro elemento negativo de @code{l} e "arremessa-o".
 
 @end deffn
 
+@anchor{compfile}
 @deffn {Função} compfile (@var{nomearquivo}, @var{f_1}, ..., @var{f_n})
 @deffnx {Função} compfile (@var{nomearquivo}, funções)
 @deffnx {Função} compfile (@var{nomearquivo}, all)
@@ -630,6 +640,7 @@ Veja também @code{translate}, @code{translate_file}, e @code{compile_file}.
 @c 
 @c @end defvar
 
+@anchor{compile}
 @deffn {Função} compile (@var{f_1}, ..., @var{f_n})
 @deffnx {Função} compile (funções)
 @deffnx {Função} compile (all)
@@ -644,6 +655,7 @@ o operador apóstrofo-apóstrofo @code{'@w{}'} faz com que ocorra avaliação so
 
 @end deffn
 
+@anchor{define}
 @deffn {Função} define (@var{f}(@var{x_1}, ..., @var{x_n}), @var{expr})
 @deffnx {Função} define (@var{f}[@var{x_1}, ..., @var{x_n}], @var{expr})
 @deffnx {Função} define (funmake (@var{f}, [@var{x_1}, ..., @var{x_n}]), @var{expr})
@@ -762,6 +774,7 @@ the first argument is evaluated.
 
 @c SEE NOTE BELOW ABOUT THE DOCUMENTATION STRING
 @c @deffn {Função} define_variable (@var{name}, @var{default_value}, @var{mode}, @var{documentation})
+@anchor{define_variable}
 @deffn {Função} define_variable (@var{name}, @var{default_value}, @var{mode})
 
 Introduz uma variável global dentro do ambiente Maxima.
@@ -897,6 +910,7 @@ Cannot assign to `baz_quux'.
 
 @end deffn
 
+@anchor{dispfun}
 @deffn {Função} dispfun (@var{f_1}, ..., @var{f_n})
 @deffnx {Função} dispfun (all)
 Mostra a definição de funções definidas pelo usuário @var{f_1}, ..., @var{f_n}.
@@ -994,6 +1008,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{functions}
 @defvr {Variável de sistema} functions
 Valor padrão: @code{[]}
 
@@ -1054,6 +1069,7 @@ Exemplos:
 
 @end defvr
 
+@anchor{fundef}
 @deffn {Função} fundef (@var{f})
 Retorna a definição da função @var{f}.
 
@@ -1077,6 +1093,7 @@ e atribui a definição para o rótulo.
 @c PROBABLY NEED SOME EXAMPLES HERE
 @end deffn
 
+@anchor{funmake}
 @deffn {Função} funmake (@var{F}, [@var{arg_1}, ..., @var{arg_n}])
 Retorna uma expressão @code{@var{F}(@var{arg_1}, ..., @var{arg_n})}.
 O valor de retorno é simplificado, mas não avaliado,
@@ -1206,6 +1223,7 @@ Maxima simplifica o valor de retorno de @code{funmake}.
 
 @end deffn
 
+@anchor{lambda}
 @deffn {Função} lambda ([@var{x_1}, ..., @var{x_m}], @var{expr_1}, ..., @var{expr_n})
 @deffnx {Função} lambda ([[@var{L}]], @var{expr_1}, ..., @var{expr_n})
 @deffnx {Função} lambda ([@var{x_1}, ..., @var{x_m}, [@var{L}]], @var{expr_1}, ..., @var{expr_n})
@@ -1388,6 +1406,7 @@ Os argumentos aparecem dentro do corpo da função como uma lista.
 @end deffn
 
 @c NEEDS CLARIFICATION AND EXAMPLES
+@anchor{local}
 @deffn {Função} local (@var{v_1}, ..., @var{v_n})
 Declara as variáveis @var{v_1}, ..., @var{v_n} para serem locais com
 relação a todas as propriedades na declaração na qual essa função
@@ -1404,6 +1423,7 @@ ocorrêcia é permitida em cada.
 
 @end deffn
 
+@anchor{macroexpansion}
 @defvr {Variável de opção} macroexpansion
 Valor padrão: @code{false}
 
@@ -1571,6 +1591,7 @@ x + 99 is equal to x
 
 @end defvr
 
+@anchor{mode_checkp}
 @defvr {Variável de opção} mode_checkp
 Valor padrão: @code{true}
 
@@ -1581,6 +1602,7 @@ de associação de variáveis.
 
 @end defvr
 
+@anchor{mode_check_errorp}
 @defvr {Variável de opção} mode_check_errorp
 Valor padrão: @code{false}
 
@@ -1591,6 +1613,7 @@ a função "error".
 
 @end defvr
 
+@anchor{mode_check_warnp}
 @defvr {Variável de opção} mode_check_warnp
 Valor padrão: @code{true}
 
@@ -1602,6 +1625,7 @@ descritos.
 @end defvr
 
 @c NEEDS CLARIFICATION AND EXAMPLES
+@anchor{mode_declare}
 @deffn {Função} mode_declare (@var{y_1}, @var{mode_1}, ..., @var{y_n}, @var{mode_n})
 @code{mode_declare} é usado para declarar os modos de variáveis e
 funções para subseq@"{u}ênte tradução ou compilação das funções.
@@ -1661,6 +1685,7 @@ declara que os valores retornados por @code{f_1}, @code{f_2}, ...  são inteiros
 
 @c WHAT IS THIS ABOUT ??
 @c NEEDS CLARIFICATION AND EXAMPLES
+@anchor{mode_identity}
 @deffn {Função} mode_identity (@var{arg_1}, @var{arg_2})
 Uma forma especial usada com @code{mode_declare} e
 @code{macros} para declarar, e.g., uma lista de listas de números em ponto flutuante ou outros
@@ -1690,6 +1715,7 @@ toda vez que você pegar o primeiro de uma lista de números.
 
 @c IS THERE ANY REASON TO SET transcompile: false ??
 @c MAYBE THIS VARIABLE COULD BE PERMANENTLY SET TO true AND STRUCK FROM THE DOCUMENTATION.
+@anchor{transcompile}
 @defvr {Variável de opção} transcompile
 Valor padrão: @code{true}
 
@@ -1701,6 +1727,7 @@ declarações para fazer o código traduzido mais adequado para compilação.
 
 @end defvr
 
+@anchor{translate}
 @deffn {Função} translate (@var{f_1}, ..., @var{f_n})
 @deffnx {Função} translate (funções)
 @deffnx {Função} translate (all)
@@ -1763,6 +1790,7 @@ funções traduzidas.
 
 @end deffn
 
+@anchor{translate_file}
 @deffn {Função} translate_file (@var{maxima_nomearquivo})
 @deffnx {Função} translate_file (@var{maxima_nomearquivo}, @var{lisp_nomearquivo})
 Traduz um arquivo com código Maxima para um arquivo com código Lisp.
@@ -1829,6 +1857,7 @@ e @code{tr_warn_undefined_variable}.
 
 @end deffn
 
+@anchor{transrun}
 @defvr {Variável de opção} transrun
 Valor padrão: @code{true}
 
@@ -1840,6 +1869,7 @@ em lugar de versão traduzidas.
 
 @c IN WHAT CONTEXT IS tr_array_as_ref: false APPROPRIATE ??? NOT SEEING THE USEFULNESS HERE.
 @c ALSO, I GUESS WE SHOULD HAVE AN ITEM FOR translate_fast_arrays, ANOTHER CONFUSING FLAG ...
+@anchor{tr_array_as_ref}
 @defvr {Variável de opção} tr_array_as_ref
 Valor padrão: @code{true}
 
@@ -1855,6 +1885,7 @@ de outra forma nomes de arrays aparecem como símbolos literais no código tradu
 
 @c WHY IS THIS FLAG NEEDED ??? UNDER WHAT CIRCUMSTANCES CAN TRANSLATION
 @c OF A BOUND VARIABLE USED AS A FUNCTION GO WRONG ???
+@anchor{tr_bound_function_applyp}
 @defvr {Variável de opção} tr_bound_function_applyp
 Valor padrão: @code{true}
 
@@ -1868,6 +1899,7 @@ a mensagem de alerta.
 
 @end defvr
 
+@anchor{tr_file_tty_messagesp}
 @defvr {Variável de opção} tr_file_tty_messagesp
 Valor padrão: @code{false}
 
@@ -1882,6 +1914,7 @@ arquivos são somente inseridas dentro do arquivo UNLISP.
 @c THIS FLAG APPEARS TO HAVE NO EFFECT.  SHOULD CUT OUT THIS ITEM AND RELATED CODE.
 @c NOTE THAT THERE IS CODE IN src/transf.lisp WHICH USES THIS FLAG BUT THE MODE
 @c FLAG IS LOST SOMEWHERE ALONG THE WAY TO THE LISP OUTPUT FILE.
+@anchor{tr_float_can_branch_complex}
 @defvr {Variável de opção} tr_float_can_branch_complex
 Valor padrão: @code{true}
 
@@ -1898,6 +1931,7 @@ Quando @code{false} então @code{acos(x)} será do modo
 
 @end defvr
 
+@anchor{tr_function_call_default}
 @defvr {Variável de opção} tr_function_call_default
 Valor padrão: @code{general}
 
@@ -1913,6 +1947,7 @@ código traduzido e compilado com o interpretador Maxima.
 
 @end defvr
 
+@anchor{tr_numer}
 @defvr {Variável de opção} tr_numer
 Valor padrão: @code{false}
 
@@ -1921,6 +1956,7 @@ Quando @code{tr_numer} for @code{true} propriedades @code{numer} são usadas par
 
 @end defvr
 
+@anchor{tr_optimize_max_loop}
 @defvr {Variável de opção} tr_optimize_max_loop
 Valor padrão: 100
 
@@ -1931,6 +1967,7 @@ propriedades de otimização não terminadas.
 
 @end defvr
 
+@anchor{tr_semicompile}
 @defvr {Variável de opção} tr_semicompile
 Valor padrão: @code{false}
 
@@ -1941,6 +1978,7 @@ de máquina pelo compilador Lisp.
 @end defvr
 
 @c ARE ANY OF THESE OBSOLETE ??
+@anchor{tr_state_vars}
 @defvr {Variável de sistema} tr_state_vars
 Valor padrão:
 @example
@@ -1962,12 +2000,14 @@ rastrear erros.
 @c tr_warnings_get EXISTS AND FUNCTIONS AS ADVERTISED (SORT OF) -- RETURNS *tr-runtime-warned*
 @c WHICH HAS ONLY A FEW KINDS OF WARNINGS PUSHED ONTO IT; IT'S CERTAINLY NOT COMPREHENSIVE
 @c DO WE REALLY NEED THIS SLIGHTLY WORKING FUNCTION ??
+@anchor{tr_warnings_get}
 @deffn {Função} tr_warnings_get ()
 Imprime uma lista de alertas que podem ter sido dadas pelo
 tradutor durante a tradução corrente.
 
 @end deffn
 
+@anchor{tr_warn_bad_function_calls}
 @defvr {Variável de opção} tr_warn_bad_function_calls
 Valor padrão: @code{true}
 
@@ -1977,6 +2017,7 @@ a declarações impróprias que foram feitas em tempo de tradução.
 
 @end defvr
 
+@anchor{tr_warn_fexpr}
 @defvr {Variável de opção} tr_warn_fexpr
 Valor padrão: @code{compfile}
 
@@ -1986,6 +2027,7 @@ todas as formas de programa especial legítimo são traduzidas.
 
 @end defvr
 
+@anchor{tr_warn_meval}
 @defvr {Variável} tr_warn_meval
 Valor padrão: @code{compfile}
 
@@ -1995,6 +2037,7 @@ tradução.
 
 @end defvr
 
+@anchor{tr_warn_mode}
 @defvr {Variável} tr_warn_mode
 Valor padrão: @code{all}
 
@@ -2003,6 +2046,7 @@ atribuídos valores inapropriados para seu modo.
 
 @end defvr
 
+@anchor{tr_warn_undeclared}
 @defvr {Variável de opção} tr_warn_undeclared
 Valor padrão: @code{compile}
 
@@ -2011,6 +2055,7 @@ alertas sobre variáveis não declaradas para o TTY.
 
 @end defvr
 
+@anchor{tr_warn_undefined_variable}
 @defvr {Variável de opção} tr_warn_undefined_variable
 Valor padrão: @code{all}
 
@@ -2019,6 +2064,7 @@ variáveis globais indefinidas forem vistas.
 
 @end defvr
 
+@anchor{compile_file}
 @deffn {Função} compile_file (@var{nomearquivo})
 @deffnx {Função} compile_file (@var{nomearquivo}, @var{nomearquivo_compilado})
 @deffnx {Função} compile_file (@var{nomearquivo}, @var{nomearquivo_compilado}, @var{lisp_nomearquivo})
@@ -2058,6 +2104,7 @@ atribuições para sinalizadores traduzidos (@code{tr_numer}, etc.) não têm ef
 @end deffn
 
 @c NEEDS CLARIFICATION
+@anchor{declare_translated}
 @deffn {Função} declare_translated (@var{f_1}, @var{f_2}, ...)
 Quando traduzindo um arquivo do código Maxima
 para Lisp, é importante para o programa tradutor saber quais funções

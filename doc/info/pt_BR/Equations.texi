@@ -9,6 +9,7 @@
 @section Funções e Variáveis Definidas para Equações
 
 @c NEED A DESCRIPTION OF %rnum AS WELL
+@anchor{%rnum_list}
 @defvr {Variável} %rnum_list
 Valor padrão: @code{[]}
 
@@ -25,6 +26,7 @@ fazer @code{concat ('%r, j)}.
 @c NEED EXAMPLE HERE
 @end defvr
 
+@anchor{algexact}
 @defvr {Variável} algexact
 Valor padrão: @code{false}
 
@@ -45,6 +47,7 @@ soluções exatas, e somente retorna aproximações quando tudo mais falha.
 @c ABOVE DESCRIPTION NOT TOO CLEAR -- MAYBE EXAMPLES WILL HELP
 @end defvr
 
+@anchor{algsys}
 @deffn {Função} algsys ([@var{expr_1}, ..., @var{expr_m}], [@var{x_1}, ..., @var{x_n}])
 @deffnx {Função} algsys ([@var{eqn_1}, ..., @var{eqn_m}], [@var{x_1}, ..., @var{x_n}])
 Resolve polinômios simultâneos @var{expr_1}, ..., @var{expr_m}
@@ -163,6 +166,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{allroots}
 @deffn {Função} allroots (@var{expr})
 @deffnx {Função} allroots (@var{eqn})
 Calcula aproximações numéricas de raízes reais e complexas do
@@ -234,6 +238,7 @@ x = - .9659625152196369 %i - .4069597231924075, x = 1.0]
 
 @end deffn
 
+@anchor{backsubst}
 @defvr {Variável} backsubst
 Valor padrão: @code{true}
 
@@ -245,6 +250,7 @@ a geração de expressões extremamente largas.
 
 @end defvr
 
+@anchor{breakup}
 @defvr {Variável} breakup
 Valor padrão: @code{true}
 
@@ -321,6 +327,7 @@ Solution:
 
 @end defvr
 
+@anchor{dimension}
 @deffn {Função} dimension (@var{eqn})
 @deffnx {Função} dimension (@var{eqn_1}, ..., @var{eqn_n})
 @code{dimen} é um pacote de análise dimensional.
@@ -330,6 +337,7 @@ Solution:
 
 @end deffn
 
+@anchor{dispflag}
 @defvr {Variável} dispflag
 Valor padrão: @code{true}
 
@@ -342,6 +350,7 @@ dentro de @code{block}.  Terminando @code{block} com um sinal de dolar, $, escol
 @end defvr
 
 @c THIS COULD BENEFIT FROM REPHRASING
+@anchor{funcsolve}
 @deffn {Função} funcsolve (@var{eqn}, @var{g}(@var{t}))
 Retorna @code{[@var{g}(@var{t}) = ...]}  ou @code{[]}, dependendo de existir
 ou não uma função racional @code{@var{g}(@var{t})} satisfazendo @var{eqn},
@@ -366,6 +375,7 @@ e obviamente generalizações estão ausêntes.
 
 @end deffn
 
+@anchor{globalsolve}
 @defvr {Variável} globalsolve
 Valor padrão: @code{false}
 
@@ -429,6 +439,7 @@ Solution
 @c THIS DESCRIPTION NEEDS WORK AND EXAMPLES
 @c MERGE IN TEXT FROM share/integequations/inteqn.usg
 @c AND EXAMPLES FROM .../intexs.mac
+@anchor{ieqn}
 @deffn {Função} ieqn (@var{ie}, @var{unk}, @var{tech}, @var{n}, @var{guess})
 @code{inteqn} é um pacote para resolver equações com integrais.
 @code{load ("inteqn")} carrega esse pacote.
@@ -460,6 +471,7 @@ guess: @code{none} o que fará com que @code{neumann} e @code{firstkindseries} u
 
 @end deffn
 
+@anchor{ieqnprint}
 @defvr {Variável de opção} ieqnprint
 Valor padrão: @code{true}
 
@@ -479,6 +491,7 @@ dados para @code{ieqn} se ocorrer um erro evita a geração de termos adicionais
 
 @end defvr
 
+@anchor{lhs}
 @deffn {Função} lhs (@var{expr})
 Retorna o lado esquerdo (isto é, o primeiro argumento)
 da expressão @var{expr},
@@ -540,6 +553,7 @@ Exemplos:
 @end deffn
 
 @c REVISIT -- THERE'S PROBABLY MORE TO SAY HERE
+@anchor{linsolve}
 @deffn {Função} linsolve ([@var{expr_1}, ..., @var{expr_m}], [@var{x_1}, ..., @var{x_n}])
 Resolve a lista de
 equações lineares simultâneas para a lista de variáveis.  As expressões
@@ -633,6 +647,7 @@ Solution
 @end deffn
 
 @c DO ANY FUNCTIONS OTHER THAN linsolve RESPECT linsolvewarn ??
+@anchor{linsolvewarn}
 @defvr {Variável} linsolvewarn
 Valor padrão: @code{true}
 
@@ -641,6 +656,7 @@ Quando @code{linsolvewarn} é @code{true},
 
 @end defvr
 
+@anchor{linsolve_params}
 @defvr {Variável} linsolve_params
 Valor padrão: @code{true}
 
@@ -652,6 +668,7 @@ equações com algumas variáveis expressas em termos e outras.
 
 @end defvr
 
+@anchor{multiplicities}
 @defvr {Variável} multiplicities
 Valor padrão: @code{not_set_yet}
 
@@ -662,6 +679,7 @@ multiplicidades das soluções individuais retornadas por @code{solve} ou
 
 @end defvr
 
+@anchor{nroots}
 @deffn {Função} nroots (@var{p}, @var{low}, @var{high})
 Retorna o número de raízes reais do polinômio 
 real de uma única variável @var{p} no intervalo semi-aberto
@@ -680,6 +698,7 @@ infinito e mais infinito.
 @end deffn
 
 @c NEEDS WORK
+@anchor{nthroot}
 @deffn {Função} nthroot (@var{p}, @var{n})
 Onde p é um polinômio com coeficientes inteiros e
 n é um inteiro positivo retorna q, um polinômio sobre os inteiros, tal
@@ -688,6 +707,7 @@ perfeita.  Essa rotina é mais rápida que @code{factor} ou mesmo @code{sqfr}.
 
 @end deffn
 
+@anchor{programmode}
 @defvr {Variável} programmode
 Valor padrão: @code{true}
 
@@ -705,6 +725,7 @@ cria rótulos de expressões intermediárias
 
 @end defvr
 
+@anchor{realonly}
 @defvr {Variável} realonly
 Valor padrão: @code{false}
 
@@ -713,6 +734,7 @@ aquelas soluções que estão livres de @code{%i}.
 
 @end defvr
 
+@anchor{realroots}
 @deffn {Função} realroots (@var{expr}, @var{bound})
 @deffnx {Função} realroots (@var{eqn}, @var{bound})
 @deffnx {Função} realroots (@var{expr})
@@ -774,6 +796,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{rhs}
 @deffn {Função} rhs (@var{expr})
 Retorna o lado direito (isto é, o segundo argumento)
 da expressão @var{expr},
@@ -834,6 +857,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{rootsconmode}
 @defvr {Variável de opção} rootsconmode
 Valor padrão: @code{true}
 
@@ -843,6 +867,7 @@ Valor padrão: @code{true}
 @end defvr
 
 @c NEEDS WORK
+@anchor{rootscontract}
 @deffn {Função} rootscontract (@var{expr})
 Converte produtos de raízes em raízes de produtos.
 Por exemplo,
@@ -924,6 +949,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{rootsepsilon}
 @defvr {Variável de opção} rootsepsilon
 Valor padrão: 1.0e-7
 
@@ -935,6 +961,7 @@ intervalo de conficência para as raízes achadas pela função @code{realroots}
 @end defvr
 
 @c NEEDS WORK
+@anchor{solve}
 @deffn {Função} solve (@var{expr}, @var{x})
 @deffnx {Função} solve (@var{expr})
 @deffnx {Função} solve ([@var{eqn_1}, ..., @var{eqn_n}], [@var{x_1}, ..., @var{x_n}])
@@ -1105,6 +1132,7 @@ y = - .1535675710019696]]
 
 @end deffn
 
+@anchor{solvedecomposes}
 @defvr {Variável de opção} solvedecomposes
 Valor padrão: @code{true}
 
@@ -1114,6 +1142,7 @@ Quando @code{solvedecomposes} é @code{true}, @code{solve} chama
 
 @end defvr
 
+@anchor{solveexplicit}
 @defvr {Variável de opção} solveexplicit
 Valor padrão: @code{false}
 
@@ -1124,6 +1153,7 @@ onde @code{F} é alguma função.
 
 @end defvr
 
+@anchor{solvefactors}
 @defvr {Variável de opção} solvefactors
 Valor padrão: @code{true}
 
@@ -1135,6 +1165,7 @@ onde a fatoração não é necessária.
 
 @end defvr
 
+@anchor{solvenullwarn}
 @defvr {Variável de opção} solvenullwarn
 Valor padrão: @code{true}
 
@@ -1144,6 +1175,7 @@ Por exemplo, @code{solve ([], [])} imprimirá duas mensagens de alerta e retorna
 
 @end defvr
 
+@anchor{solveradcan}
 @defvr {Variável de opção} solveradcan
 Valor padrão: @code{false}
 
@@ -1154,6 +1186,7 @@ contendo exponeniais e logarítmos sejam resolvidos.
 
 @end defvr
 
+@anchor{solvetrigwarn}
 @defvr {Variável de opção} solvetrigwarn
 Valor padrão: @code{true}
 
@@ -1166,6 +1199,7 @@ soluções.
 
 @end defvr
 
+@anchor{solve_inconsistent_error}
 @defvr {Variável de opção} solve_inconsistent_error
 Valor padrão: @code{true}
 

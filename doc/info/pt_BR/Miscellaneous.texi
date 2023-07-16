@@ -30,72 +30,7 @@ Usuários podem encontrar isso de forma mais detalhada navegando no diretório c
 @node Funções e Variáveis Definidas para Opções Diversas,  , Compartilhado, Opções Diversas
 @section Funções e Variáveis Definidas para Opções Diversas
 
-@defvr {Variável de sistema} aliases
-Valor padrão: @code{[]}
-
-@code{aliases} é a lista de átomos que possuem um alias definido pelo usuário (escolhido através
-das funções @code{alias}, @code{ordergreat}, @code{orderless} ou através da declaração do átomo como sendo um
-@code{noun} (substantivo) com @code{declare}).
-@end defvr
-
-
-@defvr {Declaração} alphabetic
-@code{alphabetic} é uma declaração reconhecida por @code{declare}.
-A expressão @code{declare(@var{s}, alphabetic)} diz ao Maxima para reconhecer
-como alfabético todos os caracteres em @var{s}, que deve ser uma seq@"{u}ência de caracteres.
- 
-Veja também @ref{Identificadores}.
-
-Exemplo:
-
-@c ===beg===
-@c xx\~yy\`\@ : 1729;
-@c declare ("~`@", alphabetic);
-@c xx~yy`@ + @yy`xx + `xx@@yy~;
-@c listofvars (%);
-@c ===end===
-@example
-(%i1) xx\~yy\`\@@ : 1729;
-(%o1)                         1729
-(%i2) declare ("~`@@", alphabetic);
-(%o2)                         done
-(%i3) xx~yy`@@ + @@yy`xx + `xx@@@@yy~;
-(%o3)               `xx@@@@yy~ + @@yy`xx + 1729
-(%i4) listofvars (%);
-(%o4)                  [@@yy`xx, `xx@@@@yy~]
-@end example
-
-
-@end defvr
-
-@c REPHRASE
-@c DOES apropos RETURN THE SAME THING AS THE LIST SHOWN BY describe ??
-@deffn {Função} apropos (@var{string})
-Procura por nomes Maxima que possuem @var{string} aparecendo em qualquer lugar dentro
-de seu nome.  Dessa forma, @code{apropos (exp)} retorna uma lista de todos os sinalizadores
-e funções que possuem @code{exp} como parte de seus nomes, tais como @code{expand},
-@code{exp}, e @code{exponentialize}.  Dessa forma você pode somente lembra parte do nome
-de alguma coisa você pode usar esse comando para achar o restante do nome.
-Similarmente, você pode dizer @code{apropos (tr_)} para achar uma lista de muitos dos
-comutadores relatando para o tradutor, muitos dos quais começam com @code{tr_}.
-
-@end deffn
-
-@deffn {Função} args (@var{expr})
-Retorna a lista de argumentos de @code{expr},
-que pode ser de qualquer tipo de expressão outra como um átomo.
-Somente os argumentos do operador de nível mais alto são extraídos;
-subexpressões de @code{expr} aparecem como elementos ou subexpressões de elementos
-da lista de argumentos.
-
-A ordem dos ítens na lista pode depender do sinalizador global @code{inflag}.
-
-@code{args (@var{expr})} é equivalente a @code{substpart ("[", @var{expr}, 0)}.
-Veja também @code{substpart} e @code{op}.
-
-@c NEEDS EXAMPLES
-@end deffn
-
+@anchor{genindex}
 @defvr {Variável de opção} genindex
 Valor padrão: @code{i}
 
@@ -104,6 +39,7 @@ próxima variável do somatório quando necessário.
 
 @end defvr
 
+@anchor{gensumnum}
 @defvr {Variável de opção} gensumnum
 Valor padrão: 0
 
@@ -113,79 +49,7 @@ de @code{genindex} com um sufixo numérico.
 
 @end defvr
 
-@c NEEDS EXPANSION AND EXAMPLES
-@defvr {Constante} inf
-Infinito positivo real.
-
-@end defvr
-
-@c NEEDS EXPANSION AND EXAMPLES
-@defvr {Constante} infinity
-Infinito complexo, uma magnitude infinita de ângulo de fase
-arbitrária.  Veja também @code{inf} e @code{minf}.
-
-@end defvr
-
-@defvr {Variável de sistema} infolists
-Valor padrão: @code{[]}
-
-@code{infolists} é uma lista dos nomes de todas as listas de
-informação no Maxima. São elas:
-
-@table @code
-@item labels
-Todos associam @code{%i}, @code{%o}, e rótulos @code{%t}.
-@item values
-Todos associam átomos que são variáveis de usuário, não opções do
-Maxima ou comutadores, criados através de @code{:} ou @code{::} ou associando funcionalmente.
-@c WHAT IS INTENDED BY "FUNCTIONAL BINDING" HERE ??
-
-@item functions
-Todas as funções definidas pelo usuário, criadas através de @code{:=} ou @code{define}.
-
-@item arrays
-Todos os arrays declarados e não declarados, criados através de @code{:}, @code{::}, ou @code{:=}.
-@c AREN'T THERE OTHER MEANS OF CREATING ARRAYS ??
-@item macros
-Todas as macros definidas pelo usuário.
-
-@item myoptions
-Todas as opções alguma vez alteradas pelo usuário (mesmo que tenham ou não elas
-tenham mais tarde retornadas para seus valores padrão).
-
-@item rules
-Todos os modelos definidos pelo usuário que coincidirem e regras de simplificação, criadas
-através de @code{tellsimp}, @code{tellsimpafter}, @code{defmatch}, ou @code{defrule}.
-
-@item aliases
-Todos os átomos que possuem um alias definido pelo usuário, criado através das funções
-@code{alias}, @code{ordergreat}, @code{orderless} ou declarando os átomos como um @code{noun}
-com @code{declare}.
-
-@item dependencies
-Todos os átomos que possuem dependências funcionais, criadas através das
-funções @code{depends} ou @code{gradef}.
-
-@item gradefs
-Todas as funções que possuem derivadas definidas pelo usuário, cridas através da
-função @code{gradef}.
-
-@c UMM, WE REALLY NEED TO BE SPECIFIC -- WHAT DOES "ETC" CONTAIN HERE ??
-@item props
-Todos os átomos que possuem quaisquer propriedades outras que não essas mencionadas
-acima, tais como propriedades estabelecidas por @code{atvalue} , @code{matchdeclare}, etc., também propriedades
-estabelecidas na função @code{declare}.
-
-@item let_rule_packages
-Todos os pacote de régras em uso definidos pelo usuário
-mais o pacote especial @code{default_let_rule_package}.
-(@code{default_let_rule_package} é o nome do pacote de régras usado quando
-um não está explicitamente escolhido pelo usuário.)
-
-@end table
-
-@end defvr
-
+@anchor{integerp}
 @deffn {Função} integerp (@var{expr})
 Retorna @code{true} se @var{expr} é um inteiro numérico literal, de outra forma retorna @code{false}.
 
@@ -217,6 +81,7 @@ Exemplos:
 
 @end deffn
 
+@anchor{m1pbranch}
 @defvr {Variável de opção} m1pbranch
 Valor padrão: @code{false}
 
@@ -239,6 +104,7 @@ m1pbranch:false          m1pbranch:true
 
 @end defvr
 
+@anchor{numberp}
 @deffn {Função} numberp (@var{expr})
 Retorna @code{true} se @var{expr} for um inteiro literal, número racional, 
 número em ponto flutuante, ou um grande número em ponto flutuante, de outra forma retorna @code{false}.
@@ -271,145 +137,8 @@ Exemplos:
 
 @end deffn
 
-@c CROSS REF TO WHICH FUNCTION OR FUNCTIONS ESTABLISH PROPERTIES !! (VERY IMPORTANT)
-@c NEEDS EXPANSION, CLARIFICATION, AND EXAMPLES
-@deffn {Função} properties (@var{a})
-Retorna uma lista de nomes de todas as
-propriedades associadas com o átomo @var{a}.
-
-@end deffn
-
-@c CROSS REF TO WHICH FUNCTION OR FUNCTIONS ESTABLISH PROPERTIES !! (VERY IMPORTANT)
-@c NEEDS EXPANSION, CLARIFICATION, AND EXAMPLES
-@c WHAT IS HIDDEN IN THE "etc" HERE ??
-@defvr {Símbolo especial} props
-@code{props} são átomos que possuem qualquer propriedade outra como essas explicitamente
-mencionadas em @code{infolists}, tais como especificado através de @code{atvalue}, @code{matchdeclare}, etc., 
-e também propriedades especificadas na função @code{declare}.
- 
-@end defvr
-
-@c CROSS REF TO WHICH FUNCTION OR FUNCTIONS ESTABLISH PROPERTIES !! (VERY IMPORTANT)
-@c NEEDS EXPANSION, CLARIFICATION, AND EXAMPLES
-@deffn {Função} propvars (@var{prop})
-Retorna uma lista desses átomos sobre a lista @code{props} que
-possui a propriedade indicada através de @var{prop}.  Dessa forma @code{propvars (atvalue)}
-retorna uma lista de átomos que possuem atvalues.
-
-@end deffn
-
-@c CROSS REF TO OTHER FUNCTIONS WHICH PUT/GET PROPERTIES !! (VERY IMPORTANT)
-@c NEEDS EXPANSION, CLARIFICATION, AND EXAMPLES
-@c ARE PROPERTIES ESTABLISHED BY put THE SAME AS PROPERTIES ESTABLISHED BY declare OR OTHER FUNCTIONS ??
-@c IS put (foo, true, integer) EQUIVALENT TO declare (foo, integer) FOR EXAMPLE ??
-@deffn {Função} put (@var{átomo}, @var{valor}, @var{indicador})
-Atribui @var{valor} para a propriedade (especificada através de @var{indicador}) do @var{átomo}.
-@var{indicador} pode ser o nome de qualquer propriedade, não apenas uma propriedade definida pelo sistema.
-
-@code{put} avalia seus argumentos. 
-@code{put} retorna @var{valor}.
-
-Exemplos:
-
-@example
-(%i1) put (foo, (a+b)^5, expr);
-                                   5
-(%o1)                       (b + a)
-(%i2) put (foo, "Hello", str);
-(%o2)                         Hello
-(%i3) properties (foo);
-(%o3)            [[user properties, str, expr]]
-(%i4) get (foo, expr);
-                                   5
-(%o4)                       (b + a)
-(%i5) get (foo, str);
-(%o5)                         Hello
-@end example
-
-@end deffn
-
-@deffn {Função} qput (@var{átomo}, @var{valor}, @var{indicador})
-Atribui @var{valor} para a propriedade (especificada através de @var{indicador}) do @var{átomo}.
-Isso é o mesmo que @code{put},
-exceto que os argumentos nã são avaliados.
-
-Exemplo:
-
-@example
-(%i1) foo: aa$ 
-(%i2) bar: bb$
-(%i3) baz: cc$
-(%i4) put (foo, bar, baz);
-(%o4)                          bb
-(%i5) properties (aa);
-(%o5)                [[user properties, cc]]
-(%i6) get (aa, cc);
-(%o6)                          bb
-(%i7) qput (foo, bar, baz);
-(%o7)                          bar
-(%i8) properties (foo);
-(%o8)            [value, [user properties, baz]]
-(%i9) get ('foo, 'baz);
-(%o9)                          bar
-@end example
-
-@end deffn
-
-@c CROSS REF TO OTHER FUNCTIONS WHICH PUT/GET PROPERTIES !! (VERY IMPORTANT)
-@c NEEDS EXPANSION, CLARIFICATION, AND EXAMPLES
-@c HOW DOES THIS INTERACT WITH declare OR OTHER PROPERTY-ESTABLISHING FUNCTIONS ??
-@c HOW IS THIS DIFFERENT FROM remove ??
-@deffn {Função} rem (@var{átomo}, @var{indicador})
-Remove a propriedade indicada através de @var{indicador} do @var{átomo}.
-
-@end deffn
-
-@c CROSS REF TO OTHER FUNCTIONS WHICH PUT/GET PROPERTIES !! (VERY IMPORTANT)
-@c NEEDS EXPANSION, CLARIFICATION, AND EXAMPLES
-@c HOW DOES THIS INTERACT WITH declare OR OTHER PROPERTY-ESTABLISHING FUNCTIONS ??
-@c HOW IS THIS DIFFERENT FROM rem ??
-@deffn {Função} remove (@var{a_1}, @var{p_1}, ..., @var{a_n}, @var{p_n})
-@deffnx {Função} remove ([@var{a_1}, ..., @var{a_m}], [@var{p_1}, ..., @var{p_n}], ...)
-@deffnx {Função} remove ("@var{a}", operator)
-@deffnx {Função} remove (@var{a}, transfun)
-@deffnx {Função} remove (all, @var{p})
-Remove propriedades associadas a átomos.
-
-@code{remove (@var{a_1}, @var{p_1}, ..., @var{a_n}, @var{p_n})}
-remove a propriedade @code{p_k} do átomo @code{a_k}.
-
-@code{remove ([@var{a_1}, ..., @var{a_m}], [@var{p_1}, ..., @var{p_n}], ...)}
-remove as propriedades @code{@var{p_1}, ..., @var{p_n}}
-dos átomos @var{a_1}, ..., @var{a_m}.
-Pode existir mais que um par de listas.
-
-@c VERIFY THAT THIS WORKS AS ADVERTISED
-@code{remove (all, @var{p})} remove a propriedade @var{p} de todos os átomos que a possuem.
-
-@c SHOULD REFER TO A LIST OF ALL SYSTEM-DEFINED PROPERTIES HERE.
-A propriedade removida pode ser definida pelo sistema tal como
-@code{function}, @code{macro} ou @code{mode_declare}, ou propriedades definidas pelo usuário.
-
-@c VERIFY THAT THIS WORKS AS ADVERTISED
-@c IS transfun PECULIAR TO remove ?? IF SO, SHOW SPECIAL CASE AS @defunx
-uma propriedade pode ser @code{transfun} para remover
-a versão traduzida Lisp de uma função.
-Após executar isso, a versão Maxima da função é executada
-em lugar da versão traduzida.
-
-@code{remove ("@var{a}", operator)} ou, equivalentemente, @code{remove ("@var{a}", op)}
-remove de @var{a} as propriedades @code{operator} declaradas através de
-@code{prefix}, @code{infix}, @code{nary}, @code{postfix}, @code{matchfix}, ou @code{nofix}.
-Note que o nome do operador deve ser escrito como uma seq@"{u}ência de caracteres com apóstofo.
-
-@code{remove} sempre retorna @code{done} se um átomo possui ou não uma propriedade especificada.
-Esse comportamento é diferente das funções remove mais específicas
-@code{remvalue}, @code{remarray}, @code{remfunction}, e @code{remrule}.
-
-@c IN SERIOUS NEED OF EXAMPLES HERE
-@end deffn
-
 @c NEEDS EXAMPLES
+@anchor{remvalue}
 @deffn {Função} remvalue (@var{nome_1}, ..., @var{nome_n})
 @deffnx {Função} remvalue (all)
 Remove os valores de Variáveis de usuário @var{nome_1}, ..., @var{nome_n}
@@ -424,6 +153,7 @@ Veja também @code{values}.
 @end deffn
 
 @c NEEDS EXAMPLES
+@anchor{rncombine}
 @deffn {Função} rncombine (@var{expr})
 Transforma @var{expr} combinando todos os termos de @var{expr} que possuem
 denominadores idênticos ou denominadores que diferem de cada um dos outros apenas por
@@ -439,14 +169,7 @@ cancelamentos.
 Para usar essa função escreva primeiramente @code{load("rncomb")}.
 @end deffn
 
-@c NEEDS CLARIFICATION AND EXAMPLES
-@deffn {Função} scalarp (@var{expr})
-Retorna @code{true} se @var{expr} for um número, constante, ou variável
-declarada @code{scalar} com @code{declare}, ou composta inteiramente de números, constantes, e tais
-Variáveis, bmas não contendo matrizes ou listas.
-
-@end deffn
-
+@anchor{setup_autoload}
 @deffn {Função} setup_autoload (@var{nomearquivo}, @var{função_1}, ..., @var{função_n})
 Especifica que
 se qualquer entre @var{função_1}, ..., @var{função_n} for referenciado e não ainda definido,
