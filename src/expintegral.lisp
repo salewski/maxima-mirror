@@ -736,7 +736,7 @@
          (format t "~&We expand in a power series.~%"))
        (let* ((n1 (- n 1))
               (meuler (mul -1 bigfloat%gamma))
-              (r (if (= n1 0) (sub meuler ($log z)) (div bigfloatone n1)))
+              (r (if (= n1 0) (sub meuler (ftake '%log z)) (div bigfloatone n1)))
               (f bigfloatone)
               (e bigfloatzero))
          (do* ((i 1 (+ i 1)))
@@ -748,7 +748,7 @@
               (let ((psi meuler))                
                 (dotimes (ii n1)
                   (setq psi (add psi (cdiv bigfloatone (+ ii 1)))))
-                (setq e (cmul f (sub psi ($log z))))))
+                (setq e (cmul f (sub psi (ftake '%log z))))))
              (t 
               (setq e (cdiv (mul -1 f) (- i n1)))))
            (setq r (add r e))
@@ -1313,7 +1313,7 @@
   (expintegral-ei (log z)))
 
 (defun bfloat-expintegral-li (z)
-  (bfloat-expintegral-ei ($log z)))
+  (bfloat-expintegral-ei (ftake '%log z)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -1470,8 +1470,8 @@
     (add
       (bfloat-expintegral-e 1 mz*%i)
       (mul -1 (bfloat-expintegral-e 1 z*%i))
-      ($log mz*%i)
-      (mul -1 ($log z*%i))))))
+      (ftake '%log mz*%i)
+      (mul -1 (ftake '%log z*%i))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -1634,8 +1634,8 @@
       (add
         (bfloat-expintegral-e 1 z)
         (mul -1 (bfloat-expintegral-e 1 mz))
-        (mul -1 ($log mz))
-        ($log z)))))
+        (mul -1 (ftake '%log mz))
+        (ftake '%log z)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -1816,9 +1816,9 @@
       (add
         (bfloat-expintegral-e 1 mz*%i)
         (bfloat-expintegral-e 1 z*%i)
-        ($log mz*%i)
-        ($log z*%i)))
-    ($log z))))
+        (ftake '%log mz*%i)
+        (ftake '%log z*%i)))
+    (ftake '%log z))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -1999,8 +1999,8 @@
       (add
         (bfloat-expintegral-e 1 z)
         (bfloat-expintegral-e 1 mz)
-        ($log mz)
-        (mul -1 ($log z))))))
+        (ftake '%log mz)
+        (mul -1 (ftake '%log z))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Moved from bessel.lisp 2008-12-11.  Consider deleting it.

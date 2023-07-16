@@ -2386,9 +2386,9 @@
       (power var (add v 1))
       ($gamma_incomplete
        (div (add v 1) r)
-       (mul -1 b (power var r) ($log a)))
+       (mul -1 b (power var r) (ftake '%log a)))
       (power
-       (mul -1 b (power var r) ($log a))
+       (mul -1 b (power var r) (ftake '%log a))
        (mul -1 (div (add v 1) r)))))
 
     ((m2-exp-type-2-1 (facsum-exponent expr))
@@ -2426,28 +2426,28 @@
 
        (mul
         const
-        (div 1 (mul 4 (power (mul -1 a ($log d)) (div 1 2))))
+        (div 1 (mul 4 (power (mul -1 a (ftake '%log d)) (div 1 2))))
         (mul
          (power d c)
          (power '$%pi (div 1 2))
          (power '$%e
                 (mul -2
-                     (power (mul -1 a ($log d)) (div 1 2))
-                     (power (mul -1 b ($log d)) (div 1 2))))
+                     (power (mul -1 a (ftake '%log d)) (div 1 2))
+                     (power (mul -1 b (ftake '%log d)) (div 1 2))))
          (add
           ($erfc
            (add
-            (div (power (mul -1 b ($log d)) (div 1 2)) var)
-            (mul -1 var (power (mul -1 a ($log d)) (div 1 2)))))
+            (div (power (mul -1 b (ftake '%log d)) (div 1 2)) var)
+            (mul -1 var (power (mul -1 a (ftake '%log d)) (div 1 2)))))
           (mul -1
 	       (power '$%e
                       (mul 4
-                           (power (mul -1 a ($log d)) (div 1 2))
-                           (power (mul -1 b ($log d)) (div 1 2))))
+                           (power (mul -1 a (ftake '%log d)) (div 1 2))
+                           (power (mul -1 b (ftake '%log d)) (div 1 2))))
 	       ($erfc
                 (add
-                 (mul var (power (mul -1 a ($log d)) (div 1 2)))
-                 (div (power (mul -1 b ($log d)) (div 1 2)) var)))))))))
+                 (mul var (power (mul -1 a (ftake '%log d)) (div 1 2)))
+                 (div (power (mul -1 b (ftake '%log d)) (div 1 2)) var)))))))))
 
     ((and (m2-exp-type-4-1 expr)
 	  (poseven (cdras 'n w))  ; only for n a positive, even integer
@@ -2468,31 +2468,31 @@
 	     (div
 	       (sub
 		 (mul
-		   (power ($log d) (mul -1 n))
+		   (power (ftake '%log d) (mul -1 n))
 		   (add
 		     (mul
 		       (power
 			 '$%e
 			 (mul -2
-			   (power (mul -1 a ($log d)) (div 1 2))
-			   (power (mul -1 b ($log d)) (div 1 2))))
+			   (power (mul -1 a (ftake '%log d)) (div 1 2))
+			   (power (mul -1 b (ftake '%log d)) (div 1 2))))
 		     ($erfc
 		       (sub
 			 (div
-			   (power (mul -1 b ($log d)) (div 1 2))
+			   (power (mul -1 b (ftake '%log d)) (div 1 2))
 			   var)
-			 (mul var (power (mul -1 ($log d)) (div 1 2))))))))
+			 (mul var (power (mul -1 (ftake '%log d)) (div 1 2))))))))
 		 (mul
 		   (power
 		     '$%e
 		     (mul 2
-		       (power (mul -1 a ($log d)) (div 1 2))
-		       (power (mul -1 b ($log d)) (div 1 2))))
+		       (power (mul -1 a (ftake '%log d)) (div 1 2))
+		       (power (mul -1 b (ftake '%log d)) (div 1 2))))
 		   ($erfc
 		     (add
-		       (power (mul -1 a ($log d)) (div 1 2))
-		       (div (power (mul -1 b ($log d)) (div 1 2)) var)))))
-	       (power (mul -1 a ($log d)) (div 1 2)))
+		       (power (mul -1 a (ftake '%log d)) (div 1 2))
+		       (div (power (mul -1 b (ftake '%log d)) (div 1 2)) var)))))
+	       (power (mul -1 a (ftake '%log d)) (div 1 2)))
 	     a n)))))
 
     ((and (m2-exp-type-5 (facsum-exponent expr))
@@ -2505,7 +2505,7 @@
 
      (mul
       const
-      (div -1 (mul 2 (power (mul a ($log d)) (div 1 2))))
+      (div -1 (mul 2 (power (mul a (ftake '%log d)) (div 1 2))))
       (mul
        (power d (sub c (div (mul b b) (mul 4 a))))
        (let ((index (gensumindex))
@@ -2519,12 +2519,12 @@
                      (mul
                       (div -1 (mul 4 a))
                       (power (add b (mul 2 a var)) 2)
-                      ($log d)))
-                    (power (mul a ($log d)) (mul -1 (add n (div 1 2))))
-                    (power (mul -1 b ($log d)) (sub n index))
-                    (power (mul (add b (mul 2 a var)) ($log d)) (add index 1))
+                      (ftake '%log d)))
+                    (power (mul a (ftake '%log d)) (mul -1 (add n (div 1 2))))
+                    (power (mul -1 b (ftake '%log d)) (sub n index))
+                    (power (mul (add b (mul 2 a var)) (ftake '%log d)) (add index 1))
                     (power
-                     (mul (div -1 a) (power (add b (mul 2 a var)) 2) ($log d))
+                     (mul (div -1 a) (power (add b (mul 2 a var)) 2) (ftake '%log d))
                      (mul (div -1 2) (add index 1))))
                    index 0 n)))))
 
@@ -2570,7 +2570,7 @@
       const
       (power 2 (mul -1 (add n 1)))
       (power d (sub c (div (mul a a) (mul 4 b))))
-      (power (mul b ($log d)) (mul -2 (add n 1)))
+      (power (mul b (ftake '%log d)) (mul -2 (add n 1)))
       (let ((index1 (gensumindex))
             (index2 (gensumindex))
             ($simpsum t))
@@ -2581,16 +2581,16 @@
                              (power 4 index1)
                              (ftake '%binomial index1 index2)
                              (ftake '%binomial n index1)
-                             ($log d)
-                             (power (mul a ($log d)) (sub (mul 2 n) (add index1 index2)))
+                             (ftake '%log d)
+                             (power (mul a (ftake '%log d)) (sub (mul 2 n) (add index1 index2)))
                              (power
-                              (mul (add a (mul 2 b (power var (div 1 2)))) ($log d))
+                              (mul (add a (mul 2 b (power var (div 1 2)))) (ftake '%log d))
                               (add index1 index2))
                              (power
                               (mul
                                (div -1 b)
                                (power (add a (mul 2 b (power var (div 1 2)))) 2)
-                               ($log d))
+                               (ftake '%log d))
                               (mul (div -1 2) (add index1 index2 1)))
                              (add
                               (mul 2 b
@@ -2598,23 +2598,23 @@
                                     (mul
                                      (div -1 b)
                                      (power (add a (mul 2 b (power var (div 1 2)))) 2)
-                                     ($log d))
+                                     (ftake '%log d))
                                     (div 1 2))
                                    ($gamma_incomplete
                                     (div (add index1 index2 2) 2)
                                     (mul
                                      (div -1 (mul 4 b))
                                      (power (add a (mul 2 b (power var (div 1 2)))) 2)
-                                     ($log d))))
+                                     (ftake '%log d))))
                               (mul a
                                    (add a (mul 2 b (power var (div 1 2))))
-                                   ($log d)
+                                   (ftake '%log d)
                                    ($gamma_incomplete
                                     (div (add index1 index2 1) 2)
                                     (mul
                                      (div -1 (mul 4 b))
                                      (power (add a (mul 2 b (power var (div 1 2)))) 2)
-                                     ($log d))))))
+                                     (ftake '%log d))))))
                             index2 0 index1)
                   index1 0 n))))
 
@@ -2706,11 +2706,11 @@
       (power
        (mul -1
             (power var r)
-            (add (mul b ($log a)) (mul c ($log h))))
+            (add (mul b (ftake '%log a)) (mul c (ftake '%log h))))
        (div (mul -1 n) r))
       ($gamma_incomplete
        (div n r)
-       (mul -1 (power var r) (add (mul b ($log a)) (mul c ($log h)))))))
+       (mul -1 (power var r) (add (mul b (ftake '%log a)) (mul c (ftake '%log h)))))))
 
     ((and (m2-exp-type-7-1 (facsum-exponent expr))
           (eq ($sign (sub (cdras 'r w) (cdras 'r1 w))) '$zero))
@@ -2745,26 +2745,26 @@
        (mul 2
             (power a (add (mul b (power var (div 1 2))) (mul d var)))
             (power h (add (mul c (power var (div 1 2))) (mul f var)))
-            (div 1 (add (mul d ($log a)) (mul f ($log h)))))
+            (div 1 (add (mul d (ftake '%log a)) (mul f (ftake '%log h)))))
        (mul -1
             (power '$%pi (div 1 2))
             (power '$%e
                    (mul -1
                         (div
-                         (power (add (mul b ($log a)) (mul c ($log h))) 2)
-                         (mul 4 (add (mul d ($log a)) (mul f ($log h)))))))
+                         (power (add (mul b (ftake '%log a)) (mul c (ftake '%log h))) 2)
+                         (mul 4 (add (mul d (ftake '%log a)) (mul f (ftake '%log h)))))))
             ($erfi
              (div
               (add
-               (mul b ($log a))
-               (mul c ($log h))
+               (mul b (ftake '%log a))
+               (mul c (ftake '%log h))
                (mul 2
                     (power var (div 1 2))
-                    (add (mul d ($log a)) (mul f ($log h)))))
+                    (add (mul d (ftake '%log a)) (mul f (ftake '%log h)))))
               (mul 2
-                   (power (add (mul d ($log a)) (mul f ($log h))) (div 1 2)))))
-            (add (mul b ($log a)) (mul c ($log h)))
-            (power (add (mul d ($log a)) (mul f ($log h))) (div -3 2))))))
+                   (power (add (mul d (ftake '%log a)) (mul f (ftake '%log h))) (div 1 2)))))
+            (add (mul b (ftake '%log a)) (mul c (ftake '%log h)))
+            (power (add (mul d (ftake '%log a)) (mul f (ftake '%log h))) (div -3 2))))))
 
     ((m2-exp-type-8-1 (facsum-exponent expr))
      (b c d e f g u v)
@@ -2858,9 +2858,9 @@
       (power h g)
       (power '$%e
              (div
-              (power (add (mul d ($log a)) (mul f ($log h))) 2)
-              (mul -4 (add (mul b ($log a)) (mul c ($log h))))))
-      (power (add (mul b ($log a)) (mul c ($log h))) (mul -1 (add n 1)))
+              (power (add (mul d (ftake '%log a)) (mul f (ftake '%log h))) 2)
+              (mul -4 (add (mul b (ftake '%log a)) (mul c (ftake '%log h))))))
+      (power (add (mul b (ftake '%log a)) (mul c (ftake '%log h))) (mul -1 (add n 1)))
       (let ((index (gensumindex))
             ($simpsum t))
         (mfuncall '$sum
@@ -2868,22 +2868,22 @@
                    (power 2 (sub index n))
                    (ftake '%binomial n index)
                    (power
-                    (add (mul -1 d ($log a)) (mul -1 f ($log h)))
+                    (add (mul -1 d (ftake '%log a)) (mul -1 f (ftake '%log h)))
                     (sub n index))
                    (power
                     (add
-                     (mul (add d (mul 2 b var)) ($log a))
-                     (mul (add f (mul 2 c var)) ($log h)))
+                     (mul (add d (mul 2 b var)) (ftake '%log a))
+                     (mul (add f (mul 2 c var)) (ftake '%log h)))
                     (add index 1))
                    (power
                     (mul -1
                          (div
                           (power
                            (add
-                            (mul (add d (mul 2 b var)) ($log a))
-                            (mul (add f (mul 2 c var)) ($log h)))
+                            (mul (add d (mul 2 b var)) (ftake '%log a))
+                            (mul (add f (mul 2 c var)) (ftake '%log h)))
                            2)
-                          (add (mul b ($log a)) (mul c ($log h)))))
+                          (add (mul b (ftake '%log a)) (mul c (ftake '%log h)))))
                     (div (add index 1) -2))
                    ($gamma_incomplete
                     (div (add index 1) 2)
@@ -2891,10 +2891,10 @@
                          (div
                           (power
                            (add
-                            (mul (add d (mul 2 b var)) ($log a))
-                            (mul (add f (mul 2 c var)) ($log h)))
+                            (mul (add d (mul 2 b var)) (ftake '%log a))
+                            (mul (add f (mul 2 c var)) (ftake '%log h)))
                            2)
-                          (mul 4 (add (mul b ($log a)) (mul c ($log h))))))))
+                          (mul 4 (add (mul b (ftake '%log a)) (mul c (ftake '%log h))))))))
                   index 0 n))))
 
     ((and (m2-exp-type-9-1 (facsum-exponent expr))
@@ -2974,9 +2974,9 @@
           (power a e)
           (power h g)
           (power '$%e
-                 (div (power (add (mul b ($log a)) (mul c ($log h))) 2)
-                      (mul -4 (add (mul d ($log a)) (mul f ($log h))))))
-          (power (add (mul d ($log a)) (mul f ($log h))) (mul -2 (add n 1)))
+                 (div (power (add (mul b (ftake '%log a)) (mul c (ftake '%log h))) 2)
+                      (mul -4 (add (mul d (ftake '%log a)) (mul f (ftake '%log h))))))
+          (power (add (mul d (ftake '%log a)) (mul f (ftake '%log h))) (mul -2 (add n 1)))
           (let ((index1 (gensumindex))
                 (index2 (gensumindex))
                 ($simpsum t))
@@ -2986,64 +2986,64 @@
                    (power 4 index1)
                    (ftake '%binomial index1 index2)
                    (ftake '%binomial n index1)
-                   (power (add (mul b ($log a)) (mul c ($log h)))
+                   (power (add (mul b (ftake '%log a)) (mul c (ftake '%log h)))
                           (sub (mul 2 n) (add index1 index2)))
-                   (power (add (mul b ($log a))
-                               (mul c ($log h))
+                   (power (add (mul b (ftake '%log a))
+                               (mul c (ftake '%log h))
                                (mul 2
                                     (power var (div 1 2))
-                                    (add (mul d ($log a)) (mul f ($log h)))))
+                                    (add (mul d (ftake '%log a)) (mul f (ftake '%log h)))))
                           (add index1 index2))
                    (power (mul -1
-                               (div (power (add (mul b ($log a))
-                                                (mul c ($log h))
+                               (div (power (add (mul b (ftake '%log a))
+                                                (mul c (ftake '%log h))
                                                 (mul 2
                                                      (power var (div 1 2))
-                                                     (add (mul d ($log a))
-                                                          (mul f ($log h)))))
+                                                     (add (mul d (ftake '%log a))
+                                                          (mul f (ftake '%log h)))))
                                            2)
-                                    (add (mul d ($log a)) (mul f ($log h)))))
+                                    (add (mul d (ftake '%log a)) (mul f (ftake '%log h)))))
                           (mul (div -1 2) (add index1 index2 1)))
                    (add (mul ($gamma_incomplete (mul (div 1 2)
                                                      (add index1 index2 1))
                                                 (mul (div -1 4)
-                                                     (div (power (add (mul b ($log a))
-                                                                      (mul c ($log h))
+                                                     (div (power (add (mul b (ftake '%log a))
+                                                                      (mul c (ftake '%log h))
                                                                       (mul 2
                                                                            (power var (div 1 2))
-                                                                           (add (mul d ($log a)) (mul f ($log h)))))
+                                                                           (add (mul d (ftake '%log a)) (mul f (ftake '%log h)))))
                                                                  2)
-                                                          (add (mul d ($log a)) (mul f ($log h))))))
-                             (add (mul b ($log a)) (mul c ($log h)))
-                             (add (mul b ($log a))
-                                  (mul c ($log h))
+                                                          (add (mul d (ftake '%log a)) (mul f (ftake '%log h))))))
+                             (add (mul b (ftake '%log a)) (mul c (ftake '%log h)))
+                             (add (mul b (ftake '%log a))
+                                  (mul c (ftake '%log h))
                                   (mul 2
                                        (power var (div 1 2))
-                                       (add (mul d ($log a)) (mul f ($log h))))))
+                                       (add (mul d (ftake '%log a)) (mul f (ftake '%log h))))))
                         (mul 2
                              ($gamma_incomplete (mul (div 1 2)
                                                      (add index1 index2 2))
                                                 (mul (div -1 4)
-                                                     (div (power (add (mul b ($log a))
-                                                                      (mul c ($log h))
+                                                     (div (power (add (mul b (ftake '%log a))
+                                                                      (mul c (ftake '%log h))
                                                                       (mul 2
                                                                            (power var (div 1 2))
-                                                                           (add (mul d ($log a))
-                                                                                (mul f ($log h)))))
+                                                                           (add (mul d (ftake '%log a))
+                                                                                (mul f (ftake '%log h)))))
                                                                  2)
-                                                          (add (mul d ($log a))
-                                                               (mul f ($log h))))))
-                             (add (mul d ($log a)) (mul f ($log h)))
+                                                          (add (mul d (ftake '%log a))
+                                                               (mul f (ftake '%log h))))))
+                             (add (mul d (ftake '%log a)) (mul f (ftake '%log h)))
                              (power (mul -1
-                                         (div (power (add (mul b ($log a))
-                                                          (mul c ($log h))
+                                         (div (power (add (mul b (ftake '%log a))
+                                                          (mul c (ftake '%log h))
                                                           (mul 2
                                                                (power var (div 1 2))
-                                                               (add (mul d ($log a))
-                                                                    (mul f ($log h)))))
+                                                               (add (mul d (ftake '%log a))
+                                                                    (mul f (ftake '%log h)))))
                                                      2)
-                                              (add (mul d ($log a))
-                                                   (mul f ($log h)))))
+                                              (add (mul d (ftake '%log a))
+                                                   (mul f (ftake '%log h)))))
                                     (div 1 2)))))
               index2 0 index1 t)
              index1 0 n t))))
