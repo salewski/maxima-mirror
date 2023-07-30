@@ -162,7 +162,7 @@
 		 (m* (m^ -1 k)
 		     (m- 1 (m^ 2 (m- 1 (m* 2 k))))
 		     (m^ (m* 2 '$%pi) (m* 2 k))
-		     (m// ($bern (m* 2 k))
+		     (m// (ftake '%bern (m* 2 k))
 			  `((mfactorial) ,(m* 2 k)))
 		     (m// (m^ `((%log) ,(m- z)) (m- s (m* 2 k)))
 			  ($gamma (m+ s 1 (m* -2 k)))))))))
@@ -534,14 +534,14 @@
 ;; Berlin, 2003, 780-789. DOI 10.1007/3-540-44839-X_82
 ;; http://homepages.physik.uni-muenchen.de/~Winitzki/papers/
 ;;
-;; Darko Verebic, 
+;; Darko Veberic, 
 ;; Having Fun with Lambert W(x) Function
 ;; arXiv:1003.1628v1, March 2010, http://arxiv.org/abs/1003.1628
 ;;
 ;; See also http://en.wikipedia.org/wiki/Lambert's_W_function
 
 (defmfun $lambert_w (z)
-  (simplify (list '(%lambert_w) (resimplify z))))
+  (ftake* '%lambert_w z))
 
 ;;; Set properties to give full support to the parser and display
 (defprop $lambert_w %lambert_w alias)
@@ -653,7 +653,7 @@
 ;; Approximate k=-1 branch of Lambert's W function over -1/e < z < 0. 
 ;; W(z) is real, so we ensure the starting guess for Halley iteration 
 ;; is also real.
-;; Verebic (2010)
+;; Veberic (2010)
 (defun init-lambert-w-minus1 (z)
   (cond 
     ((not (realp z)) 
@@ -679,7 +679,7 @@
 ;;   for im(z) >= 0, approximates k=-1  branch
 ;;
 ;; Corless et al (1996) (4.22)
-;; Verebic (2010)
+;; Veberic (2010)
 ;;
 ;; z is a real or complex bigfloat: 
 (defun lambert-branch-approx (z)
@@ -794,17 +794,6 @@
 ;;; Generalized Lambert W function
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmfun $generalized_lambert_w (k z)
-  (simplify (list '(%generalized_lambert_w) (resimplify k) (resimplify z))))
-
-;;; Set properties to give full support to the parser and display
-(defprop $generalized_lambert_w %generalized_lambert_w alias)
-(defprop $generalized_lambert_w %generalized_lambert_w verb)
-(defprop %generalized_lambert_w $generalized_lambert_w reversealias)
-(defprop %generalized_lambert_w $generalized_lambert_w noun)
-
-;;; lambert_w is a simplifying function
-(defprop %generalized_lambert_w simp-generalized-lambertw operators)
 
 ;;; Derivative of lambert_w
 (defprop %generalized_lambert_w
@@ -829,22 +818,36 @@
     ((mexpt) ((%generalized_lambert_w) k x) -1)))
   integral)
 
-(defun simp-generalized-lambertw (expr ignored z)
-  (declare (ignore ignored))
-  (twoargcheck expr)
-  (let ((k (simpcheck (cadr expr) z))
-        (x (simpcheck (caddr expr) z)))
+(def-simplifier generalized_lambert_w (k x)
+  (flet ((test-for-integer (arg)
+	   ;; The ARG must be some kind of number acceptable to
+	   ;; BIGFLOAT:TO.  If ARG is numerically equal to an integer,
+	   ;; return the integer value.  Otherwise, return NIL.
+	   (let* ((new-arg (bigfloat:to arg))
+		  (arg-truncate (bigfloat:truncate new-arg)))
+	     (when (bigfloat:= arg-truncate new-arg)
+	       arg-truncate))))
     (cond
-     ;; Numerical evaluation for real or complex x
-     ((and (integerp k) (complex-float-numerical-eval-p x))
+      ;; Numerical evaluation for real or complex x
+      ((complex-float-numerical-eval-p k x)
        ;; x may be an integer.  eg "generalized_lambert_w(0,1),numer;"
-       (if (integerp x) 
-	   (to (bigfloat::lambert-w-k k (bigfloat:to ($float x))))
-	   (to (bigfloat::lambert-w-k k (bigfloat:to x)))))
-     ;; Numerical evaluation for real or complex bigfloat x
-     ((and (integerp k) (complex-bigfloat-numerical-eval-p x))
-      (to (bigfloat::lambert-w-k k (bigfloat:to x))))
-     (t (list '(%generalized_lambert_w simp) k x)))))
+       ;; Also, we can only evaluate this if k is equal to an integer.
+       (let ((k-int (test-for-integer k)))
+	 (cond (k-int
+		(if (integerp x) 
+		    (to (bigfloat::lambert-w-k k-int (bigfloat:to ($float x))))
+		    (to (bigfloat::lambert-w-k k-int (bigfloat:to x)))))
+	       (t
+		(give-up)))))
+      ;; Numerical evaluation for real or complex bigfloat x
+      ((complex-bigfloat-numerical-eval-p k x)
+       (let ((k-int (test-for-integer k)))
+	 (cond (k-int
+		(to (bigfloat::lambert-w-k k-int (bigfloat:to x))))
+	       (t
+		(give-up)))))
+      (t
+       (give-up)))))
 
 (in-package "BIGFLOAT")
 

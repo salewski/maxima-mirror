@@ -636,6 +636,10 @@
 			       and count from 1
 			       collect (list arg `(simpcheck (nth ,count ,form-arg) ,z-arg)))))))
       `(progn
+	 ;; Define the noun function.
+	 (defmfun ,verb-name (,@lambda-list)
+	   (ftake ',noun-name ,@lambda-list))
+
 	 ;; Set up properties
 	 (defprop ,noun-name ,simp-name operators)
 	 ;; The verb and alias properties are needed to make things like
@@ -655,7 +659,12 @@
 	   (arg-count-check ,(length lambda-list)
 			    ,form-arg)
 	   (let ,arg-forms
-	     (flet ((give-up ()
+	     ;; Allow args to give-up if the default args won't work.
+	     ;; Useful for the (rare?) case like genfact where we want
+	     ;; to give up but want different values for args.
+	     (flet ((give-up (&optional ,@(mapcar #'(lambda (a)
+						      (list a a))
+						  lambda-list))
 		      ;; Should this also return from the function?
 		      ;; That would fit in better with giving up.
 		      (eqtest (list '(,noun-name) ,@lambda-list) ,form-arg)))

@@ -6,7 +6,7 @@
 * References for contrib_ode::
 @end menu
 
-@node Introduction to contrib_ode, Functions and Variables for contrib_ode, contrib_ode-pkg, contrib_ode-pkg
+@node Introduction to contrib_ode, Functions and Variables for contrib_ode, Package contrib_ode, Package contrib_ode
 
 @section Introduction to contrib_ode 
 
@@ -238,7 +238,7 @@ Extensive debugging traces and messages are displayed if the command
 @closecatbox
 
 
-@node Functions and Variables for contrib_ode, Possible improvements to contrib_ode, Introduction to contrib_ode, contrib_ode-pkg
+@node Functions and Variables for contrib_ode, Possible improvements to contrib_ode, Introduction to contrib_ode, Package contrib_ode
 @section Functions and Variables for contrib_ode
 
 @anchor{contrib_ode}
@@ -510,7 +510,7 @@ using the recurrence (A&S 5.1.14).
 @end deffn
 
 
-@node Possible improvements to contrib_ode, Test cases for contrib_ode, Functions and Variables for contrib_ode, contrib_ode-pkg
+@node Possible improvements to contrib_ode, Test cases for contrib_ode, Functions and Variables for contrib_ode, Package contrib_ode
 @section Possible improvements to contrib_ode
 
 
@@ -547,7 +547,7 @@ Add more test cases.
 
 @end itemize
 
-@node Test cases for contrib_ode, References for contrib_ode, Possible improvements to contrib_ode, contrib_ode-pkg
+@node Test cases for contrib_ode, References for contrib_ode, Possible improvements to contrib_ode, Package contrib_ode
 @section Test cases for contrib_ode
 
 
@@ -574,7 +574,7 @@ There are some crashes.
 
 @end itemize
 
-@node References for contrib_ode, ,Test cases for contrib_ode, contrib_ode-pkg
+@node References for contrib_ode, ,Test cases for contrib_ode, Package contrib_ode
 @section References for contrib_ode
 
 

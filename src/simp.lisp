@@ -71,18 +71,17 @@
 
 (mapc #'(lambda (x) (setf (get (first x) 'operators) (second x)))
       '((mplus simplus) (mtimes simptimes) (mncexpt simpncexpt)
-	(mminus simpmin) (%gamma simpgamma) (mfactorial simpfact)
+	(mminus simpmin)
+	(mfactorial simpfact)
 	(mnctimes simpnct) (mquotient simpquot) (mexpt simpexpt)
-	(%log simpln) 
         (%derivative simpderiv)
         (%signum simpsignum)
 	(%integrate simpinteg) (%limit simp-limit) 
 	(bigfloat simpbigfloat) (lambda simplambda) (mdefine simpmdef)
-	(mqapply simpmqapply) (%gamma simpgamma)
-	($beta simpbeta) (%sum simpsum) (%binomial simpbinocoef)
-	(%plog simpplog) (%product simpprod) (%genfact simpgfact)
-	($atan2 simpatan2) ($matrix simpmatrix) (%matrix simpmatrix)
-	($bern simpbern) ($euler simpeuler)))
+	(mqapply simpmqapply)
+	(%sum simpsum)
+	(%product simpprod)
+	($matrix simpmatrix) (%matrix simpmatrix)))
 
 (defprop $li lisimp specsimp)
 (defprop $psi psisimp specsimp)
@@ -1347,9 +1346,7 @@
 ;; The log function distributes over lists, matrices, and equations
 (defprop %log (mlist $matrix mequal) distribute_over)
 
-(defun simpln (x y z)
-  (oneargcheck x)
-  (setq y (simpcheck (cadr x) z))
+(def-simplifier log (y)
   (cond ((onep1 y) (addk -1 y))
         ((zerop1 y)
          (cond (radcanp (list '(%log simp) 0))
@@ -1357,10 +1354,10 @@
                 (merror (intl:gettext "log: encountered log(0).")))
                (t (throw 'errorsw t))))
         ;; Check evaluation in floating point precision.
-        ((flonum-eval (mop x) y))
+        ((flonum-eval (mop form) y))
         ;; Check evaluation in bigfloag precision.
-        ((and (not (member 'simp (car x)))
-              (big-float-eval (mop x) y)))
+        ((and (not (member 'simp (car form)))
+              (big-float-eval (mop form) y)))
         ((eq y '$%e) 1)
         ((mexptp y)
          (cond ((or (and $logexpand (eq $domain '$real))
@@ -1384,14 +1381,14 @@
                                       '($complex $imaginary)))))
                 ;; Simplify log(exp(x)) and log(exp(%i*x)), where x is a real
                 (caddr y))
-               (t (eqtest (list '(%log) y) x))))
+               (t (give-up))))
         ((ratnump y)
          ;; Simplify log(n/d)
          (cond ((eql (cadr y) 1)
                 (mul -1 (take '(%log) (caddr y))))
                ((eq $logexpand '$super)
                 (sub (take '(%log) (cadr y)) (take '(%log) (caddr y))))
-               (t (eqtest (list '(%log) y) x))))
+               (t (give-up))))
         ((and (member $logexpand '($all $super))
               (mtimesp y))
          (do ((y (cdr y) (cdr y))
@@ -1407,8 +1404,8 @@
               (maxima-integerp y)
               (eq ($sign y) '$neg))
          (add (mul '$%i '$%pi) (take '(%log) (neg y))))
-        ((taylorize (mop x) (second x)))
-        (t (eqtest (list '(%log) y) x))))
+        ((taylorize (mop form) (second form)))
+        (t (give-up))))
 
 (defun simpln1 (w)
   (simplifya (list '(mtimes) (caddr w)
@@ -1999,6 +1996,7 @@
 
 (defprop %signum (mlist $matrix mequal) distribute_over)
 
+#+nil
 (defun simpsignum (e y z)
   (declare (ignore y))
   (oneargcheck e)
@@ -2027,6 +2025,39 @@
 	
 		 ;; nounform return
 		 (t (eqtest (list '(%signum) x) e)))))))
+
+(def-simplifier signum (x)
+  (let (sgn)
+    (cond ((complex-number-p x #'mnump)
+	   (if (complex-number-p x #'$ratnump) ;; nonfloat complex
+	       (if (zerop1 x)
+		   0
+		   ($rectform (div x ($cabs x))))
+	       (maxima::to (bigfloat::signum (bigfloat::to x)))))
+		   
+	  ;; idempotent: signum(signum(z)) = signum(z).
+	  ((and (consp x)
+		(consp (car x))
+		(eq '%signum (mop x)))
+	   x)
+		   
+	  (t
+	   (setq sgn ($csign x))
+	   (cond ((eq sgn '$neg) -1)
+		 ((eq sgn '$zero) 0)
+		 ((eq sgn '$pos) 1)
+
+		 ;; multiplicative: signum(ab) = signum(a) * signum(b).
+		 ((mtimesp x)
+		  (muln (mapcar #'(lambda (s) (take '(%signum) s)) (margs x))
+			t))
+
+		 ;; Reflection rule: signum(-x) --> -signum(x).
+		 ((great (neg x) x)
+		  (neg (take '(%signum) (neg x))))
+	
+		 ;; nounform return
+		 (t (give-up)))))))
 
 (defun exptrl (r1 r2)
   (cond ((equal r2 1) r1)
@@ -3163,7 +3194,8 @@
 			(great x1 y1))))))
 	((alike1 (cadr x) y) (great (caddr x) 1))
 	((mnump (caddr x)) (great (cadr x) y))
-	(t (great (simpln1 x) (simpln (list '(%log) y) 1 t)))))
+	(t (great (simpln1 x)
+		  (ftake '%log y)))))
 
 (defmfun $multthru (e1 &optional e2)
   (let (arg1 arg2)

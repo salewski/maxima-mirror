@@ -221,6 +221,55 @@
   (defun maxima-version1 ()
     (sanitize-string *autoconf-version*)))
 
+(defun setup-search-lists ()
+  "Set up the default values for $file_search_lisp, $file_search_maxima,
+  $file_search_demo, $file_search_usage, and $file_search_test."
+  (let* ((ext (pathname-type (compile-file-pathname "foo.lisp")))
+	 (lisp-patterns (list ext "lisp"))
+	 (maxima-patterns '("mac" "wxm"))
+	 (lisp+maxima-patterns (append lisp-patterns maxima-patterns))
+	 (demo-patterns '("dem"))
+	 (usage-patterns '("usg")))
+
+    (flet ((build-search-list (path-info)
+	     (let (search-path)
+	       (dolist (info path-info)
+		 (destructuring-bind (dir extensions)
+		     info
+		   (dolist (ext extensions)
+		     (push (combine-path dir (concatenate 'string "*." ext))
+			   search-path))))
+	       (make-mlist-l (nreverse search-path)))))
+
+      (setf $file_search_lisp
+	    (build-search-list (list (list (combine-path *maxima-userdir* "**")
+					   lisp-patterns)
+				     (list (combine-path *maxima-sharedir* "**")
+					   ;; sharedir should only have lisp files.
+					   '("lisp"))
+				     (list *maxima-srcdir* lisp-patterns)
+				     (list *maxima-topdir* lisp-patterns))))
+      (setf $file_search_maxima
+	    (build-search-list (list (list (combine-path *maxima-userdir* "**")
+					   maxima-patterns)
+				     (list (combine-path *maxima-sharedir* "**")
+					   ;; sharedir should only have mac files.
+					   '("mac"))
+				     (list *maxima-srcdir*
+					   '("mac"))
+				     (list *maxima-topdir*
+					   '("mac")))))
+      (setf $file_search_demo
+	    (build-search-list (list (list (combine-path *maxima-sharedir* "**")
+					   demo-patterns)
+				     (list *maxima-demodir* demo-patterns))))
+      (setf $file_search_usage
+	    (build-search-list (list (list (combine-path *maxima-sharedir* "**")
+					   usage-patterns)
+				     (list *maxima-docdir* usage-patterns))))
+      (setf $file_search_tests
+	    (build-search-list (list (list *maxima-testsdir* lisp+maxima-patterns)))))))
+  
 (defun set-pathnames ()
   (let ((maxima-prefix-env (maxima-getenv "MAXIMA_PREFIX"))
 	(maxima-layout-autotools-env (maxima-getenv "MAXIMA_LAYOUT_AUTOTOOLS"))
@@ -275,62 +324,14 @@
     (setq $maxima_objdir *maxima-objdir*)
     (setf (gethash '$maxima_objdir *variable-initial-values*) *maxima-objdir*))
 
-  (let* ((ext #+gcl "o"
-	      #+(or cmu scl) (c::backend-fasl-file-type c::*target-backend*)
-	      #+sbcl "fasl"
-	      #+clisp "fas"
-	      #+allegro "fasl"
-	      #+openmcl (pathname-type ccl::*.fasl-pathname*)
-	      #+lispworks (pathname-type (compile-file-pathname "foo.lisp"))
-	      #+ecl "fas"
-              #+abcl "abcl"
-	      #-(or gcl cmu scl sbcl clisp allegro openmcl lispworks ecl abcl)
-	      "")
-	 (lisp-patterns (concatenate 'string "$$$.{" ext ",lisp,lsp}"))
-	 (maxima-patterns "$$$.{mac,mc,wxm}")
-	 (lisp+maxima-patterns (concatenate 'string "$$$.{" ext ",lisp,lsp,mac,mc,wxm}"))
-	 (demo-patterns "$$$.{dem,dm1,dm2,dm3,dmt}")
-	 (usage-patterns "$$.{usg,texi}")
-	 (share-subdirs-list (share-subdirs-list))
-	 ;; Smash the list of share subdirs into a string of the form
-	 ;; "{affine,algebra,...,vector}" .
-	 (share-subdirs (format nil "{~{~A~^,~}}" share-subdirs-list)))
+  (setup-search-lists)
 
-    (setq $file_search_lisp
-	  (list '(mlist)
-		;; actually, this entry is not correct.
-		;; there should be a separate directory for compiled
-		;; lisp code. jfa 04/11/02
-		(combine-path *maxima-userdir* lisp-patterns)
-		(combine-path *maxima-sharedir* lisp-patterns)
-		(combine-path *maxima-sharedir* share-subdirs lisp-patterns)
-		(combine-path *maxima-srcdir* lisp-patterns)
-        (combine-path *maxima-topdir* lisp-patterns)))
-    (setq $file_search_maxima
-	  (list '(mlist)
-		(combine-path *maxima-userdir* maxima-patterns)
-		(combine-path *maxima-sharedir* maxima-patterns)
-		(combine-path *maxima-sharedir* share-subdirs maxima-patterns)
-        (combine-path *maxima-topdir* maxima-patterns)))
-    (setq $file_search_demo
-	  (list '(mlist)
-		(combine-path *maxima-sharedir* demo-patterns)
-		(combine-path *maxima-sharedir* share-subdirs demo-patterns)
-		(combine-path *maxima-demodir* demo-patterns)))
-    (setq $file_search_usage
-	  (list '(mlist)
-		(combine-path *maxima-sharedir* usage-patterns)
-		(combine-path *maxima-sharedir* share-subdirs usage-patterns)
-		(combine-path *maxima-docdir* usage-patterns)))
-    (setq $file_search_tests
-	  `((mlist) ,(combine-path *maxima-testsdir* lisp+maxima-patterns)))
-
-    ;; If *maxima-lang-subdir* is not nil test whether corresponding info directory
-    ;; with some data really exists.  If not this probably means that required
-    ;; language pack wasn't installed and we reset *maxima-lang-subdir* to nil.
-    (when (and *maxima-lang-subdir*
-	       (not (probe-file (combine-path *maxima-infodir* *maxima-lang-subdir* "maxima-index.lisp"))))
-       (setq *maxima-lang-subdir* nil))))
+  ;; If *maxima-lang-subdir* is not nil test whether corresponding info directory
+  ;; with some data really exists.  If not this probably means that required
+  ;; language pack wasn't installed and we reset *maxima-lang-subdir* to nil.
+  (when (and *maxima-lang-subdir*
+	     (not (probe-file (combine-path *maxima-infodir* *maxima-lang-subdir* "maxima-index.lisp"))))
+    (setq *maxima-lang-subdir* nil)))
 
 (defun get-dirs (path &aux (ns (namestring path)))
   (directory (concatenate 'string

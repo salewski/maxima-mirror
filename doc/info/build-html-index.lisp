@@ -27,6 +27,12 @@
   "Log file containing info for each entry that is added to the index
   table.")
 
+(defun texinfo-version-number (major minor &optional (patch 0))
+  "Convert the major, minor, and patch to an integer."
+  (+ (* 10000 major)
+     (* 100 minor)
+     patch))
+
 (let ((maxima_nnn-pattern (pregexp:pregexp "^maxima_[0-9][0-9]*$")))
   (defun maxima_nnn-p (f)
     "Determine if F is a pathname-name that looks like
@@ -123,16 +129,17 @@
 	(update-entry old new)))
 
     ;; This is messy.  Texinfo 6.8 uses plain apostrophes in the info
-    ;; file.  But with texinfo 7.0.3, some entries in HTML use an
+    ;; file.  But with texinfo 7.0.[23], some entries in HTML use an
     ;; apostrophe (U+27) character, but the info file uses
-    ;; Right_Single_Quotation_Mark (U+2019).  And apparently, the next version of Texinfo will not.
+    ;; Right_Single_Quotation_Mark (U+2019).  And apparently, the next
+    ;; version of Texinfo will not.
     ;;
     ;; Convert these only for the cases we know this is a problem.
     ;;
     ;; This current implementation will very likely not work with gcl
     ;; only supports 8-bit characters.
     (when (and *texinfo-version*
-	       (= *texinfo-version* 70003))
+	       (>= *texinfo-version* (texinfo-version-number 7 0 2)))
       (dolist (item '("Euler's number"
 		      "Introduction to Maxima's Database"))
 	(update-entry item
@@ -141,46 +148,95 @@
 ;; Find entries from the function and variable index.  An example of
 ;; what we're looking for:
 ;;
-;;   <a href="maxima_55.html#index-asinh">
+;;   <a href="Elementary-Functions.html#index-asinh">
 ;;
-;; We extract the file name and the stuff after "#index-" which is the
-;; html id that we need.  It's also the key we need for the hash
-;; table.
-(let ((href (pregexp:pregexp "<a href=\"(maxima_[[:digit:]]+\.html)#index-([^\"]*)\">")))
+;; We extract the file name, "Elementary-Functions.html", and the
+;; stuff starting with "#index-".  This gives the item-id,
+;; "index-asinh" that we want to use for the link (without the "#"),
+;; and the stuff after "#index-", "asinh" is the id topic we need.
+(let ((href (pregexp:pregexp "<a href=\"([[:alnum:]_-]+\.html)#(index-([^\"]*))\">")))
   (defun match-entries (line)
     (let ((match (pregexp:pregexp-match href line)))
       (when match
-	(destructuring-bind (whole file item-id)
+	(destructuring-bind (whole file item-id id)
 	    match
 	  (declare (ignore whole))
-	  (values item-id item-id file line))))))
+	  (values id item-id file line))))))
 
 ;; Find entries from the TOC.  An example of what we're looking for:
 ;;
-;;  <a id="toc-Bessel-Functions-1" href="maxima_14.html#Bessel-Functions">15.2 Bessel Functions</a>
+;;  <a id="toc-Bessel-Functions-1" href="Special-Functions.html#Bessel-Functions">15.2 Bessel Functions</a></li>
 ;;
-;; We extract the file name and then the title of the subsection.
+;; We extract the file name, "Special-Functions.html" and the id,
+;; "Bessel-Functions" and then the title of the subsection, without
+;; the section numbers, "Bessel Functions".  
 ;; Further subsections are ignored.
-(let ((regexp (pregexp:pregexp "<a id=\"toc-.*\" href=\"(maxima_[^\"]+)\">[[:digit:]]+\.[[:digit:]]+ ([^\"]+?)<")))
+(let ((regexp (pregexp:pregexp "<a id=\"toc-.*\" href=\"([^#\"]+)(#([^\"]+))\">[[:digit:]]+\.[[:digit:]]+ ([^\"]+?)</a>")))
   (defun match-toc (line)
     (let ((match (pregexp:pregexp-match regexp line)))
       (when match
-	;;(format t "match: ~S: ~A~%" match line)
-	(destructuring-bind (whole file item)
+	(destructuring-bind (whole file item# id item)
 	    match
-	  (declare (ignore whole))
-	  ;; Replace "&rsquo;" with "'"
+	  (declare (ignore whole item#))
 	  (when (find #\& item :test #'char=)
-	    (setf item (pregexp:pregexp-replace* "&rsquo;" item (string (code-char #x27)))))
+	    ;; Replace HTML entities with the corresponding char.
+	    ;; See, for example,
+	    ;; https://lilith.fisica.ufmg.br/~wag/TRANSF/codehtml.html
+	    ;;
+	    ;; Perhaps we should use the language to reduce the number
+	    ;; of calls to pregexp?
+	    (dolist (replacement '(("&rsquo;" #x27) ; Right single-quote -> apostrophe
+				   ;; From the de manual
+				   ("&uuml;" 252)
+				   ("&Uuml;" 220)
+				   ("&auml;" 228)
+				   ;; From the pt manual
+				   ("&ccedil;" 231)
+				   ("&atilde;" 227)
+				   ("&oacute;" 243)
+				   ;; From the pt_BR manual
+				   ("&aacute;" 225)
+				   ("&ouml;" 246)
+				   ))
+	      (destructuring-bind (html-entity char-code)
+		  replacement
+		(setf item (pregexp:pregexp-replace* html-entity
+						     item
+						     (string (code-char char-code)))))))
 
 	  (format *log-file* "TOC: ~S -> ~S~%" item file)
 
-	  (values item "" file line))))))
+	  (values item id file line))))))
 
-(defun find-index-file (dir)
+(defparameter *index-file-name*
+  (make-hash-table :test 'equal)
+  "Hash table whose key is the lang and whose value is a list of the
+  file name of function and variable index and the title of the
+  index.")
+
+;; Setup the hashtable.  The default (English) is the empty string.
+(dolist (entry 
+	 '(("" "Function-and-Variable-Index.html" "Function and Variable Index")
+	   ("de" "Index-der-Variablen-und-Funktionen.html" "Index der Variablen und Funktionen")
+	   ("pt" "Indice-de-Funcoes-e-Variaveis.html" "Índice de Funções e Variáveis")
+	   ("es" "Indice-de-Funciones-y-Variables.html" "Índice de Funciones y Variables")
+	   ("pt_BR" "Indice-de-Funcoes-e-Variaveis.html" "Índice de Funções e Variáveis")))
+  (destructuring-bind (key &rest value)
+      entry
+    (setf (gethash key *index-file-name*) value)))
+
+(defun get-index-file-name (lang)
+  (first (gethash lang *index-file-name*)))
+
+(defun get-index-title (lang)
+  (second (gethash lang *index-file-name*)))
+
+(defun find-index-file (dir lang)
   "Find the name of HTML file containing the function and variable
   index."
-  (let ((f-a-v-i (merge-pathnames "Function-and-Variable-Index.html"
+  (unless (gethash lang *index-file-name*)
+    (merror "Unknown or unsupported language for HTML help: ~A" lang))
+  (let ((f-a-v-i (merge-pathnames (get-index-file-name lang)
 				  dir)))
     (when (probe-file f-a-v-i)
       (return-from find-index-file f-a-v-i)))
@@ -208,37 +264,38 @@
     ;; Check if the last 2 files to see if one of them contains the
     ;; function and variable index we want.  Return the first one that
     ;; matches.
-    (format t "Looking for function and variable index~%")
-    (dolist (file (last files 2))
-      (when (grep-l "<title>(Function and Variable Index)" file)
-	(format t "Function index: ~S.~%"
-		(namestring file))
-	(return-from find-index-file file)))))
-  
+    (let* ((title (get-index-title lang))
+	   (search-item (format nil "<title>.*~A" title)))
+      (format t "Looking for function and variable index: ~A~%" title)
+      (dolist (file (last files 2))
+	(when (grep-l search-item file)
+	  (format t "Function index: ~S.~%"
+		  (namestring file))
+	  (return-from find-index-file file))))))
+
+;; Parse the texinfo version string.  It should look something like
+;; "M.m.p", where M and m are a sequence of (base 10) digits and ".p"
+;; is the optional patch version.
 (defun parse-texinfo-version (string)
   (when string
     (let ((posn 0)
 	  (len (length string))
-	  (version 0))
+	  version)
       (dotimes (k 3)
-	(cond
-	  ((<= posn len)
-	   (multiple-value-bind (digits end)
-	       (parse-integer string
-			      :start posn
-			      :junk-allowed t)
-	     (setf version (+ (or digits 0)
-			      (* version 100)))
-	     (setf posn (1+ end))))
-	  (t
-	   (setf version (* version 100)))))
-      version)))
+	(when (<= posn len)
+	  (multiple-value-bind (digits end)
+	      (parse-integer string
+			     :start posn
+			     :junk-allowed t)
+	    (push digits version)
+	    (setf posn (1+ end)))))
+      (apply #'texinfo-version-number (nreverse version)))))
 
 (defun get-texinfo-version (file)
   "Get the texinfo version from FILE"
   (let ((version-line
 	  (with-open-file (f file :direction :input)
-	    ;; Texinfo write a comment line containing the version number of
+	    ;; Texinfo writes a comment line containing the version number of
 	    ;; the texinfo used to build the html file.  It's at the
 	    ;; beginnning so search just the first 5 lines or so.
 	    (loop for count from 1 to 5
@@ -253,15 +310,24 @@
     (setf *texinfo-version*
 	  (parse-texinfo-version *texinfo-version-string*))))
 
-(defun build-html-index (dir)
+(defun find-toc-file (dir)
+  ;; List of possible filenames that contain the table of contents.
+  ;; The first is used by texinfo 6.8 and later.  The second is used
+  ;; by texinfo 5.1.  Return the first one found.
+  (dolist (toc '("index.html" "maxima_0.html"))
+    (let ((toc-path (merge-pathnames toc dir)))
+      (when (probe-file toc-path)
+	(return-from find-toc-file toc-path)))))
+
+(defun build-html-index (dir lang)
   (clrhash *html-index*)
-  (let ((index-file (find-index-file dir)))
+  (let ((index-file (find-index-file dir lang)))
     (unless index-file
       (error "Could not find HTML file containing the function and variable index."))
 
     (with-open-file (*log-file* "build-html-index.log"
 				:direction :output :if-exists :supersede)
-      (let ((toc-path (merge-pathnames "maxima_toc.html" dir)))
+      (let ((toc-path (find-toc-file dir)))
 	(get-texinfo-version toc-path)
 	(format t "Texinfo Version ~A: ~D~%" *texinfo-version-string* *texinfo-version*)
 	(process-one-html-file index-file #'match-entries t "Add")
@@ -271,9 +337,11 @@
 ;; Run this to build a hash table from the topic to the HTML file
 ;; containing the documentation.  The single argument DIR should be a
 ;; directory that contains the html files to be searched for the
-;; topics.  For example it can be "<maxima-dir>/doc/info/*.html"
-(defmfun $build_and_dump_html_index (dir)
-  (build-html-index dir)
+;; topics.  For example it can be "<maxima-dir>/doc/info/*.html".  The
+;; LANG arg specifies the language to use.  For English, either leave
+;; the argument out, or use "".
+(defmfun $build_and_dump_html_index (dir &optional (lang ""))
+  (build-html-index dir lang)
   (let (entries)
     (maphash #'(lambda (k v)
 		 (push (list k (namestring (car v)) (cdr v)) entries))

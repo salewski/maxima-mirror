@@ -491,7 +491,7 @@
 	 (cond ((or (atom (cadr e)) (member 'array (cdaadr e) :test #'eq)) (chainrule e x))
 	       ((freel (cddr e) x) (diff%deriv (cons (sdiff (cadr e) x) (cddr e))))
 	       (t (diff%deriv (list e x 1)))))
-	((member (caar e) '(%binomial $beta) :test #'eq)
+	((member (caar e) '(%binomial %beta) :test #'eq)
 	 (let ((efact ($makefact e)))
 	   (mul2 (factor (sdiff efact x)) (div e efact))))
 	((eq (caar e) '%integrate) (diffint e x))
@@ -650,7 +650,7 @@
 		 ((mexpt) $%e ((mtimes) -1 ((mexpt) x 2)))))
 	  )))
 
-(defprop $atan2 ((x y) ((mtimes) y ((mexpt) ((mplus) ((mexpt) x 2) ((mexpt) y 2)) -1))
+(defprop %atan2 ((x y) ((mtimes) y ((mexpt) ((mplus) ((mexpt) x 2) ((mexpt) y 2)) -1))
 		 ((mtimes) -1 x ((mexpt) ((mplus) ((mexpt) x 2) ((mexpt) y 2)) -1)))
   grad)
 
@@ -1202,6 +1202,9 @@
 (defmfun $float (e)
   (cond ((numberp e)
 	 (let ((e1 (float e))) (if (float-inf-p e1) (signal 'floating-point-overflow) e1)))
+	((eq e '$%i)
+	 ;; Handle %i specially.
+	 (mul 1.0 '$%i))
 	((and (symbolp e) (mget e '$numer)))
 	((or (atom e) (member 'array (cdar e) :test #'eq)) e)
 	((eq (caar e) 'rat) (fpcofrat e))

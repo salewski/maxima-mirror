@@ -572,6 +572,16 @@
 (defun apparently-a-directory-p (path)
   (eq (pathname-name path) nil))
 
+;; We keep these here in case we want to optimize the search.  To
+;; speed things up, we might want to support search lists like
+;; "share/**/*.{mac,wxm,mc}" so that we only descend the directory
+;; once.  Then we would take the list of paths and try to match the
+;; one with the given extensions.
+;;
+;; Currently, the search list is ["share/**/*.mac", "share/**/*.wxm",
+;; "share/**/*.mc"].  Thus to find "foo.mc", we end up doing a
+;; directory 3 times.
+#+nil
 (defun new-file-search (name template)
   (cond ((file-exists-p name))
 	((atom template)
@@ -585,8 +595,9 @@
 	 (let ((temp nil))
 	   (loop for v in template
 		 when (setq temp (new-file-search name v))
-		 do (return temp))))))
+		   do (return temp))))))
 
+#+nil
 (defun new-file-search1 (name begin lis)
   (cond ((null lis)
 	 (let ((file (namestring ($filename_merge begin name))))
@@ -599,6 +610,38 @@
 	(t (loop for v in (car lis) with tem
 		  when (setq tem  (new-file-search1 name begin (cons v (cdr lis))))
 		  do (return tem)))))
+
+(defvar *debug-new-file-search* nil)
+
+;; Search for a file named NAME.  If the file exists, return it.
+;; Otherwise, TEMPLATE is a list of wildcard paths to be searched for
+;; the NAME.  Each entry in TEMPLATE should be a Lisp wildcard
+;; pathname.
+(defun new-file-search (name template)
+  (cond ((file-exists-p name))
+	(t
+	 (let ((filename (pathname name)))
+	   (dolist (path template)
+	     (let ((pathnames (directory (merge-pathnames filename path))))
+	       (when *debug-new-file-search*
+		 (format *debug-io* "wildpath ~S~%" (merge-pathnames filename path)))
+	       (when pathnames
+		 ;; We MUST sort the results in alphabetical order
+		 ;; because that's how the old search paths were
+		 ;; sorted.
+		 (setf pathnames (sort pathnames #'string< :key #'namestring))
+		 (when *debug-new-file-search*
+		   (format *debug-io* "pathname = ~S~%" pathnames))
+		 ;; If more than one path is returned, print a warning
+		 ;; that we're selecting the first file.  Print all
+		 ;; the matches too so the user knows.
+		 (unless (= 1 (length pathnames))
+		   (mwarning
+		    (format nil
+			    "More than one file matches.  Selecting the first file from:~
+~%~{  ~A~^~%~}~%"
+			    (mapcar #'namestring pathnames))))
+		 (return-from new-file-search (namestring (first pathnames))))))))))
 
 (defun save-linenumbers (&key (c-lines t) d-lines (from 1) (below $linenum) a-list
 			 (file  "/tmp/lines")

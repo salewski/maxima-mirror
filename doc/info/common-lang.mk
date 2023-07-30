@@ -1,21 +1,24 @@
 info_TEXINFOS = maxima.texi
 
-all-local: maxima-index.lisp maxima-index-html.lisp maxima_toc.html
+all-local: maxima-index.lisp maxima-index-html.lisp index.html
 
 maxima-index.lisp: maxima.info $(srcdir)/../build_index.pl
 	/usr/bin/env perl $(srcdir)/../build_index.pl maxima.info ':crlf' > maxima-index.lisp
 
 # Really depends on all the individual html files, but let's assume
-# that if maxima_toc.html is done, we have all the remaining html
+# that if index.html is done, we have all the remaining html
 # files.
 #
-# First we find all the files that we don't want to have to process.
-# This includes the indices, maxima_singlepage.html and any other html
-# file that doesn't start with "maxima".
-maxima-index-html.lisp : maxima_toc.html
-	../../../maxima-local --batch-lisp=../build-html-index.lisp
+# Load build-html-index.lisp and run the builder to create
+# maxima-index-html.lisp.  In a clean directory, there won't be a
+# maxima-index-html.lisp, so we don't want to try to verify the html
+# index to prevent spurious warnings.  Then after it's done, run
+# maxima to verify the index.
+maxima-index-html.lisp : index.html $(top_srcdir)/doc/info/build-html-index.lisp
+	MAXIMA_LANG_SUBDIR=$(lang) $(top_srcdir)/maxima-local --no-init --no-verify-html-index --preload=$(top_srcdir)/doc/info/build-html-index.lisp --batch-string='build_and_dump_html_index("./*.html", "$(lang)");'
+	MAXIMA_LANG_SUBDIR=$(lang) $(top_srcdir)/maxima-local --no-init --batch-string="quit();"
 
-maxima_singlepage.html maxima_toc.html: maxima.texi $(maxima_TEXINFOS)
+maxima_singlepage.html index.html: maxima.texi $(maxima_TEXINFOS) $(figurefiles) $(top_srcdir)/doc/info/manual.css texi2html.init
 	../build_html.sh -l $(lang)
 
 maxima.pdf: maxima.texi $(maxima_TEXINFOS)
@@ -25,7 +28,10 @@ maxima.pdf: maxima.texi $(maxima_TEXINFOS)
 
 include $(top_srcdir)/common.mk
 
-htmlname = maxima
+# The basename for the html files for the manual.  Since we don't
+# rename the html files, the html file names can basically have any
+# name.
+htmlname = *
 htmlinstdir = $(dochtmldir)$(langsdir)
 include $(top_srcdir)/common-html.mk
 
@@ -38,10 +44,9 @@ clean-info:
 	rm -f maxima-index-html.lisp
 
 clean-html:
-	rm -f maxima*.html
-	rm -f maxima_singlepage.html
+	rm -f *.html
 
-EXTRA_DIST = maxima-index.lisp maxima-index-html.lisp $(genericdirDATA) maxima_toc.html
+EXTRA_DIST = maxima-index.lisp maxima-index-html.lisp $(genericdirDATA) index.html
 
 
 install-info-am: $(INFO_DEPS) maxima-index.lisp maxima-index-html.lisp
