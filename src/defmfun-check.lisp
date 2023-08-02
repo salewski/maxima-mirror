@@ -670,20 +670,78 @@
 		      (eqtest (list '(,noun-name) ,@lambda-list) ,form-arg)))
 	       ,@body)))))))
 
+;; Defines a simplifier for taking limits of a function.
+;;
+;; The name of the function is NAME and the SIMPLIM%FUNCTION is set up
+;; appropriately.
+;;
+;; For example, to define how to take limits of the bessel_j function, we do:
+;;
+;; (def-simplimit bessel_j (v z)
+;;   (cond
+;;     ;; Handle an argument 0 at this place.
+;;     ((or (zerop1 z)
+;;          (eq z '$zeroa)
+;;          (eq z '$zerob))
+;;      (let ((sgn ($sign ($realpart v))))
+;;        (cond ((and (eq sgn '$neg)
+;;                    (not (maxima-integerp v)))
+;;               ;; bessel_j(v,0), Re(v)<0 and v not an integer
+;;               '$infinity)
+;;              ((and (eq sgn '$zero)
+;;                    (not (zerop1 v)))
+;;               ;; bessel_j(v,0), Re(v)=0 and v #0
+;;               '$und)
+;;              ;; Call the simplifier of the function.
+;;              (t (give-up)))))
+;;     ((or (eq z '$inf)
+;;          (eq z '$minf))
+;;      ;; bessel_j(v,inf) or bessel_j(v,minf)
+;;      0)
+;;     (t
+;;      ;; All other cases are handled by the simplifier of the function.
+;;      (give-up))))  
+;;
+;; The function GIVE-UP means use the simplifier for the function to
+;; evaluate the limit because nothing special is needed.
+;;
+;; The expansion is:
+;; (progn
+;;   (defprop %bessel_j simplim-%bessel_j simplim%function)
+;;   (defun simplim-%bessel_j (#:expr-2886797 #:var-2886798 #:val-2886799)
+;;     (flet ((give-up ()
+;;              (simplify (list '(%bessel_j) v z))))
+;;       (let ((v
+;;              (limit (nth 1 #:expr-2886797) #:var-2886798 #:val-2886799 'think))
+;;             (z
+;;              (limit (nth 2 #:expr-2886797) #:var-2886798 #:val-2886799 'think)))
+;;         (cond
+;;           ((or (zerop1 z) (eq z '$zeroa) (eq z '$zerob))
+;;            (let ((sgn ($sign ($realpart v))))
+;;              (cond
+;;                ((and (eq sgn '$neg) (not (maxima-integerp v)))
+;;                 '$infinity)
+;;                ((and (eq sgn '$zero) (not (zerop1 v)))
+;;                 '$und)
+;;                (t
+;;                 (give-up)))))
+;;           ((or (eq z '$inf) (eq z '$minf))
+;;            0)
+;;           (t
+;;            (give-up)))))))
 (defmacro def-simplimit (name lambda-list &body body)
   (let* ((expr (gensym "EXPR-"))
 	 (var (gensym "VAR-"))
 	 (val (gensym "VAL-"))
 	 (noun-name ($nounify name))
 	 (limit-function-name (intern (concatenate 'string "SIMPLIM-" (string noun-name))))
-	 
 	 (arg-forms (loop for arg in lambda-list
 			  and count from 1
 			  collect (list arg `(limit (nth ,count ,expr) ,var ,val 'think)))))
     `(progn
        (defprop ,noun-name ,limit-function-name simplim%function)
        (defun ,limit-function-name (,expr ,var ,val)
-	 (flet ((give-up ()
-		  (simplify (list '(,noun-name) ,@lambda-list))))
 	 (let (,@arg-forms)
-	   ,@body))))))
+	   (flet ((give-up ()
+		    (simplify (list '(,noun-name) ,@lambda-list))))
+	     ,@body))))))
