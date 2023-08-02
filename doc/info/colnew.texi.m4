@@ -1248,19 +1248,34 @@ This example (Ascher et al, 1995, Example 9.2) solves a numerically
 difficult boundary value problem using continuation.
 
 @noindent The linear differential equation is
-@center @math{ε u'@w{}' + x u' = -ε π^2 cos(πx) - (πx) sin(πx)}, @math{-1 < x < 1}
+m4_displaymath(
+<<<
+\epsilon u'' + x u' = -\epsilon \pi^2 \cos \pi x - \pi x\sin \pi x \quad -1 < x < 1
+>>>,
+<<<@center @math{ε u'@w{}' + x u' = -ε π^2 cos(πx) - (πx) sin(πx)}, @math{-1 < x < 1}>>>
+)
 
 @noindent with boundary conditions
-@center @math{u(-1)=-2} and @math{u(1)=0}
+m4_displaymath(
+<<<\eqalign{
+u(-1) &= -2 \cr
+u(1) &= 0
+}>>>,
+<<<@center @math{u(-1)=-2} and @math{u(1)=0}>>>)
 
 @noindent The exact solution is
-@center @math{u(x) = cos(πx) + erf(x/sqrt(2ε))/erf(1/sqrt(2ε))}
+m4_displaymath(
+<<<
+u(x) = \cos \pi x + {{\rm erf}\left(\displaystyle{x \over \sqrt{2\epsilon}}\right) \over
+{\rm erf}\left(\displaystyle{1 \over \sqrt{2\epsilon}}\right)}
+>>>,
+<<<@center @math{u(x) = cos(πx) + erf(x/sqrt(2ε))/erf(1/sqrt(2ε))}>>>)
 
 When @math{ε} is small the solution has a rapid transition near @math{x=0}
 and is difficult to solve numerically.  COLNEW is able to solve the
-problem for directly for @math{ε=1.0e-6}, but here we will use
-continuation to solve it succesively for
-@math{ε=[1e-2,1e-3,1e-4,1e-5,1e-6]}.
+problem for directly for m4_math(<<<\epsilon = 10^{-6}>>>,<<<@math{ε=1.0e-6}>>>), but here we will use
+continuation to solve it succesively for m4_mathdot(<<<\epsilon = [10^{-2}, 10^{-3}, 10^{-4}, 10^{-5}, 10^{-6}]>>>,
+<<<@math{ε=[1e-2,1e-3,1e-4,1e-5,1e-6]}>>>)
 
 There is @var{nconc} = 1 differential equation of second order.
 The list of orders
@@ -1269,8 +1284,13 @@ The list of orders
 The unknown vector of length @var{mstar} is
 @math{z(x) = [z_1(x),z_2(x)] = [u(x),u'(x)]}.
 
-The differential equation is expressed as 
-@math{[u'@w{}'(x)] = F(x,z_1,z_2) = [-(x/ε)z_2 - π^2cos(πx) - (πx/ε)sin(πx)]}
+The differential equation is expressed as
+m4_displaymath(
+<<<
+[u''(x)] = F(x,z_1,z_2) = \left[-{x\over \epsilon}z_2 - \pi^2\cos \pi x - {\pi x \over \epsilon}\sin \pi x\right]
+>>>,
+<<<
+@math{[u'@w{}'(x)] = F(x,z_1,z_2) = [-(x/ε)z_2 - π^2cos(πx) - (πx/ε)sin(πx)]}>>>)
 
 There are @var{mstar=2} boundary conditions. They are given by a
 function @math{G(z_1,z_2)} that returns a list of length mstar.
