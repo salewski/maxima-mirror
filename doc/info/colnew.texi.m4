@@ -695,14 +695,24 @@ implementation is in share/colnew/ex2.
 There are two nonlinear differential equations
 for @math{φ} and @math{ψ} over @math{0 < x < 1}.
 
-@math{
-(ε^4/μ)[φ'@w{}' + (1/x) φ' - (1/x^2) φ] + ψ (1-φ/x) - φ = - γ x (1-(1/2)x^2)
-}
+m4_displaymath(
+<<<\eqalign{
+{ε^4 \over μ}\left[φ'' + {1 \over x}φ' - {1\over x^2}φ\right] + ψ \left(1-{1\over x}φ\right) - φ &= - γ x\left(1-{x^2\over 2}\right) \cr
+\mu \left[ψ'@w{}' + {1\over x} ψ' - {1 \over x^2}ψ\right] - φ\left(1-{φ \over {2x}}\right) &= 0
+}>>>,
+<<<(ε^4/μ)[φ'@w{}' + (1/x) φ' - (1/x^2) φ] + ψ (1-φ/x) - φ = - γ x (1-(1/2)x^2)@*
+μ [ψ'@w{}' + (1/x) ψ' - (1/x^2)ψ] - φ(1-φ/(2x)) = 0>>>)
 
-@math{ μ [ψ'@w{}' + (1/x) ψ' - (1/x^2)ψ] - φ(1-φ/(2x)) = 0 }
+m4_dnl @c m4_displaymath(
+m4_dnl @c <<<(ε^4/μ)\left[φ'@w{}' + {1 \over x} φ' - {1\over x^2| φ\right] + ψ \left(1-{φ\over x}\right) - φ = - γ x \left(1-{1\over 2}x^2\right)>>>,
+m4_dnl @c <<<(ε^4/μ)[φ'@w{}' + (1/x) φ' - (1/x^2) φ] + ψ (1-φ/x) - φ = - γ x (1-(1/2)x^2)>>>)
+m4_dnl @c 
+m4_dnl @c m4_displaymath(
+m4_dnl @c <<<μ \left[ψ'@w{}' + {1\over x} ψ' - {1 \over x^2}ψ\right] - φ\left(1-{φ \over {2x}}\right) = 0}>>>,
+m4_dnl @c <<< μ [ψ'@w{}' + (1/x) ψ' - (1/x^2)ψ] - φ(1-φ/(2x)) = 0}>>>)
 
 subject to boundary conditions
-@math{φ = 0} and @math{x ψ' - 0.3 ψ + 0.7 x = 0} at x=0 and x=1.
+@math{φ = 0} and @math{x ψ' - 0.3 ψ + 0.7 x = 0} at @math{x=0} and @math{x=1}.
 
 
 For @math{ε = μ = 0.01}, two solutions exists.  These are obtained by
@@ -721,12 +731,22 @@ The vector of unknowns of length @var{mstar}=4 is
 
 The differential equation is expressed as
 
+m4_displaymath(
+<<<\eqalign{
+[φ'@w{}'(x), ψ'@w{}'(x)] &= F(x,z_1,z_2,z_3,z_4) \cr
+&= 
+\left[{z_1 \over x^2} - {z_2 \over x} + \left(z_1-z_3 \left(1-{z_1\over x}\right) - γ x \left(1-{x^2 \over 2}\right)\right) {\mu \over ε^4}, 
+ {z_3 \over x^2} - {z_4 \over x} + {z_1 \over μ} \left(1-{z_1\over {2x}}\right)
+\right]
+}>>>,
+<<<
 @math{[φ'@w{}'(x), ψ'@w{}'(x)]}
 
 @math{=F(x,z_1,z_2,z_3,z_4)}
 
 @math{=[z_1/x^2 - z_2/x + (z_1-z_3 (1-z_1/x) - γ x (1-x^2/2))/(ε^4/μ),
 z_3/x^2 - z_4/x + z_1 (1-z_1/(2x))/μ]}
+>>>)
 
 
 There are four boundary conditions given by list @math{zeta}
@@ -753,7 +773,7 @@ and function @math{G(z_1,z_2,z_3,z_4)}.
 @end multitable
 
 giving @math{zeta=[0.0,0.0,1.0,1.0]} and 
-@math{G(z_1,z_2,z_3,z_4)=[z_1, z_3, z_1, z_4-0.3*z_3+0.7]}
+@math{G(z_1,z_2,z_3,z_4)=[z_1, z_3, z_1, z_4-0.3 z_3+0.7]}
 
 Note that @var{x} is not an argument of function @var{G}.  The 
 value of @var{x=zeta[j]} must be substituted.
