@@ -669,3 +669,21 @@
 		      ;; That would fit in better with giving up.
 		      (eqtest (list '(,noun-name) ,@lambda-list) ,form-arg)))
 	       ,@body)))))))
+
+(defmacro def-simplimit (name lambda-list &body body)
+  (let* ((expr (gensym "EXPR-"))
+	 (var (gensym "VAR-"))
+	 (val (gensym "VAL-"))
+	 (noun-name ($nounify name))
+	 (limit-function-name (intern (concatenate 'string "SIMPLIM-" (string noun-name))))
+	 
+	 (arg-forms (loop for arg in lambda-list
+			  and count from 1
+			  collect (list arg `(limit (nth ,count ,expr) ,var ,val 'think)))))
+    `(progn
+       (defprop ,noun-name ,limit-function-name simplim%function)
+       (defun ,limit-function-name (,expr ,var ,val)
+	 (flet ((give-up ()
+		  (simplify (list '(,noun-name) ,@lambda-list))))
+	 (let (,@arg-forms)
+	   ,@body))))))

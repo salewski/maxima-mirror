@@ -123,6 +123,8 @@
 
 ;; Support a simplim%bessel_j function to handle specific limits
 
+#+nil
+(progn
 (defprop %bessel_j simplim%bessel_j simplim%function)
 
 (defun simplim%bessel_j (expr var val)
@@ -152,6 +154,32 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%bessel_j) v z))))))
+)
+
+(def-simplimit bessel_j (v z)
+  (cond
+    ;; Handle an argument 0 at this place.
+    ((or (zerop1 z)
+         (eq z '$zeroa)
+         (eq z '$zerob))
+     (let ((sgn ($sign ($realpart v))))
+       (cond ((and (eq sgn '$neg)
+                   (not (maxima-integerp v)))
+              ;; bessel_j(v,0), Re(v)<0 and v not an integer
+              '$infinity)
+             ((and (eq sgn '$zero)
+                   (not (zerop1 v)))
+              ;; bessel_j(v,0), Re(v)=0 and v #0
+              '$und)
+             ;; Call the simplifier of the function.
+             (t (give-up)))))
+    ((or (eq z '$inf)
+         (eq z '$minf))
+     ;; bessel_j(v,inf) or bessel_j(v,minf)
+     0)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (give-up))))  
 
 (def-simplifier bessel_j (order arg)
   (let ((rat-order nil))
