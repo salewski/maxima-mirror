@@ -486,8 +486,10 @@
 
 ;; Support a simplim%bessel_y function to handle specific limits
 
+#+nil
 (defprop %bessel_y simplim%bessel_y simplim%function)
 
+#+nil
 (defun simplim%bessel_y (expr var val)
   ;; Look for the limit of the arguments.
   (let ((v (limit (cadr expr) var val 'think))
@@ -522,6 +524,38 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%bessel_y) v z))))))
+
+(def-simplimit bessel_y (v z)
+  (cond
+    ;; Handle an argument 0 at this place.
+    ((or (zerop1 z)
+         (eq z '$zeroa)
+         (eq z '$zerob))
+     (cond ((zerop1 v)
+            ;; bessel_y(0,0)
+            '$minf)
+           ((integerp v)
+            ;; bessel_y(n,0), n an integer
+            (cond ((evenp v) '$minf)
+                  (t (cond ((eq z '$zeroa) '$minf)
+                           ((eq z '$zerob) '$inf)
+                           (t '$infinity)))))
+           ((not (zerop1 ($realpart v)))
+            ;; bessel_y(v,0), Re(v)#0
+            '$infinity)
+           ((and (zerop1 ($realpart v))
+                 (not (zerop1 v)))
+            ;; bessel_y(v,0), Re(v)=0 and v#0
+            '$und)
+           ;; Call the simplifier of the function.
+           (t (give-up))))
+    ((or (eq z '$inf)
+         (eq z '$minf))
+     ;; bessel_y(v,inf) or bessel_y(v,minf)
+     0)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (give-up))))
 
 (def-simplifier bessel_y (order arg)
   (let ((rat-order nil))
@@ -819,8 +853,10 @@
 
 ;; Support a simplim%bessel_i function to handle specific limits
 
+#+nil
 (defprop %bessel_i simplim%bessel_i simplim%function)
 
+#+nil
 (defun simplim%bessel_i (expr var val)
   ;; Look for the limit of the arguments.
   (let ((v (limit (cadr expr) var val 'think))
@@ -850,6 +886,33 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%bessel_i) v z))))))
+
+(def-simplimit bessel_i (v z)
+  (cond
+    ;; Handle an argument 0 at this place.
+    ((or (zerop1 z)
+         (eq z '$zeroa)
+         (eq z '$zerob))
+     (let ((sgn ($sign ($realpart v))))
+       (cond ((and (eq sgn '$neg)
+                   (not (maxima-integerp v)))
+              ;; bessel_i(v,0), Re(v)<0 and v not an integer
+              '$infinity)
+             ((and (eq sgn '$zero)
+                   (not (zerop1 v)))
+              ;; bessel_i(v,0), Re(v)=0 and v #0
+              '$und)
+             ;; Call the simplifier of the function.
+             (t (give-up)))))
+    ((eq z '$inf)
+     ;; bessel_i(v,inf)
+     '$inf)
+    ((eq z '$minf)
+     ;; bessel_i(v,minf)
+     '$infinity)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (give-up))))
 
 (def-simplifier bessel_i (order arg)
   (let ((rat-order nil))
@@ -1177,8 +1240,10 @@
 
 ;; Support a simplim%bessel_k function to handle specific limits
 
+#+nil
 (defprop %bessel_k simplim%bessel_k simplim%function)
 
+#+nil
 (defun simplim%bessel_k (expr var val)
   ;; Look for the limit of the arguments.
   (let ((v (limit (cadr expr) var val 'think))
@@ -1215,6 +1280,40 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%bessel_k) v z))))))
+
+(def-simplimit bessel_k (v z)
+  (cond
+    ;; Handle an argument 0 at this place.
+    ((or (zerop1 z)
+         (eq z '$zeroa)
+         (eq z '$zerob))
+     (cond ((zerop1 v)
+            ;; bessel_k(0,0)
+            '$inf)
+           ((integerp v)
+            ;; bessel_k(n,0), n an integer
+            (cond ((evenp v) '$inf)
+                  (t (cond ((eq z '$zeroa) '$inf)
+                           ((eq z '$zerob) '$minf)
+                           (t '$infinity)))))
+           ((not (zerop1 ($realpart v)))
+            ;; bessel_k(v,0), Re(v)#0
+            '$infinity)
+           ((and (zerop1 ($realpart v))
+                 (not (zerop1 v)))
+            ;; bessel_k(v,0), Re(v)=0 and v#0
+            '$und)
+           ;; Call the simplifier of the function.
+           (t (give-up))))
+    ((eq z '$inf)
+     ;; bessel_k(v,inf)
+     0)
+    ((eq z '$minf)
+     ;; bessel_k(v,minf)
+     '$infinity)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (give-up))))
 
 (def-simplifier bessel_k (order arg)
   (let ((rat-order nil))
