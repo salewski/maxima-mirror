@@ -1043,6 +1043,31 @@ limit(bessel_k(v, z), z, inf);
 limit(bessel_k(v, z), z, minf);
 infinity;
 
+limit(airy_ai(z), z, inf);
+0;
+
+limit(airy_ai(z), z, minf);
+0;
+
+limit(airy_dai(z), z, inf);
+0;
+
+limit(airy_dai(z), z, minf);
+und;
+
+limit(airy_bi(z), z, inf);
+inf;
+
+limit(airy_bi(z), z, minf);
+0;
+
+limit(airy_dbi(z), z, inf);
+inf;
+
+limit(airy_dbi(z), z, minf);
+und;
+
+
 
 
 
