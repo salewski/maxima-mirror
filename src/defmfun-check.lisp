@@ -737,6 +737,7 @@
 	 (limit-function-name (intern (concatenate 'string "SIMPLIM-" (string noun-name))))
 	 (arg-forms (loop for arg in lambda-list
 			  and count from 1
+			  ;; Look for the limit of the n'th argument
 			  collect (list arg `(limit (nth ,count ,expr) ,var ,val 'think)))))
     `(progn
        (defprop ,noun-name ,limit-function-name simplim%function)
