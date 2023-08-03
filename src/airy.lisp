@@ -25,6 +25,7 @@
 
 ;; Airy Ai function 
 
+#+nil
 (defprop %airy_ai simplim%airy_ai simplim%function)
 (defprop %airy_ai ((z) ((%airy_dai) z)) grad)
 
@@ -64,6 +65,7 @@
 
 (setf (gethash '%airy_ai *flonum-op*) 'airy-ai)
 
+#+nil
 (defun simplim%airy_ai (expr var val)
   ; Look for the limit of the argument
   (let ((z (limit (cadr expr) var val 'think)))
@@ -73,6 +75,14 @@
 	  (t
 	   ; Handle other cases with the function simplifier
 	   (simplify (list '(%airy_ai) z))))))
+
+(def-simplimit airy_ai (z)
+  (cond ((or (eq z '$inf)		; A&S 10.4.59
+	     (eq z '$minf))		; A&S 10.4.60
+	 0)
+	(t
+					; Handle other cases with the function simplifier
+	 (give-up))))
 
 (defun airy-ai-hypergeometric (z)
   "Returns the hypergeometric representation of Airy Ai"
@@ -110,6 +120,7 @@
 
 
 ;; Derivative dAi/dz of Airy function Ai(z)
+#+nil
 (defprop %airy_dai simplim%airy_dai simplim%function)
 (defprop %airy_dai ((z) ((mtimes) z ((%airy_ai) z))) grad)
 (defprop %airy_dai ((z) ((%airy_ai) z)) integral)
@@ -126,6 +137,7 @@
 
 (setf (gethash '%airy_dai *flonum-op*) 'airy-dai)
 
+#+nil
 (defun simplim%airy_dai (expr var val)
   ; Look for the limit of the argument
   (let ((z (limit (cadr expr) var val 'think)))
@@ -136,6 +148,15 @@
 	  (t
 	   ; Handle other cases with the function simplifier
 	   (simplify (list '(%airy_dai) z))))))
+
+(def-simplimit airy_dai (z)
+  (cond ((eq z '$inf)			; A&S 10.4.61
+	 0)
+	((eq z '$minf)			; A&S 10.4.62
+	 '$und)
+	(t
+					; Handle other cases with the function simplifier
+	 (give-up))))
 
 (defun airy-dai-hypergeometric (z)
   "Returns the hypergeometric representation of Ai'(x), the derivative
@@ -174,6 +195,7 @@
 	 (airy-dai-hypergeometric z))
 	(t (give-up))))
 
+#+nil
 (defprop %airy_bi simplim%airy_bi simplim%function)
 (defprop %airy_bi ((z) ((%airy_dbi) z)) grad)
 
@@ -213,6 +235,7 @@
 
 (setf (gethash '%airy_bi *flonum-op*) 'airy-bi)
 
+#+nil
 (defun simplim%airy_bi (expr var val)
   ; Look for the limit of the argument
   (let ((z (limit (cadr expr) var val 'think)))
@@ -223,6 +246,15 @@
 	  (t
 	   ; Handle other cases with the function simplifier
 	   (simplify (list '(%airy_bi) z))))))
+
+(def-simplimit airy_bi (z)
+  (cond ((eq z '$inf)			; A&S 10.4.63
+	 '$inf)
+	((eq z '$minf)			; A&S 10.4.64
+	 0)
+	(t
+					; Handle other cases with the function simplifier
+	 (give-up))))
 
 (defun airy-bi-hypergeometric (z)
   "Returns the hypergeometric representation of Airy Bi"
@@ -260,6 +292,7 @@
 
 
 ;; Derivative dBi/dz of Airy function Bi(z)
+#+nil
 (defprop %airy_dbi simplim%airy_dbi simplim%function)
 (defprop %airy_dbi ((z) ((mtimes) z ((%airy_bi) z))) grad)
 (defprop %airy_dbi ((z) ((%airy_bi) z)) integral)
@@ -276,6 +309,7 @@
 
 (setf (gethash '%airy_dbi *flonum-op*) 'airy-dbi)
 
+#+nil
 (defun simplim%airy_dbi (expr var val)
   ; Look for the limit of the argument
   (let ((z (limit (cadr expr) var val 'think)))
@@ -286,6 +320,15 @@
 	  (t
 	   ; Handle other cases with the function simplifier
 	   (simplify (list '(%airy_dbi) z))))))
+
+(def-simplimit airy_dbi (z)
+  (cond ((eq z '$inf)			; A&S 10.4.66
+	 '$inf)
+	((eq z '$minf)			; A&S 10.4.67
+	 '$und)
+	(t
+					; Handle other cases with the function simplifier
+	 (give-up))))
 
 (defun airy-dbi-hypergeometric (z)
   "Returns the hypergeometric representation of Bi'(z), the derivative
