@@ -193,8 +193,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %expintegral_e simplim%expintegral_e simplim%function)
 
+#+nil
 (defun simplim%expintegral_e (expr var val)
   ;; Look for the limit of the arguments.
   (let ((a (limit (cadr expr) var val 'think))
@@ -222,6 +224,31 @@
         (t
          ;; All other cases are handled by the simplifier of the function.
          (ftake '%expintegral_e a z)))))
+
+(def-simplimit expintegral_e (a z)
+  (cond ((and (onep1 a)
+              (or (eq z '$zeroa)
+                  (eq z '$zerob)
+                  (zerop1 z)))
+         ;; Special case order a=1
+         '$inf)
+         
+        ((member ($sign (add ($realpart a) -1)) '($neg $nz $zero))
+					; realpart of order < 1
+         (cond ((eq z '$zeroa)
+                ;; from above, always inf
+                '$inf)
+               ((eq z '$zerob)
+                ;; this can be further improved to give a directed infinity
+                '$infinity)
+               ((zerop1 z)
+                ;; no direction, return infinity
+                '$infinity)
+               (t
+                (give-up))))
+        (t
+         ;; All other cases are handled by the simplifier of the function.
+         (give-up))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
