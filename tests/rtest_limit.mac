@@ -960,3 +960,90 @@ ind;
 
 limit(signum(x)*x/sin(x),x,0);
 ind;
+
+/* Basic tests for limits of special functions */
+limit(bessel_j(v, z), z, inf);
+0;
+
+limit(bessel_j(v, z), z, minf);
+0;
+
+limit(bessel_j(1/4,z), z, 1);
+bessel_j(1/4, 1);
+
+limit(bessel_j(0,z), z, 0);
+1;
+
+limit(bessel_j(-1/4, z), z, 0);
+infinity;
+
+limit(bessel_j(%i, z), z, 0);
+und;
+
+limit(bessel_y(0, z), z, 0);
+minf;
+
+limit(bessel_y(2, z), z, 0);
+minf;
+
+limit(bessel_y(3, z), z, 0, 'plus);
+minf;
+
+limit(bessel_y(3, z), z, 0, 'minus);
+inf;
+
+limit(bessel_y(1+%i, z), z, 0);
+infinity;
+
+limit(bessel_y(%i, z), z, 0);
+und;
+
+limit(bessel_y(v, z), z, inf);
+0;
+
+limit(bessel_y(v, z), z, minf);
+0;
+
+limit(bessel_i(-1/4, z), z, 0);
+infinity;
+
+limit(bessel_i(%i, z), z, 0);
+und;
+
+limit(bessel_i(v, z), z, inf);
+inf;
+
+limit(bessel_i(v, z), z, minf);
+infinity;
+
+limit(bessel_k(0, z), z, 0);
+inf;
+
+limit(bessel_k(2, z), z, 0);
+inf;
+
+limit(bessel_k(3, z), z, 0, 'plus);
+inf;
+
+limit(bessel_k(3, z), z, 0, 'minus);
+minf;
+
+limit(bessel_k(3, z), z, 0);
+infinity;
+
+limit(bessel_k(1+%i, z), z, 0);
+infinity;
+
+limit(bessel_k(%i, z), z, 0);
+und;
+
+limit(bessel_k(v, z), z, inf);
+0;
+
+limit(bessel_k(v, z), z, minf);
+infinity;
+
+
+
+
+
