@@ -1067,8 +1067,23 @@ inf;
 limit(airy_dbi(z), z, minf);
 und;
 
+limit(expintegral_e(1, z), z, 0);
+inf;
 
+limit(expintegral_e(1/2, z), z, 0, 'plus);
+inf;
 
+limit(expintegral_e(1/2, z), z, 0, 'minus);
+infinity;
+
+limit(expintegral_e(1/2, z), z, 0);
+infinity;
+
+limit(expintegral_e1(z), z, 0);
+inf;
+
+limit(expintegral_li(z), z, 1);
+minf;
 
 
 
