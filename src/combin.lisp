@@ -522,8 +522,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %zeta simplim%zeta simplim%function)
 
+#+nil
 (defun simplim%zeta (expr var val)
   ;; Look for the limit of the argument
   (let* ((arg (limit (cadr expr) var val 'think))
@@ -539,6 +541,21 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%zeta) arg))))))
+
+(def-simplimit zeta (arg)
+  ;; Look for the limit of the argument
+  (let ((dir (limit (add arg-arg (neg arg)) var val 'think)))
+    (cond
+      ;; Handle an argument 1 at this place
+      ((onep1 arg)
+       (cond ((eq dir '$zeroa)
+              '$inf)
+             ((eq dir '$zerob)
+              '$minf)
+             (t '$infinity)))
+      (t
+       ;; All other cases are handled by the simplifier of the function.
+       (give-up)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
