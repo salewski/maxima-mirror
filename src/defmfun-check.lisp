@@ -677,56 +677,32 @@
 ;;
 ;; For example, to define how to take limits of the bessel_j function, we do:
 ;;
-;; (def-simplimit bessel_j (v z)
+;; (def-simplimit %expintegral_e1 (z)
 ;;   (cond
-;;     ;; Handle an argument 0 at this place.
+;;     ;; Handle an argument 0 at this place
 ;;     ((or (zerop1 z)
 ;;          (eq z '$zeroa)
 ;;          (eq z '$zerob))
-;;      (let ((sgn ($sign ($realpart v))))
-;;        (cond ((and (eq sgn '$neg)
-;;                    (not (maxima-integerp v)))
-;;               ;; bessel_j(v,0), Re(v)<0 and v not an integer
-;;               '$infinity)
-;;              ((and (eq sgn '$zero)
-;;                    (not (zerop1 v)))
-;;               ;; bessel_j(v,0), Re(v)=0 and v #0
-;;               '$und)
-;;              ;; Call the simplifier of the function.
-;;              (t (give-up)))))
-;;     ((or (eq z '$inf)
-;;          (eq z '$minf))
-;;      ;; bessel_j(v,inf) or bessel_j(v,minf)
-;;      0)
+;;      ;; limit is inf from both sides
+;;      '$inf)
 ;;     (t
 ;;      ;; All other cases are handled by the simplifier of the function.
-;;      (give-up))))  
-;;
+;;      (give-up))))
+;; 
 ;; The function GIVE-UP means use the simplifier for the function to
 ;; evaluate the limit because nothing special is needed.
 ;;
 ;; The expansion is:
 ;; (progn
-;;   (defprop %bessel_j simplim-%bessel_j simplim%function)
-;;   (defun simplim-%bessel_j (#:expr-2886797 #:var-2886798 #:val-2886799)
-;;     (flet ((give-up ()
-;;              (simplify (list '(%bessel_j) v z))))
-;;       (let ((v
-;;              (limit (nth 1 #:expr-2886797) #:var-2886798 #:val-2886799 'think))
-;;             (z
-;;              (limit (nth 2 #:expr-2886797) #:var-2886798 #:val-2886799 'think)))
+;;   (defprop %expintegral_e1 simplim-%expintegral_e1 simplim%function)
+;;   (defun simplim-%expintegral_e1 (#:expr-9587 #:var-9588 #:val-9589)
+;;     (let ((z-arg (nth 1 #:expr-9587))
+;;           (z (limit z-arg #:var-9588 #:val-9589 'think)))
+;;       (flet ((give-up ()
+;;                (simplify (list '(%expintegral_e1) z))))
 ;;         (cond
 ;;           ((or (zerop1 z) (eq z '$zeroa) (eq z '$zerob))
-;;            (let ((sgn ($sign ($realpart v))))
-;;              (cond
-;;                ((and (eq sgn '$neg) (not (maxima-integerp v)))
-;;                 '$infinity)
-;;                ((and (eq sgn '$zero) (not (zerop1 v)))
-;;                 '$und)
-;;                (t
-;;                 (give-up)))))
-;;           ((or (eq z '$inf) (eq z '$minf))
-;;            0)
+;;            '$inf)
 ;;           (t
 ;;            (give-up)))))))
 (defmacro def-simplimit (name lambda-list &body body)
@@ -734,15 +710,36 @@
 	 (var (gensym "VAR-"))
 	 (val (gensym "VAL-"))
 	 (noun-name ($nounify name))
+	 ;; Name of the limit simplifier function is the noun name
+	 ;; prefixed by "SIMPLIM-".
 	 (limit-function-name (intern (concatenate 'string "SIMPLIM-" (string noun-name))))
-	 (arg-forms (loop for arg in lambda-list
+	 ;; For each variable "A" in the lambda-list, create a new
+	 ;; symbol "A-ARG" that is will be the name for the n'th arg.
+	 ;; Some simplifiers want the actual value of the arg and not
+	 ;; the limit of the arg.  One such function is
+	 ;; gamma_incomplete.
+	 (arg-names (loop for arg in lambda-list
 			  and count from 1
 			  ;; Look for the limit of the n'th argument
-			  collect (list arg `(limit (nth ,count ,expr) ,var ,val 'think)))))
+			  collect (intern (concatenate 'string (string arg) "-ARG"))))
+	 ;; For each value in ARG-NAMES, create a form to extract the
+	 ;; value from the actual arg (EXPR) to the simplifier.
+	 (arg-names-values (loop for arg in arg-names
+				 and count from 1
+				 collect `(nth ,count ,expr)))
+	 (arg-names-init (mapcar #'(lambda (name value)
+				     `(,name ,value))
+				 arg-names
+				 arg-names-values))
+	 (arg-init (mapcar #'(lambda (arg name)
+			       `(,arg (limit ,name ,var ,val 'think)))
+			   lambda-list
+			   arg-names)))
     `(progn
        (defprop ,noun-name ,limit-function-name simplim%function)
        (defun ,limit-function-name (,expr ,var ,val)
-	 (let (,@arg-forms)
+	 (let (,@arg-names-init)
+	   (let (,@arg-init)
 	   (flet ((give-up ()
 		    (simplify (list '(,noun-name) ,@lambda-list))))
-	     ,@body))))))
+	     ,@body)))))))
