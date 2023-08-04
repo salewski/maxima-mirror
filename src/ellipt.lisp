@@ -1552,8 +1552,10 @@ first kind:
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %elliptic_kc simplim%elliptic_kc simplim%function)
 
+#+nil
 (defun simplim%elliptic_kc (expr var val)
   ;; Look for the limit of the argument
   (let ((m (limit (cadr expr) var val 'think)))
@@ -1563,6 +1565,14 @@ first kind:
           (t 
             ;; All other cases are handled by the simplifier of the function.
             (simplify (list '(%elliptic_kc) m))))))
+
+(def-simplimit elliptic_kc (m)
+  (cond ((onep1 m)
+         ;; For an argument 1 return $infinity.
+         '$infinity)
+        (t 
+         ;; All other cases are handled by the simplifier of the function.
+         (give-up))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
