@@ -2913,6 +2913,7 @@ ignoring dummy variables and array indices."
 
 ;;; Limit(log(XXX), var, 0, val), where val is either zerob (limit from below)
 ;;; or zeroa (limit from above).
+#+nil
 (defun simplimln (expr var val)
   (let ((arglim (limit (cadr expr) var val 'think)) (dir)) 
     (cond ((eq arglim '$inf) '$inf) ;log(inf) = inf
@@ -2947,8 +2948,45 @@ ignoring dummy variables and array indices."
              (cond  ((or (eql dir 1) (eql dir -1))
 	                  (add (ftake '%log (mul -1 arglim)) (mul dir '$%i '$%pi)))
 	                (t (throw 'limit nil))))))) ;do a nounform return
+#+nil
 (setf (get '%log 'simplim%function) 'simplimln)
-(setf (get '%plog 'simplim%function) 'simplimln)
+
+(def-simplimit log (arglim)
+  (cond ((eq arglim '$inf) '$inf)	;log(inf) = inf
+        ;;log(minf,infinity,zerob) = infinity & log(0) = infinity
+	((or (member arglim '($minf $infinity $zerob)))
+	 '$infinity)
+	((eq arglim '$zeroa) '$minf)	;log(zeroa) = minf
+        ;; log(ind)=und & log(und)=und
+	((member arglim '($ind $und)) '$und)
+        ;; log(1^(-)) = zerob, log(1^(+)) = zeroa & log(1)=0
+	((eql arglim 1)
+	 (if (or (eq val '$zerob) (eq var '$zeroa)) val 0))
+	;; Special case of arglim = 0
+	((eql arglim 0)
+	 (setq dir (behavior arglim-arg var val))
+	 (cond ((eql dir -1) '$infinity)
+	       ((eql dir 0) '$infinity)
+	       ((eql dir 1) '$minf)))
+        ;; When arglim is off the negative real axis, use direct substitution
+	((off-negative-real-axisp arglim) 
+         (ftake '%log arglim))
+	(t
+	 ;; We know that arglim is a negative real number, say xx.
+	 ;; When the imaginary part of (cadr expr) near var is negative,
+	 ;; return log(-x) - %i*pi; when the imaginary part of (cadr expr) 
+	 ;; near var is positive return log(-x) + %i*pi; and when
+	 ;; we cannot determine the behavior of the imaginary part,
+	 ;; return a nounform. The value of val (either zeroa or zerob)
+	 ;; determines what is meant by "near" (smaller than var when 
+	 ;; val is zerob and larger than var when val is zeroa).
+	 (setq dir (behavior ($imagpart arglim-arg) var val))
+         (cond  ((or (eql dir 1) (eql dir -1))
+	         (add (ftake '%log (mul -1 arglim)) (mul dir '$%i '$%pi)))
+	        (t (throw 'limit nil))))))
+
+(setf (get '%plog 'simplim%function) 'simplim-%log)
+
 
 (defun simplim%limit (e x pt)
 	(declare (ignore e x pt))
