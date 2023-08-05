@@ -3448,6 +3448,7 @@ ignoring dummy variables and array indices."
       0
       `((%inverse_jacobi_ds) ,arg ,m)))
 
+#+nil
 (defun simplim%signum (e x pt)
   (let ((e (limit (cadr e) x pt 'think)) (sgn))
     (cond ((eq '$minf e) -1)
@@ -3461,7 +3462,23 @@ ignoring dummy variables and array indices."
 		     (setq sgn (mnqp e 0))
 			 (cond ((eq t sgn) (ftake '%signum e))
 			 	   (t (throw 'limit nil))))))) ; don't know
+#+nil
 (setf (get '%signum 'simplim%function) 'simplim%signum)
+
+(def-simplimit signum (e)
+  (cond ((eq '$minf e) -1)
+	((eq '$inf e) 1)
+	((eq '$infinity e) '$und)
+	((eq '$ind e) '$ind)
+	((eq '$und e) e)
+	((eq '$zerob e) -1)
+	((eq '$zeroa e) 1)
+	(t  
+	 (let ((sgn (mnqp e 0)))
+	   (cond ((eq t sgn) (ftake '%signum e))
+                 
+		 (t                     ; don't know
+                  (throw 'limit nil)))))))
 
 ;; more functions for limit to handle
 
