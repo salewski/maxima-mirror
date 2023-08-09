@@ -360,8 +360,8 @@ COLNEW is best learned by example.
 The problem describes a uniformly loaded beam of variable stiffness, simply supported at both ends.
 
 The problem from (Gawain&Bell 1978) and is Example 1 from (Ascher 1981a).
-The maxima code is in file share/colnew/prob1.mac and a Fortran implementation
-is in share/colnew/ex1. 
+The maxima code is in file @url{https://sourceforge.net/p/maxima/code/ci/master/tree/share/colnew/prob1.mac, share/colnew/prob1.mac} and a Fortran implementation
+is in @url{https://sourceforge.net/p/maxima/code/ci/master/tree/share/colnew/ex1,share/colnew/ex1}. 
 
 @noindent The differential equation is
 
@@ -689,8 +689,8 @@ axisymmetric external pressure distribution superimposed on a uniform
 internal pressure distribution.
 The problem is described in (Parker&Wan 1984) and is Example 2
 from (Ascher 1981a).
-The maxima code is in file share/colnew/prob2.mac and a Fortran
-implementation is in share/colnew/ex2.
+The maxima code is in file @url{https://sourceforge.net/p/maxima/code/ci/master/tree/share/colnew/prob2.mac,share/colnew/prob2.mac} and a Fortran
+implementation is in @url{https://sourceforge.net/p/maxima/code/ci/master/tree/share/colnew/ex2,share/colnew/ex2}.
 
 There are two nonlinear differential equations
 for @math{φ} and @math{ψ} over @math{0 < x < 1}.
@@ -1253,8 +1253,8 @@ H'(inf) = 0
 The solution uses a number of techniques to obtain convergence.
 Refer to (Ascher 1981a) for details.
 
-The code is in directory share/colnew.  The maxima code is in file
-prob3.mac.  The reference Fortran implementation is in directory ex3. 
+The maxima code is in file
+@url{https://sourceforge.net/p/maxima/code/ci/master/tree/share/colnew/prob3.mac, share/colnew/prob3.mac}.  The reference Fortran implementation is in @url{https://sourceforge.net/p/maxima/code/ci/master/tree/share/colnew/ex3, share/colnew/ex3}. 
 
 
 @subsection Example 4: Quantum Neumann equation
@@ -1265,16 +1265,17 @@ solution domain, provides an initial quess to the solution
 and uses continuation to solve the system of non-linear
 differential equations.
 
-The code is in directory share/colnew.  The maxima code is in file
-prob4.mac.  The Fortran
-implementation is in directory ex4. 
+The maxima code is in file
+@url{https://sourceforge.net/p/maxima/code/ci/master/tree/share/colnew/prob4.mac, share/colnew/prob4.mac}.  The Fortran
+implementation is in @url{https://sourceforge.net/p/maxima/code/ci/master/tree/share/colnew/ex4, share/colnew/ex4}. 
 
 
 @subsection Example 5: Simple example of continuation 
 
 This example (Ascher et al, 1995, Example 9.2) solves a numerically
 difficult boundary value problem using continuation.
-
+The maxima code is in file @url{https://sourceforge.net/p/maxima/code/ci/master/tree/share/colnew/prob5.mac,share/colnew/prob5.mac} and a Fortran
+implementation is in @url{https://sourceforge.net/p/maxima/code/ci/master/tree/share/colnew/ex5,share/colnew/ex5}.
 @noindent The linear differential equation is
 m4_displaymath(
 <<<
