@@ -700,8 +700,12 @@ m4_displaymath(
 {ε^4 \over μ}\left[φ'' + {1 \over x}φ' - {1\over x^2}φ\right] + ψ \left(1-{1\over x}φ\right) - φ &= - γ x\left(1-{x^2\over 2}\right) \cr
 \mu \left[ψ'@w{}' + {1\over x} ψ' - {1 \over x^2}ψ\right] - φ\left(1-{φ \over {2x}}\right) &= 0
 }>>>,
-<<<(ε^4/μ)[φ'@w{}' + (1/x) φ' - (1/x^2) φ] + ψ (1-φ/x) - φ = - γ x (1-(1/2)x^2)@*
-μ [ψ'@w{}' + (1/x) ψ' - (1/x^2)ψ] - φ(1-φ/(2x)) = 0>>>)
+<<<@example
+(ε^4/μ)[φ'@w{}' + (1/x) φ' - (1/x^2) φ] + ψ (1-φ/x) - φ =
+    - γ x (1-(1/2)x^2)
+μ [ψ'@w{}' + (1/x) ψ' - (1/x^2)ψ] - φ(1-φ/(2x)) = 0
+@end example
+>>>)
 
 m4_dnl @c m4_displaymath(
 m4_dnl @c <<<(ε^4/μ)\left[φ'@w{}' + {1 \over x} φ' - {1\over x^2| φ\right] + ψ \left(1-{φ\over x}\right) - φ = - γ x \left(1-{1\over 2}x^2\right)>>>,
@@ -1221,6 +1225,30 @@ can be compared with Figure 1 in (Ascher 1981a).
 Example 3 from (Ascher 1981a) describes the velocities in the
 boundary layer produced by the rotating flow of a viscous incompressible
 fluid over a stationary infinite disk (Gawain&Bell 1978).
+
+The differential equations are:
+m4_displaymath(
+<<<\eqalign{
+G'' + {3-n\over 2} HG' + (n-1)H'G - s(G-1) &= 0 \cr
+H''' + {3-n\over 2} HH'' + n\left(H'\right)^2 - 1 + G^2 -sH' &= 0
+}>>>,
+<<<@example
+G'' + (3-n)/2*H*G'' + (n-1)*H'*G - s*(G-1) = 0
+H''' + (3-n)/2*H*H'' + n(H')^2 - 1 + G^2 - s*H' = 0
+@end example>>>)
+
+with the boundary conditions
+m4_displaymath(
+<<<\eqalign{
+G(0) &= H(0) = H'(0) = 0 \cr
+G(\infty) &= 1 \cr
+H'(\infty) &= 0
+}>>>,
+<<<@example
+G(0) = H(0) = H'(0) = 0
+G(inf) = 1
+H'(inf) = 0
+@end example>>>)
 
 The solution uses a number of techniques to obtain convergence.
 Refer to (Ascher 1981a) for details.
