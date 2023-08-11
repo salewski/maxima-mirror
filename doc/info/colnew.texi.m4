@@ -108,7 +108,9 @@ Left end of interval
 Right end of interval
 
 @item zeta
-Real list of length 
+@var{zeta} 
+m4_math(<<<(\zeta)>>>, <<<>>>)
+is a real list of length 
 m4_mathdot(<<<m^*>>>,<<<@var{mstar}>>>)
 m4_math(<<<\zeta_j>>>, <<<@code{zeta[j]}>>>) 
 is the 
@@ -406,9 +408,13 @@ m4_displaymath(
 <<<@center @math{u(x) = (1/4) (10 ln(2) - 3) (1-x) + (1/2) (1/x + (3+x) ln(x) - x)}>>>)
 
 @noindent There is @var{nconc} = 1 differential equation of fourth order. The list of orders
-@var{m} = [4] and @var{mstar} = sum(m[j]) = 4.
+m4_math(<<<m = [4]>>>, <<<@var{m} = [4]>>>) 
+and
+m4_mathdot(<<<m^* = \sum_j m_j = 4>>>, <<< @var{mstar} = sum(m[j]) = 4>>>)
 
-@noindent The unknown vector of length @var{mstar} is
+@noindent The unknown vector of length 
+m4_math(<<<m^*>>>, <<<@var{mstar}>>>)
+is
 
 m4_displaymath(
 <<<
@@ -431,10 +437,15 @@ u''''(x) = F(x,z_1,z_2,z_3,z_4) = 1 - 6 x^2 z_3 - 6x z_2>>>,
 @center @math{u'@w{}'@w{}'@w{}'(x) = F(x,z_1,z_2,z_3,z_4) = 1 - 6 x^2 z_3 - 6x z_2}
 >>>)
 
-There are @var{mstar=4} boundary conditions. They are given by a
-function @math{G(z_1,z_2,z_3,z_4)} that returns a list of length mstar.
-The j-th boundary condition applies at @var{x = zeta[j]} and is satisfied
-when @var{g[j] = 0}.  We have
+There are 
+m4_math(<<<m^* = 4>>>, <<<@var{mstar=4}>>>) 
+boundary conditions. They are given by a
+function @math{G(z_1,z_2,z_3,z_4)} that returns a list of length 
+m4_mathdot(<<<m^*>>>, <<<@var{mstar}>>>)
+The @math{j}-th boundary condition applies at 
+m4_math(<<<x = \zeta_j>>>, <<<@var{x = zeta[j]}>>>)
+and is satisfied
+when @math{g[j] = 0}.  We have
 
 @c The {xxxxxx} set the column widths
 @multitable {xxxxxxxxx} {xxxxxxxxx} {xxxxxxxxxx} {xxxxxxxxx}
@@ -457,7 +468,8 @@ when @var{g[j] = 0}.  We have
 @tab @math{z_3}
 @end multitable
 
-giving  @math{zeta = [1.0,1,0,2.0,2.0]}
+giving  
+m4_math(<<<\zeta = [1.0,1,0,2.0,2.0]>>>, <<<@math{zeta = [1.0,1,0,2.0,2.0]}>>>)
 and @math{G(z_1,z_2,z_3,z_4) = [z_1, z_3, z_1, z_3]}.
 
 The Jacobians @var{df} and @var{dg} of @var{f} and @var{g} respectively
