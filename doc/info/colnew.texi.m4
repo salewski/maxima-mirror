@@ -758,10 +758,14 @@ guess; and secondly, with the initial conditions given by the
 function @var{solutn}.
 
 There are @var{nconc} = 2 differential equations of second order.
-The list of orders @var{m} = [2,2] and
-@var{mstar} = sum(m[i]) = 4.
+The list of orders 
+m4_math(<<<m = [2,2]>>>, <<<@var{m} = [2,2]>>>)
+ and
+m4_mathdot(<<<m^* = \sum_i m_i = 4>>>, <<<@var{mstar} = sum(m[i]) = 4>>>)
 
-The vector of unknowns of length @var{mstar}=4 is
+The vector of unknowns of length 
+m4_math(<<<m^* = 4>>>, <<<@var{mstar}=4>>>) 
+is
 @math{z(x) = [ φ(x), φ'(x), ψ(x), ψ'(x)]}.
 
 The differential equation is expressed as
@@ -807,11 +811,15 @@ and function @math{G(z_1,z_2,z_3,z_4)}.
 @tab @math{z_4 - 0.3@ z_3 + 0.7}
 @end multitable
 
-giving @math{zeta=[0.0,0.0,1.0,1.0]} and 
-@math{G(z_1,z_2,z_3,z_4)=[z_1, z_3, z_1, z_4-0.3 z_3+0.7]}
+giving 
+m4_math(<<<\zeta=[0.0,0.0,1.0,1.0]>>>, <<<@math{zeta=[0.0,0.0,1.0,1.0]}>>>)
+and 
+@math{G(z_1,z_2,z_3,z_4)=[z_1, z_3, z_1, z_4-0.3 z_3+0.7]}.
 
-Note that @var{x} is not an argument of function @var{G}.  The 
-value of @var{x=zeta[j]} must be substituted.
+Note that @math{x} is not an argument of function @math{G}.  The 
+value of 
+m4_math(<<<x = \zeta_j>>>, <<<@var{x=zeta[j]}>>>)
+must be substituted.
 
 @c ===beg===
 @c load("colnew")$
@@ -1342,9 +1350,13 @@ m4_mathdot(<<<\epsilon = [10^{-2}, 10^{-3}, 10^{-4}, 10^{-5}, 10^{-6}]>>>,
 
 There is @var{nconc} = 1 differential equation of second order.
 The list of orders
-@var{m} = [2] and @var{mstar} = sum(m[j]) = 2.
+m4_math(<<<m = [2]>>>, <<<@var{m} = [2]>>>) 
+and 
+m4_mathdot(<<<m^* = \sum_j m[j] = 2>>>, <<<@var{mstar} = sum(m[j]) = 2>>>)
 
-The unknown vector of length @var{mstar} is
+The unknown vector of length 
+m4_math(<<<m^*>>>, <<<@var{mstar}>>>)
+is
 @math{z(x) = [z_1(x),z_2(x)] = [u(x),u'(x)]}.
 
 The differential equation is expressed as
@@ -1355,10 +1367,15 @@ m4_displaymath(
 <<<
 @math{[u'@w{}'(x)] = F(x,z_1,z_2) = [-(x/ε)z_2 - π^2cos(πx) - (πx/ε)sin(πx)]}>>>)
 
-There are @var{mstar=2} boundary conditions. They are given by a
-function @math{G(z_1,z_2)} that returns a list of length mstar.
-The j-th boundary condition applies at @var{x = zeta[j]} and is satisfied
-when @var{g[j] = 0}.  We have
+There are 
+m4_math(<<<m^*=2>>>, <<<@var{mstar=2}>>>) 
+boundary conditions. They are given by a
+function @math{G(z_1,z_2)} that returns a list of length 
+m4_mathdot(<<<m^*>>>, @var{mstar})
+The @math{j}-th boundary condition applies at 
+m4_math(<<<x = \zeta_j>>>, <<<@var{x = zeta[j]}>>>) 
+and is satisfied
+when @math{g[j] = 0}.  We have
 
 @multitable {xxxxxxxxx} {xxxxxxxxx} {xxxxxxxxxx} {xxxxxxxxx}
 @headitem j@ @ @ @tab zeta[j]@  @tab Condition@  @tab g[j]
@@ -1372,7 +1389,8 @@ when @var{g[j] = 0}.  We have
 @tab @math{z_1}
 @end multitable
 
-giving  @math{zeta = [-1.0,1,0]}
+giving  
+m4_math(<<<\zeta = [-1.0,1,0]>>>, <<<@math{zeta = [-1.0,1,0]}>>>)
 and @math{G(z_1,z_2) = [z_1+2, z_1]}.
 
 The Jacobians @var{df} and @var{dg} of @var{f} and @var{g} respectively
