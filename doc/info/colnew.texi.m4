@@ -92,9 +92,14 @@ The function arguments are:
 Number of differential equations   (ncomp ≤ 20)
 
 @item m
-Integer list of length @var{ncomp}.  m4_math(m_j, m[j]) is the order of the @math{j}-th
+Integer list of length @var{ncomp}.  
+m4_math(m_j, m[j]) 
+is the order of the @math{j}-th
 differential equation,
-with m4_math(<<<1 \le m_j \le 4>>>, <<<@math{1 ≤ m[j] ≤ 4}>>>) and m4_mathdot(<<<m^* = \sum_j m_j \le 40>>>, <<<@math{mstar = sum(m[j]) ≤ 40}>>>)
+with 
+m4_math(<<<1 \le m_j \le 4>>>, <<<@math{1 ≤ m[j] ≤ 4}>>>)
+and 
+m4_mathdot(<<<m^* = \sum_j m_j \le 40>>>, <<<@math{mstar = sum(m[j]) ≤ 40}>>>)
 
 @item aleft
 Left end of interval
@@ -103,10 +108,17 @@ Left end of interval
 Right end of interval
 
 @item zeta
-Real list of length m4_math(<<<m^*>>>,<<<@var{mstar}>>>).  m4_math(<<<\zeta_j>>>, <<<@code{zeta[j]}>>>) is the 
+Real list of length 
+m4_mathdot(<<<m^*>>>,<<<@var{mstar}>>>)
+m4_math(<<<\zeta_j>>>, <<<@code{zeta[j]}>>>) 
+is the 
 @math{j}-th boundary or side condition point. The
-list m4_math(\zeta, zeta) must be ordered, 
-with  m4_mathdot(<<<\zeta_j \le \zeta_{j+1}>>>, <<<zeta[j] ≤ zeta[j+1]>>>) All side condition
+list 
+m4_math(\zeta, zeta) 
+must be ordered, 
+with  
+m4_mathdot(<<<\zeta_j \le \zeta_{j+1}>>>, <<<zeta[j] ≤ zeta[j+1]>>>)
+All side condition
 points must be mesh points in all meshes used,
 see description of ipar[11] and fixpnt below.
 
@@ -122,8 +134,9 @@ A integer list of length 11.  The parameters in ipar are:
   
   @item @var{ipar[2]} ( = @math{k} )@*
   Number of collocation points per subinterval , where
-  m4_mathdot(<<<\max_j m_j \le k \le 7>>>, <<<@math{max(m[i]) ≤ k ≤ 7}>>>)
-  If @var{ipar[2]}=0 then colnew sets m4_mathdot(<<<k = \max\left(\max_i m_i + 5, 5 - \max_i m_i\right)>>>, <<<k = max(max(m[i])+1, 5-max(m[i]))>>>)
+m4_mathdot(<<<\max_j m_j \le k \le 7>>>, <<<@math{max(m[i]) ≤ k ≤ 7}>>>)
+  If @var{ipar[2]}=0 then colnew sets 
+m4_mathdot(<<<k = \max\left(\max_i m_i + 5, 5 - \max_i m_i\right)>>>, <<<k = max(max(m[i])+1, 5-max(m[i]))>>>)
   
   @item @var{ipar[3]}  ( = @math{n} )@*
   Number of subintervals in the initial mesh.@*
@@ -131,7 +144,8 @@ A integer list of length 11.  The parameters in ipar are:
   
   @item @var{ipar[4]} ( = ntol )@*
   Number of solution and derivative tolerances.@*
-  Require m4_mathdot(<<<0 < {\rm ntol} < m^*>>>, <<< 0 < @var{ntol}  ≤ @var{mstar}>>>)
+  Require 
+m4_mathdot(<<<0 < {\rm ntol} < m^*>>>, <<< 0 < @var{ntol}  ≤ @var{mstar}>>>)
   
   @item @var{ipar[5]}  ( = ndimf )@*
   The length of list @var{fspace}. Its size provides a constraint on @var{nmax}.
@@ -143,11 +157,11 @@ m4_mathdot(<<<{\rm nsizef} = 4 + 3m^* + (5 + {\rm kd})\times{\rm kdm} + (2m^* - 
   @item @var{ipar[6]} ( = ndimi )@*
   The length of list @var{ispace}. Its size provides a constraint on @var{nmax}, the maximum
   number of subintervals.  Choose @var{ipar[6]} according to the formula
-  m4_math(<<<{\rm ipar[6]} = {\rm nmax}\times {\rm nsizei}>>>, <<<@math{ipar[6] ≥ nmax*nsizei}>>>)
+m4_math(<<<{\rm ipar[6]} = {\rm nmax}\times {\rm nsizei}>>>, <<<@math{ipar[6] ≥ nmax*nsizei}>>>)
   where
-  m4_math(<<<{\rm nsizei} = 3 + {\rm kdm}>>>, <<<@math{nsizei = 3 + kdm}>>>)
+m4_math(<<<{\rm nsizei} = 3 + {\rm kdm}>>>, <<<@math{nsizei = 3 + kdm}>>>)
   with
-  m4_displaymath(<<<\eqalign{
+m4_displaymath(<<<\eqalign{
     {\rm kdm} &= {\rm kd} + m^* \cr
     {\rm kd} &= k + {\rm ncomp} \cr
     {\rm nrec} &= {\it number of right end boundary conditions} \cr
@@ -1307,8 +1321,11 @@ u(x) = \cos \pi x + {{\rm erf}\left(\displaystyle{x \over \sqrt{2\epsilon}}\righ
 
 When @math{ε} is small the solution has a rapid transition near @math{x=0}
 and is difficult to solve numerically.  COLNEW is able to solve the
-problem for directly for m4_math(<<<\epsilon = 10^{-6}>>>,<<<@math{ε=1.0e-6}>>>), but here we will use
-continuation to solve it succesively for m4_mathdot(<<<\epsilon = [10^{-2}, 10^{-3}, 10^{-4}, 10^{-5}, 10^{-6}]>>>,
+problem for directly for 
+m4_mathcomma(<<<\epsilon = 10^{-6}>>>,<<<@math{ε=1.0e-6}>>>)
+but here we will use
+continuation to solve it succesively for 
+m4_mathdot(<<<\epsilon = [10^{-2}, 10^{-3}, 10^{-4}, 10^{-5}, 10^{-6}]>>>,
 <<<@math{ε=[1e-2,1e-3,1e-4,1e-5,1e-6]}>>>)
 
 There is @var{nconc} = 1 differential equation of second order.
