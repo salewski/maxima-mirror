@@ -92,9 +92,9 @@ The function arguments are:
 Number of differential equations   (ncomp ≤ 20)
 
 @item m
-Integer list of length @var{ncomp}.  m[j] is the order of the j-th
-differential equation, with @math{1 ≤ m[j] ≤ 4}
-and @math{mstar = sum(m[j]) ≤ 40}.
+Integer list of length @var{ncomp}.  m4_math(m_j, m[j]) is the order of the @math{j}-th
+differential equation,
+with m4_math(<<<1 \le m_j \le 4>>>, <<<@math{1 ≤ m[j] ≤ 4}>>>) and m4_mathdot(<<<m^* = \sum_j m_j \le 40>>>, <<<@math{mstar = sum(m[j]) ≤ 40}>>>)
 
 @item aleft
 Left end of interval
@@ -103,10 +103,10 @@ Left end of interval
 Right end of interval
 
 @item zeta
-Real list of length @var{mstar}.  zeta[j] is the 
-j-th boundary or side condition point. The list zeta
-must be ordered, 
-with  zeta[j] ≤ zeta[j+1]. All side condition
+Real list of length m4_math(<<<m^*>>>,<<<@var{mstar}>>>).  m4_math(<<<\zeta_j>>>, <<<@code{zeta[j]}>>>) is the 
+@math{j}-th boundary or side condition point. The
+list m4_math(\zeta, zeta) must be ordered, 
+with  m4_mathdot(<<<\zeta_j \le \zeta_{j+1}>>>, <<<zeta[j] ≤ zeta[j+1]>>>) All side condition
 points must be mesh points in all meshes used,
 see description of ipar[11] and fixpnt below.
 
@@ -120,36 +120,41 @@ A integer list of length 11.  The parameters in ipar are:
     @item 1, if the problem is nonlinear
   @end itemize
   
-  @item @var{ipar[2]} ( = k )@*
+  @item @var{ipar[2]} ( = @math{k} )@*
   Number of collocation points per subinterval , where
-  @math{max(m[i]) ≤ k ≤ 7}.@*
-  If @var{ipar[2]}=0 then colnew sets  k = max(max(m[i])+1, 5-max(m[i]))
+  m4_mathdot(<<<\max_j m_j \le k \le 7>>>, <<<@math{max(m[i]) ≤ k ≤ 7}>>>)
+  If @var{ipar[2]}=0 then colnew sets m4_mathdot(<<<k = \max\left(\max_i m_i + 5, 5 - \max_i m_i\right)>>>, <<<k = max(max(m[i])+1, 5-max(m[i]))>>>)
   
-  @item @var{ipar[3]}  ( = n )@*
+  @item @var{ipar[3]}  ( = @math{n} )@*
   Number of subintervals in the initial mesh.@*
-  If @var{ipar[3]} = 0 then colnew arbitrarily sets n = 5.
+  If @var{ipar[3]} = 0 then colnew arbitrarily sets @math{n = 5}.
   
   @item @var{ipar[4]} ( = ntol )@*
   Number of solution and derivative tolerances.@*
-  Require  0 < @var{ntol}  ≤ @var{mstar}.
+  Require m4_mathdot(<<<0 < {\rm ntol} < m^*>>>, <<< 0 < @var{ntol}  ≤ @var{mstar}>>>)
   
   @item @var{ipar[5]}  ( = ndimf )@*
   The length of list @var{fspace}. Its size provides a constraint on @var{nmax}.
   Choose ipar[5] according to the formula
-  @math{ipar[5] ≥ nmax*nsizef} 
+m4_math(<<<{\rm ipar[5]} \ge {\rm nmax} \cdot {\rm nsizef}>>>, <<<@math{ipar[5] ≥ nmax*nsizef}>>>)
   where
-  @math{ nsizef = 4 + 3 * mstar + (5+kd) * kdm + (2*mstar-nrec) * 2*mstar}. 
+m4_mathdot(<<<{\rm nsizef} = 4 + 3m^* + (5 + {\rm kd})\times{\rm kdm} + (2m^* - {\rm nrec})\times 2 m^*>>>, <<<@math{ nsizef = 4 + 3 * mstar + (5+kd) * kdm + (2*mstar-nrec) * 2*mstar}>>>) 
   
   @item @var{ipar[6]} ( = ndimi )@*
   The length of list @var{ispace}. Its size provides a constraint on @var{nmax}, the maximum
   number of subintervals.  Choose @var{ipar[6]} according to the formula
-  @math{ipar[6] ≥ nmax*nsizei}
+  m4_math(<<<{\rm ipar[6]} = {\rm nmax}\times {\rm nsizei}>>>, <<<@math{ipar[6] ≥ nmax*nsizei}>>>)
   where
-  @math{nsizei = 3 + kdm}
+  m4_math(<<<{\rm nsizei} = 3 + {\rm kdm}>>>, <<<@math{nsizei = 3 + kdm}>>>)
   with
+  m4_displaymath(<<<\eqalign{
+    {\rm kdm} &= {\rm kd} + m^* \cr
+    {\rm kd} &= k + {\rm ncomp} \cr
+    {\rm nrec} &= {\it number of right end boundary conditions} \cr
+  }>>>,<<<
     @math{kdm = kd + mstar}@*
     @math{kd = k * ncomp}@*
-    @math{nrec = number of right end boundary conditions}.
+    @math{nrec = number of right end boundary conditions}>>>).
   
   @item @var{ipar[7]} ( = iprint )@*
   output control
