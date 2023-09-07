@@ -774,21 +774,30 @@ The differential equation is expressed as
 
 m4_displaymath(
 <<<\eqalign{
-[φ'@w{}'(x), ψ'@w{}'(x)] &= F(x,z_1,z_2,z_3,z_4) \cr
-&= 
-\left[{z_1 \over x^2} - {z_2 \over x} + \left(z_1-z_3 \left(1-{z_1\over x}\right) - γ x \left(1-{x^2 \over 2}\right)\right) {\mu \over ε^4}, 
- {z_3 \over x^2} - {z_4 \over x} + {z_1 \over μ} \left(1-{z_1\over {2x}}\right)
-\right]
+F(x,z_1,z_2,z_3,z_4)
+  &= \left[
+       \matrix{
+         \phi''(x) \cr
+         \psi''(x)
+       }
+     \right]
+     \cr
+  &= \left[
+       \matrix{
+         \displaystyle{z_1 \over x^2} - {z_2 \over x} + \left[z_1-z_3 \left(1-{z_1\over x}\right) - γ x \left(1-{x^2 \over 2}\right)\right] {\mu \over \epsilon^4}
+         \cr 
+         \displaystyle{z_3 \over x^2} - {z_4 \over x} + {z_1 \over μ} \left(1-{z_1\over {2x}}\right)
+       }
+     \right]
 }>>>,
-<<<
-@math{[φ'@w{}'(x), ψ'@w{}'(x)]}
+<<<@math{[φ'@w{}'(x), ψ'@w{}'(x)]}
 
 @math{=F(x,z_1,z_2,z_3,z_4)}
 
 @math{=[z_1/x^2 - z_2/x + (z_1-z_3 (1-z_1/x) - γ x (1-x^2/2))/(ε^4/μ),
 z_3/x^2 - z_4/x + z_1 (1-z_1/(2x))/μ]}
->>>)
-
+>>>
+)
 
 There are four boundary conditions given by list @math{zeta}
 and function @math{G(z_1,z_2,z_3,z_4)}.
