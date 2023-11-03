@@ -15,7 +15,7 @@
 ;; THIS IS THE NEW DETERMINANT PACKAGE
 
 (declare-top (special ;;x
-              *ptr* *ptc* *blk* ml* *detsign* rzl*))
+              *ptr* *ptc* *blk* #+nil ml* *detsign* rzl*))
 
 (defun sprdet (ax n)
   (declare (fixnum n))
@@ -137,10 +137,10 @@
      tag1 (when (null nml) (go tag2))
      (setq dd  (car nml))
      (setq nml (cdr nml))
-     (nbn dd x)
+     (nbn dd x ml*)
      (go tag1)))
 
-(defun nbn (rule x)
+(defun nbn (rule x ml*)
   (prog (ans r a)
      (setq ans 0 r (cadar rule))
      (when (equal r 0) (return 0))
@@ -150,10 +150,10 @@
      (setq ans (gpplus ans (gptimes (if (= (cadr a) 1)
 					(aref x (caddr a) (cadddr a))
 					(gpctimes (cadr a) (aref x (caddr a) (cadddr a))))
-				    (getminor (car a)))))
+				    (getminor (car a) ml*))))
      (go loop)))
 
-(defun getminor (index)
+(defun getminor (index ml*)
   (cond ((null (setq index (assoc index ml* :test #'equal))) 0)
 	(t (rplacd (cdr index) (1- (cddr index)))
 	 (when (= (cddr index) 0)
@@ -214,7 +214,7 @@
    (setq l (cdr l))
    (go loop)))
 
-(declare-top (unspecial ml* rzl*))
+(declare-top (unspecial #+nil ml* rzl*))
 
 (defun atranspose (a n)
   (prog (i j d)
