@@ -103,11 +103,11 @@
 (defun subst-lexical-symbols-into-mdefine-or-lambda (e)
   (let*
     ((args (remove-if #'(lambda (x) (kindp x '$global)) (extract-arguments-symbols e)))
-     (args-gensyms (mapcar
-                     #'(lambda (s)
-                         (let ((s1 (gensym (symbol-name s))))
-                           (setf (get s1 'reversealias) (or (get s 'reversealias) s)) s1)) args))
-     (subst-eqns (mapcar #'(lambda (x y) `((mequal) ,x ,y)) args args-gensyms))
+     (args-gensyms (mapcar #'make-lexical-gensym args))
+     (subst-eqns (apply #'append (mapcar #'(lambda (x y)
+                                             (list `((mequal) ,x ,y)
+                                                   `((mequal) ,($nounify x) ,($nounify y))))
+                                         args args-gensyms)))
      (substituted-definition (let (($simp nil)) (declare (special $simp)) ($substitute `((mlist) ,@ subst-eqns) e)))
      (function-header (first (second e)))
      (function-header-new (cons function-header (rest (second substituted-definition)))))

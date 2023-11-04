@@ -3198,6 +3198,11 @@
                (rest ($substitute (cons '(mlist) (mapcar #'(lambda (a b) `((mequal) ,a ,b)) args-y args-replace)) y)))))))
 
 (defun alike1-mprog (x y)
+  (if (and ($listp (second x)) ($listp (second y)))
+    (alike1-mprog-with-local-variables x y)
+    (and (= (length x) (length y)) (every #'alike1 (rest x) (rest y)))))
+
+(defun alike1-mprog-with-local-variables (x y)
   (let
     ((args-x (mapcar #'(lambda (e) (if (symbolp e) e (second e))) (cdr (second x))))
      (args-y (mapcar #'(lambda (e) (if (symbolp e) e (second e))) (cdr (second y)))))
