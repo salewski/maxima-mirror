@@ -34,8 +34,13 @@ ev(g(2*y+z,-0.5),y:7);
 3*(z+14)+1.22984884706593$
 h(n):=sum(i*x^i,i,0,n);
 h(n):=sum(i*x^i,i,0,n)$
-functions;
-[f(x),g(y,z),h(n)]$
+
+/* Make test insensitive to presence of lexical symbols in list of functions;
+ * I wonder if there is a better way to do that, rather than via string comparison.
+ */
+string (functions);
+"[f(x),g(y,z),h(n)]"$
+
 t[n](x):=ratexpand(2*x*t[n-1](x)-t[n-2](x));
 t[n](x):=ratexpand(2*x*t[n-1](x)-t[n-2](x))$
 t[0](x):=1;

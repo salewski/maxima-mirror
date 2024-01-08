@@ -314,12 +314,19 @@
 	((atom f)
 	 (and (atom g) (equal f g)))
 		     
-	((op-equalp f 'lambda)
+	((and (op-equalp f 'lambda) (op-equalp g 'lambda))
      (alike1-lambda-or-simple-mdefine f g))
 
-	((op-equalp f 'mdefine)
+	((and (op-equalp f 'mdefine) (op-equalp g 'mdefine))
      (alike1-mdefine f g))
 	
+	((and (op-equalp f 'mprog) (op-equalp g 'mprog))
+	 (alike1-mprog f g))
+
+	((or (and (op-equalp f 'mdo) (op-equalp g 'mdo))
+	     (and (op-equalp f 'mdoin) (op-equalp g 'mdoin)))
+	 (alike1-mdo-mdoin f g))
+
 	(($ratp f)
 	 (and ($ratp g) (approx-alike (ratdisrep f) (ratdisrep g))))
 	
