@@ -977,5 +977,16 @@ block( [ bad: [], str],
   reverse(bad));
  [];
 
+/* same as preceding example, except "for fpprintprec in ..." instead of "for fpprintprec:4 thru ..."
+ * this verifies non-lexicalization of MDOIN; preceding verifies MDO
+ */
+block( [ bad: [], str],
+  for fpprintprec in [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] do
+    for a in [1,5,50,-1,-5] do
+       if parse_string(str: string(1+bfloat(a*10^(-fpprintprec-1)))) # 1.0b0
+       then push([fpprintprec,a,str],bad),
+  reverse(bad));
+ [];
+
 (reset(fpprec, fpprintprec), done);
 done;

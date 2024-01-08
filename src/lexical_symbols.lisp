@@ -181,19 +181,24 @@
 (defun parse-$do-with-lexicalization (&rest a)
   (let*
     ((do-expr (apply 'parse-$do-simple a))
-     (var (third do-expr))
-     (var-subst (gensym (symbol-name var)))
-     (next (sixth do-expr))
-     (unless (eighth do-expr))
-     (body (ninth do-expr)))
-    (setf (get var-subst 'reversealias) (or (get var 'reversealias) var))
-    (setf (third do-expr) var-subst)
-    (let (($simp nil))
-      (declare (special $simp))
-      (setf (sixth do-expr) (maxima-substitute var-subst var next))
-      (setf (eighth do-expr) (maxima-substitute var-subst var unless))
-      (setf (ninth do-expr) (maxima-substitute var-subst var body)))
-    do-expr))
+     (var (third do-expr)))
+    (if (kindp var '$global)
+      ;; no lexicalization in this case
+      do-expr
+      ;; otherwise lexicalize the loop variable
+      (let*
+        ((var-subst (gensym (symbol-name var)))
+         (next (sixth do-expr))
+         (unless (eighth do-expr))
+         (body (ninth do-expr)))
+        (setf (get var-subst 'reversealias) (or (get var 'reversealias) var))
+        (setf (third do-expr) var-subst)
+        (let (($simp nil))
+          (declare (special $simp))
+          (setf (sixth do-expr) (maxima-substitute var-subst var next))
+          (setf (eighth do-expr) (maxima-substitute var-subst var unless))
+          (setf (ninth do-expr) (maxima-substitute var-subst var body)))
+        do-expr))))
 
 (def-mheader $do (mdo))
 
