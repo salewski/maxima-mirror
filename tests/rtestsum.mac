@@ -178,16 +178,18 @@ sum (g[i](x), i, 0, n);
 sum (h[i](x), i, 0, n);
 'sum (x^i, i, 0, n);
 
-/* see SF bug report # 817521 */
+/* see SF bug #416: "translate sum(a[i//fixnum]) very wrong" */
 
-(kill (foo), foo (n):= block([aaa,m], modedeclare([m,n], fixnum), m:n, [ aaa[1], aaa[n], aaa[m], aaa[1]+aaa[2], sum(aaa[i],i,1,m) ] ), foo (2));
-[aaa[1],aaa[2],aaa[2],aaa[2]+aaa[1], aaa[2]+aaa[1]];
+(kill (foo),
+ foo (n):= block([aaa,m], modedeclare([m,n], fixnum), m:n, [ aaa[1], aaa[n], aaa[m], aaa[1]+aaa[2], sum(aaa[i],i,1,m) ] ),
+ string (foo (2)));
+"[aaa[1],aaa[2],aaa[2],aaa[2]+aaa[1],aaa[2]+aaa[1]]";
 
 (translate(foo), 0);
 0;
 
-foo (2);
-[aaa[1],aaa[2],aaa[2],aaa[2]+aaa[1], aaa[2]+aaa[1]];
+string (foo (2));
+"[aaa[1],aaa[2],aaa[2],aaa[2]+aaa[1],aaa[2]+aaa[1]]";
 
 /* see SF bug report # 851765 */
 
