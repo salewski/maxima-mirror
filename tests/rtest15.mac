@@ -276,6 +276,13 @@ compile(f);
 [f];
 f();
 [1,[2,3]];
+
+/* ensure ALIKE1 handles f[a](x, [y]) correctly
+ * inspired by lambda([u,[v]], ...) above
+ */
+f[a, b](x, [y]) := y*b - x*a;
+f[a, b](x, [y]) := y*b - x*a;
+
 /* m-tlambda&env& */
 f(x):=apply(lambda([u,[v]],[u+x,v]),[0,2,3]);
 f(x):=apply(lambda([u,[v]],[u+x,v]),[0,2,3]);

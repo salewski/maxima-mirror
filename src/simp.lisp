@@ -3114,8 +3114,8 @@
 
 (defun alike1-lambda-or-simple-mdefine (x y)
   (let
-    ((args-x (cdr (second x)))
-     (args-y (cdr (second y))))
+    ((args-x (rest ($flatten (second x))))
+     (args-y (rest ($flatten (second y)))))
     (when (= (length args-x) (length args-y))
       (let ((args-replace (mapcar #'(lambda (a) (declare (ignore a)) (gensym)) args-x)))
         (alike (rest ($substitute (cons '(mlist) (mapcar #'(lambda (a b) `((mequal) ,a ,b)) args-x args-replace)) x))
@@ -3132,9 +3132,9 @@
   ;; then substitute as in simple case.
   (let*
     ((args-x-a (cdr (second (second x))))
-     (args-x-b (cddr (second x)))
+     (args-x-b (rest ($flatten (cons '(mlist) (cddr (second x))))))
      (args-y-a (cdr (second (second y))))
-     (args-y-b (cddr (second y)))
+     (args-y-b (rest ($flatten (cons '(mlist) (cddr (second y))))))
      (args-x (append args-x-a args-x-b))
      (args-y (append args-y-a args-y-b)))
     (when (and (= (length args-x-a) (length args-y-a)) (= (length args-x-b) (length args-y-b)))
