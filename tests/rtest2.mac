@@ -671,10 +671,28 @@ errcatch (foo (x, x) ::= x)$
 errcatch (foo (x, [x]) ::= x)$
 [];
 
-errcatch (block ([x, x], x))$
+/* for block, uniqueness of local variables is verified in the parser */
+
+errcatch (parse_string ("block ([x, x], x))"));
 [];
 
-errcatch (block ([x, x:foo], x))$
+errcatch (parse_string ("block ([x, x:foo], x))"));
+[];
+
+/* this subterfuge via apply and funmake constructs nonlexical blocks;
+ * verify that the duplicate variable is detected anyway
+ */
+
+errcatch (apply (block, ['[x, x], 'x]));
+[];
+
+errcatch (apply (block, ['[x, x:foo], 'x]));
+[];
+
+errcatch ((funmake (block, ['[x, x], 'x]), ev (%%)));
+[];
+
+errcatch ((funmake (block, ['[x, x:foo], 'x]), ev (%%)));
 [];
 
 /* Verify some WNA checks

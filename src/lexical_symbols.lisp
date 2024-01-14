@@ -42,6 +42,10 @@
 
 ;; Lexicalize MPROG (i.e., block([a, b, c, ...], ...))
 
+(defun verify-unique-vars (vars+var-inits)
+  (let ((vars (mapcar #'(lambda (e) (if (atom e) e (second e))) vars+var-inits)))
+    (mapl #'(lambda (l) (if (member (car l) (cdr l)) (mread-synerr "block: variable ~a isn't unique." (car l)))) vars)))
+
 (defun maybe-subst-lexical-symbols-into-mprog (e)
   (if (or (null (cdr e)) (not ($listp (cadr e))))
     e
@@ -50,13 +54,26 @@
        (mprog-args (cdr e))
        (vars+var-inits (cdr (car mprog-args)))
        (exprs (cdr mprog-args)))
+      (verify-unique-vars vars+var-inits)
       (subst-lexical-symbols-into-mprog mprog-op vars+var-inits exprs))))
+
+(defun nounify-symbol-name (s)
+  (let ((s-name (symbol-name s)))
+    (cond
+      ;; Dunno if this first case is possible, but anyway protect the remainder of the cases.
+      ((eql (length s-name) 0)
+       (merror "Local variable must have a name.~%"))
+      ((eql (aref s-name 0) #\%) s)
+      ((eql (aref s-name 0) #\$)
+       (implode (cons #\% (rest (coerce s-name 'cons)))))
+      (t
+       (implode (cons #\% (coerce s-name 'cons)))))))
 
 (defun make-lexical-gensym (s)
   (let*
     ((s1 (gensym (symbol-name s)))
-     (%s ($nounify s))
-     (%s1 ($nounify s1)))
+     (%s (nounify-symbol-name s))
+     (%s1 (nounify-symbol-name s1)))
     (setf (get s1 'reversealias) (or (get s 'reversealias) s))
     (setf (get %s1 'reversealias) (or (get %s 'reversealias) %s))
     s1))
@@ -74,7 +91,7 @@
     (gensyms-all (append vars-only-gensyms var-inits-gensyms))
     (subst-eqns (apply #'append (mapcar #'(lambda (x y)
                                             (list `((mequal) ,x ,y)
-                                                  `((mequal) ,($nounify x) ,($nounify y))))
+                                                  `((mequal) ,(nounify-symbol-name x) ,(nounify-symbol-name y))))
                                         vars-all-lexical gensyms-all)))
     (gensym-mprogn (let (($simp nil)) (declare (special $simp)) ($substitute `((mlist) ,@ subst-eqns) `((mprogn) ,@ exprs))))
     (gensym-inits (mapcar #'(lambda (e y) (list (first e) y (third e))) var-inits-lexical var-inits-gensyms))
@@ -106,7 +123,7 @@
      (args-gensyms (mapcar #'make-lexical-gensym args))
      (subst-eqns (apply #'append (mapcar #'(lambda (x y)
                                              (list `((mequal) ,x ,y)
-                                                   `((mequal) ,($nounify x) ,($nounify y))))
+                                                   `((mequal) ,(nounify-symbol-name x) ,(nounify-symbol-name y))))
                                          args args-gensyms)))
      (substituted-definition (let (($simp nil)) (declare (special $simp)) ($substitute `((mlist) ,@ subst-eqns) e)))
      (function-header (first (second e)))
