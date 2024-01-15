@@ -20,11 +20,11 @@
 */
 
 as_directed_graph(g) := block(
-  [edges, dedges],
+  [my_edges, dedges],
   if is_digraph(g) then return(g),
   if not is_graph(g) then error("as_directed_graph: the argument is no a graph!", g),
-  edges: edges(g),
-  dedges: append(edges, map(reverse, edges)),
+  my_edges: edges(g),
+  dedges: append(my_edges, map(reverse, my_edges)),
   create_graph(vertices(g), dedges, 'directed=true))$
 
 relabel_graph_vertices(gr, [options]) := block(
@@ -109,18 +109,18 @@ random_regular_graph(n, [d]) := block(
   create_graph(makelist(i0-1,i0,1,n), edg))$
 
 mycielski_graph(g) := block(
-  [mapping:hash_table(), ng, i:0, edges:[], vertices],
+  [mapping:hash_table(), ng, i:0, my_edges:[], vertices],
   if not is_graph(g) then error("`mycielsky_graph': argument is not a graph"),
   for v in vertices(g) do (
     set_hash(v, mapping, i),
     i : i+1),
   vertices : makelist(i, i, 0, 2*i),
   for e in edges(g) do (
-    edges : cons([get_hash(e[1], mapping), get_hash(e[2], mapping)], edges),
-    edges : cons([get_hash(e[1], mapping)+i, get_hash(e[2], mapping)], edges),
-    edges : cons([get_hash(e[1], mapping), get_hash(e[2], mapping)+i], edges)),
-  for j:0 thru i-1 do edges : cons([i+j, 2*i], edges),
-  create_graph(vertices, edges))$
+    my_edges : cons([get_hash(e[1], mapping), get_hash(e[2], mapping)], my_edges),
+    my_edges : cons([get_hash(e[1], mapping)+i, get_hash(e[2], mapping)], my_edges),
+    my_edges : cons([get_hash(e[1], mapping), get_hash(e[2], mapping)+i], my_edges)),
+  for j:0 thru i-1 do my_edges : cons([i+j, 2*i], my_edges),
+  create_graph(vertices, my_edges))$
 
 grotzch_graph() := block(
   [g:mycielski_graph(cycle_graph(5)), positions:[]],
@@ -133,14 +133,14 @@ grotzch_graph() := block(
   g)$
 
 complete_bipartite_graph(n, m) := block(
-  [edges, A, B, g],
+  [my_edges, A, B, g],
   if not (integerp(n) and integerp(m)) or
        n<=0 or m<=0 then
      error("`complete_bipartite_graph': arguments are not positive integers"),
   A : makelist(i-1, i, 1, n),
   B : makelist(i+n-1, i, 1, m),
-  edges : create_list([i,j], i, A, j, B),
-  g : create_graph(append(A, B), edges),
+  my_edges : create_list([i,j], i, A, j, B),
+  g : create_graph(append(A, B), my_edges),
   set_positions(
     append(
       makelist([i-1, [0, i-n/2]], i, 1, n),
@@ -275,7 +275,7 @@ induced_subgraph1(e_list, gr) := block(
   create_graph(listify(v_list), e_list))$
 
 make_graph(vertices, edges_lambda, [dir]) := block(
-  [%n%, v_map, edges:[], j_min, int_vertices, vrt, e_list, directed: assoc('directed, dir, false)],
+  [%n%, v_map, my_edges:[], j_min, int_vertices, vrt, e_list, directed: assoc('directed, dir, false)],
 
   /* Build a list of vertices */
   if integerp(vertices) then (
@@ -290,30 +290,30 @@ make_graph(vertices, edges_lambda, [dir]) := block(
   /* Build a list of edges */
   if listp(edges_lambda) then block(
     [inv_map:map(reverse, v_map)],
-    edges : map(lambda([e], [assoc(e[1], inv_map), assoc(e[2], inv_map)]), edges_lambda))
+    my_edges : map(lambda([e], [assoc(e[1], inv_map), assoc(e[2], inv_map)]), edges_lambda))
   else (
     for i:1 thru %n% do (
       if directed=true then
         for j:1 thru i-1 do
           if apply(edges_lambda, [assoc(i, v_map), assoc(j, v_map)])=true then
-            edges : cons([i,j], edges),
+            my_edges : cons([i,j], my_edges),
       for j:i+1 thru %n% do
         if apply(edges_lambda, [assoc(i, v_map), assoc(j, v_map)])=true then
-          edges : cons([i,j], edges))),
+          my_edges : cons([i,j], my_edges))),
 
   /* Put the labels on vertices if vertices is not a list of integers */
   if not(integerp(vertices)) then (
     if every(integerp, vertices) then (
       vrt : vertices,
-      edges : map( lambda([u], [assoc(u[1], v_map), assoc(u[2], v_map)]), edges))
+      my_edges : map( lambda([u], [assoc(u[1], v_map), assoc(u[2], v_map)]), my_edges))
     else (
       vrt : makelist([i, part(vertices, i)], i, 1, %n%))),
 
   /* Create the graph */
   if directed=true then
-    create_graph(vrt, edges, 'directed=true)
+    create_graph(vrt, my_edges, 'directed=true)
   else
-    create_graph(vrt, edges))$
+    create_graph(vrt, my_edges))$
 
 tutte_graph() := sparse6_decode(
   ":m`?WSMHDbPwGa@?_QhSs\\NgRaKE`HEdH@QaUbca|MUX`qr[YW\\eVwaAs[nF{UMqclhIYYCfSWCmDT\\QpTYr")$
