@@ -65,9 +65,9 @@
        (merror "Local variable must have a name.~%"))
       ((eql (aref s-name 0) #\%) s)
       ((eql (aref s-name 0) #\$)
-       (implode (cons #\% (rest (coerce s-name 'cons)))))
+       (intern (coerce (cons #\% (rest (coerce s-name 'cons))) 'string) :maxima))
       (t
-       (implode (cons #\% (coerce s-name 'cons)))))))
+       (intern (coerce (cons #\% (coerce s-name 'cons)) 'string) :maxima)))))
 
 (defun make-lexical-gensym (s)
   (let*
