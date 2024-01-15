@@ -71,6 +71,8 @@ if not fboundp (lbfgs) then load (lbfgs);
 
 with_parameters ([L]) ::= buildq ([a : subst (":", "=",  ev (L [1])), e : rest (L)], block (a, splice (e)));
 
+declare ([niter, lbfgs_tolerance, iprint, %lambda], nonlexical);
+
 augmented_lagrangian_method (FOM, xx, constraints, yy, [optional_args]) := 
 
   block ([n, augmented_lagrangian, %lambda, %nu, FOM_augment,
@@ -106,3 +108,5 @@ augmented_lagrangian_method (FOM, xx, constraints, yy, [optional_args]) :=
       %nu : 2 * %nu),
 
     [map ("=", xx, yy), '%lambda = %lambda]));
+
+remove ([niter, lbfgs_tolerance, iprint, %lambda], nonlexical);

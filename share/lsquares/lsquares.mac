@@ -301,6 +301,18 @@ lsquares_estimates_exact (MSE, parameters) := block
         sublist_indices (%%, lambda ([x], x = lmin (%%))),
         makelist (solutions [i], i, %%)));
 
+/* in order to recognize optional arguments of the form initial = ..., iprint = ..., tol = ...
+ * in the argument list, initial, iprint, and tol must be nonlexical.
+ * not sure how else to make it work, other than declaring them nonlexical
+ * for this function definition; they must be be nonlexical because that's
+ * what the caller is going to supply.
+ *
+ * declaring and then removing the nonlexical property grates a little bit.
+ * maybe we need a nonlexical block. something to think about.
+ */
+
+declare ([initial, iprint, tol], nonlexical);
+
 lsquares_estimates_approximate (MSE, parameters, [optional_args]) := block
 
   ([initial : makelist (1, i, 1, length (parameters)),
@@ -310,6 +322,8 @@ lsquares_estimates_approximate (MSE, parameters, [optional_args]) := block
     with_parameters (optional_args,
         lbfgs (MSE, parameters, initial, tol, iprint),
         [%%]));
+
+remove ([initial, iprint, tol], nonlexical);
 
 lsquares_residuals (data, variables, equation, parameters_estimates) :=
 
