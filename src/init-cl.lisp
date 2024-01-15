@@ -641,11 +641,11 @@
 (defun initialize-runtime-globals ()
   (setf *load-verbose* nil)
 
-  ;; Temporary expedient: declare all global variables.
-  ;; The right thing to do is declare a variable global in DEFMVAR.
+  ;; Temporary expedient: declare all global variables as nonlexical.
+  ;; The right thing to do is declare a variable nonlexical in DEFMVAR.
 
   (with-context-$global
-    (maphash #'(lambda (k v) (declare (ignore v)) (mkind k '$global)) *variable-initial-values*))
+    (maphash #'(lambda (k v) (declare (ignore v)) (mkind k '$nonlexical)) *variable-initial-values*))
 
   (disable-some-lisp-warnings)
 

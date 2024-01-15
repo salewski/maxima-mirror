@@ -17,11 +17,11 @@ eval_when([translate],
 define_variable(bestlength,0,fixnum)$
 define_variable(trylength,0,fixnum)$
 
-/* Using this global variable to communicate between subroutines here is poor programming design ...
+/* Using this nonlexical variable to communicate between subroutines here is poor programming design ...
  * Anyway just make it work as expected in the presence of lexical symbols.
  */
 
-declare (list2, global);
+declare (list2, nonlexical);
 
 /* Properties */
 

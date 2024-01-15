@@ -1149,6 +1149,7 @@ aa + 2*bb;
 1;
 
 /* SF bug #3605: "Variable confusion in function handling Taylor series" */
+/* HMM, I WONDER IF THESE EXAMPLES CAN BE REVISED IN LIGHT OF LEXICAL VARIABLES */
 
 kill(x, y);
 done;
