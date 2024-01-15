@@ -1807,3 +1807,26 @@ x/2;
  I2 (f) := block ([x], integrate (f (x), x, 1, 2)),
  I2 (lambda ([y], h (y, x))));
 log(2)*x;
+
+/* verify that declare(..., nonlexical) doesn't interfere with context: 'global
+ * (such interference was detected when the name of the nonlexical feature
+ * was "global"; these test cases verify that the interference has gone away.
+ * The interference bug was fixed by commit 37bfaca.
+ *
+ * first three operations look arbitrary, but in fact are required;
+ * changing any of them made the interference bug go away.
+ */
+
+(kill(all),
+ context:'global,
+ declare (''(nounify ('hypergeometric)), complex),
+ declare (aaaa, nonlexical),
+ ?kindp (aaaa, nonlexical));
+true;
+
+(define_variable (bbb, 123, any),
+ ?kindp ('bbb, nonlexical));
+true;
+
+(context: 'initial, 0);
+0;
