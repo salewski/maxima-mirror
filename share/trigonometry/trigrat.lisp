@@ -1,9 +1,9 @@
 (in-package :maxima)
 
-;; Communicating between functions via global variables is poor design,
+;; Communicating between functions via nonlexical variables is poor design,
 ;; but anyway just make it work as before.
-;; Circle back and reorganize to eliminate global variables later.
-(meval #$declare ([d2%, lg, lexp], global)$)
+;; Circle back and reorganize to eliminate nonlexical variables later.
+(meval #$declare ([d2%, lg, lexp], nonlexical)$)
 
 (defun $listofei (e )
    (declare (special $d2% $lg $lexp))

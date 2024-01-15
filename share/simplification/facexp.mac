@@ -44,7 +44,7 @@ EVAL_WHEN([TRANSLATE,BATCH,LOADFILE],
 
 /* Commented out all local SPECIAL declarations. -wj */
 
-declare ([argdum, argdum2, list, nextlayerfactor, op_fcn_list], global);
+declare ([argdum, argdum2, list, nextlayerfactor, op_fcn_list], nonlexical);
 
 eval_when([batch,loadfile],
   if get('gnauto,'diageval_version)=false

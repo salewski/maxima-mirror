@@ -112,10 +112,10 @@ true;
 [tan(1), cos(1), sin(1)];
 
 /* Lexical symbol 'a' is distinct from global 'a',
- * unless 'a' is declared global.
+ * unless 'a' is declared nonlexical.
  *
- * HOWEVER, note that 'a' is not declared global at the time block([a], ...) is parsed
- * in (declare(a, integer), block([a], featurep(a, integer)))
+ * HOWEVER, note that 'a' is not declared at the time block([a], ...) is parsed
+ * in e.g. (declare(a, integer), block([a], featurep(a, integer)))
  * (i.e., both expressions within MPROGN).
  * Therefore the result is 'false'. In order for block([a], featurep(a, integer))
  * to know about declare(a, integer), the declaration must be evaluated before
@@ -126,7 +126,7 @@ true;
 false;
 
 /* block([a], ...) is parsed BEFORE declare(a, ...) is evaluated. */
-(declare (a, global),
+(declare (a, nonlexical),
  block ([a], featurep (a, integer)));
 false;
 
@@ -387,7 +387,7 @@ unknown;
 block ([x], assume (x < 0), is (x > 0));
 false;
 
-declare (y, global);
+declare (y, nonlexical);
 done;
 
 (assume ('y > 0),
@@ -902,7 +902,7 @@ warning: assigning 8, a non-prime, to 'modulus'
 
 /* NOT SEEING A DISTINCTION BETWEEN LEXICAL AND DYNAMIC SCOPE HERE.
  * IN EITHER CASE, MODULUS REFERS TO THE GLOBAL SYMBOL
- * (ASSUMING ALL BUILT-IN GLOBAL FLAGS ARE DECLARED GLOBAL IN THE LEXICAL CASE)
+ * (ASSUMING ALL BUILT-IN GLOBAL FLAGS ARE DECLARED NONLEXICAL IN THE LEXICAL CASE)
  */
 
 /* maxima-discuss 2019-05-28: "Advantages of dynamic scoping (was Question about defmatch)"
@@ -961,7 +961,7 @@ implement that.
  */
 
 (kill(a, b, f, g, t, t1, T),
- declare (n, global), /* FOURIER LEAKS N !! ASSUMING THAT'S ACCEPTABLE, WHOSE RESPONSIBILITY IS IT TO DECLARE N GLOBAL ?? */
+ declare (n, nonlexical), /* FOURIER LEAKS N !! ASSUMING THAT'S ACCEPTABLE, WHOSE RESPONSIBILITY IS IT TO DECLARE N NONLEXICAL ?? */
  load(fourie),
  fourier(g(t+(t1+T/2)),t,T),
  ev(%%));

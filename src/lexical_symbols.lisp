@@ -13,11 +13,11 @@
 ;;
 ;; This file, by itself, only implements lexical local variables.
 ;;
-;; This file defines a new feature, global,
+;; This file defines a new feature, nonlexical,
 ;; which makes symbols dynamic instead of lexical.
-;; One can say declare(foo, global) and then featurep(foo, global) => true,
-;; or, equivalently, (KINDP '$FOO '$GLOBAL) => T.
-;; Any symbols which have been declared global by the time
+;; One can say declare(foo, nonlexical) and then featurep(foo, nonlexical) => true,
+;; or, equivalently, (KINDP '$FOO '$NONLEXICAL) => T.
+;; Any symbols which have been declared nonlexical by the time
 ;; the construct is parsed are excluded from gensym substitution.
 
 (in-package :maxima)
@@ -80,8 +80,8 @@
 
 (defun subst-lexical-symbols-into-mprog (mprog-op vars+var-inits exprs)
   (let*
-   ((vars+var-inits-lexical (remove-if #'(lambda (x) (kindp (if (symbolp x) x (second x)) '$global)) vars+var-inits))
-    (vars+var-inits-global (remove-if-not #'(lambda (x) (kindp (if (symbolp x) x (second x)) '$global)) vars+var-inits))
+   ((vars+var-inits-lexical (remove-if #'(lambda (x) (kindp (if (symbolp x) x (second x)) '$nonlexical)) vars+var-inits))
+    (vars+var-inits-nonlexical (remove-if-not #'(lambda (x) (kindp (if (symbolp x) x (second x)) '$nonlexical)) vars+var-inits))
     (vars-only-lexical (remove-if-not #'symbolp vars+var-inits-lexical))
     (var-inits-lexical (remove-if #'symbolp vars+var-inits-lexical))
     (var-inits-vars-lexical (mapcar #'second var-inits-lexical))
@@ -95,7 +95,7 @@
                                         vars-all-lexical gensyms-all)))
     (gensym-mprogn (let (($simp nil)) (declare (special $simp)) ($substitute `((mlist) ,@ subst-eqns) `((mprogn) ,@ exprs))))
     (gensym-inits (mapcar #'(lambda (e y) (list (first e) y (third e))) var-inits-lexical var-inits-gensyms))
-    (gensym-mprog `(,mprog-op ((mlist) ,@ (append vars-only-gensyms gensym-inits vars+var-inits-global)) ,@ (cdr gensym-mprogn))))
+    (gensym-mprog `(,mprog-op ((mlist) ,@ (append vars-only-gensyms gensym-inits vars+var-inits-nonlexical)) ,@ (cdr gensym-mprogn))))
    gensym-mprog))
 
 (defvar left-paren-symbol '|$(|)
@@ -119,7 +119,7 @@
 
 (defun subst-lexical-symbols-into-mdefine-or-lambda (e)
   (let*
-    ((args (remove-if #'(lambda (x) (kindp x '$global)) (extract-arguments-symbols e)))
+    ((args (remove-if #'(lambda (x) (kindp x '$nonlexical)) (extract-arguments-symbols e)))
      (args-gensyms (mapcar #'make-lexical-gensym args))
      (subst-eqns (apply #'append (mapcar #'(lambda (x y)
                                              (list `((mequal) ,x ,y)
@@ -199,7 +199,7 @@
   (let*
     ((do-expr (apply 'parse-$do-simple a))
      (var (third do-expr)))
-    (if (kindp var '$global)
+    (if (kindp var '$nonlexical)
       ;; no lexicalization in this case
       do-expr
       ;; otherwise lexicalize the loop variable
