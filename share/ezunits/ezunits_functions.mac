@@ -460,43 +460,31 @@ matchdeclare
     dd%, lambda ([e%], symbolp (e%) and get (e%, 'constvalue) # false),
     ee%, lambda ([e%], symbolp (e%) and get (e%, 'dimension) # false),
     ee1%, lambda ([e%], symbolp (e%) and ?mget (e%, 'numer) # false),
-    ff%, lambda ([e%], symbolp (e%)),
+    ff%, lambda ([e%], symbolp (e%) and assoc (e%, known_unit_conversions) # false),
     gg%, lambda ([e%], not atom (e%) and op (e%) = "`"),
     hh%, lambda ([e%], not atom (e%) and op (e%) = "^"),
-    ii%, lambda ([e%], not mapatom (e%) and member (op (e%), ["+", "-", "*", "/"])));
+    ii%, lambda ([e%], not mapatom (e%) and member (op (e%), ["+", "-", "*", "/"])),
+    jj%, lambda ([e%], not atom (e%) and (setp (e%) or listp (e%) or matrixp (e%) or op (e%) = "=")));
 
 simp : false;
-defrule (raa, 'dimensions (aa%), 1);
-defrule (rbb, 'dimensions (bb%), bb%);
-defrule (rcc, 'dimensions (cc%), dimensions (get (cc%, 'units)));
-defrule (rdd, 'dimensions (dd%), dimensions (get (dd%, 'constvalue)));
-defrule (ree, 'dimensions (ee%), get (ee%, 'dimension));
-defrule (ree1, 'dimensions (ee1%), dimensions (?mget (ee1%, 'numer)));
-defrule
-   (rff,
-    'dimensions (ff%), 
+tellsimp (dimensions (aa%), 1);
+tellsimp (dimensions (bb%), bb%);
+tellsimp (dimensions (cc%), dimensions (get (cc%, 'units)));
+tellsimp (dimensions (dd%), dimensions (get (dd%, 'constvalue)));
+tellsimp (dimensions (ee%), get (ee%, 'dimension));
+tellsimp ( dimensions (ee1%), dimensions (?mget (ee1%, 'numer)));
+tellsimp
+   (dimensions (ff%), 
     block
       ([ff%2 : ev (ff%, args (known_unit_conversions), infeval)],
-        if ff%2 # ff% then dimensions (ff%2) else 'dimensions (ff%)));
-defrule (rgg, 'dimensions (gg%), (constvalue (first (gg%)), if unitp (%%) then dimensions (second (%%)) else 1) * dimensions (second (gg%)));
+        dimensions (ff%2)));
+tellsimp (dimensions (gg%), (constvalue (first (gg%)), if unitp (%%) then dimensions (second (%%)) else 1) * dimensions (second (gg%)));
 matchdeclare (aa%, all, bb%, constantp_not1);
-defrule (rhh, 'dimensions (aa%^bb%), dimensions (aa%) ^ bb%);
-defrule (rii, 'dimensions (ii%), map (dimensions, ii%));
-/* ??? defrule (rjj, 'dimensions (sqrt (aa%)), sqrt (dimensions (aa%))); */
+tellsimp (dimensions (aa%^bb%), dimensions (aa%) ^ bb%);
+tellsimp (dimensions (ii%), map (dimensions, ii%));
+/* ??? tellsimp (dimensions (sqrt (aa%)), sqrt (dimensions (aa%))); */
+tellsimp (dimensions (jj%), map (dimensions, jj%));
 simp : true;
-
-dimensions (expr) :=
-    /* Binding *NOUNSFLAG* is pretty terrible,
-     * but it's the only way to disable ev(..., nouns);
-     * ev(..., nouns=false) has no effect!
-     */
-    block ([?\*nounsflag\*: false],
-           dimensions1 (expr));
-
-dimensions1 (expr) :=
-    if not atom (expr) and (setp (expr) or listp (expr) or matrixp (expr) or op (expr) = "=")
-        then map (dimensions, expr)
-        else apply (apply1, ['dimensions (expr), raa, rbb, rcc, rdd, ree, ree1, rff, rgg, rhh, rii]);
 
 /* Adapted from dimensions_as_list in share/physics/dimension.mac.
  * Thanks to Barton Willis.
