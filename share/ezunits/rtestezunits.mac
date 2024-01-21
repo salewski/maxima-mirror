@@ -622,7 +622,8 @@ ev (xx, xyz = (1729 + 42/99) ` kg, nouns);
 
 /* small example from mma mailing list circa 2009-05-29 */
 
-block ([R, w, L, x, y, z], kill (x), R : x ` Ohm, w : z ` Hz, L : y ` H, (R + w*L) `` Ohm);
+(kill (x, y, z),
+ block ([R, w, L], R : x ` Ohm, w : z ` Hz, L : y ` H, (R + w*L) `` Ohm));
 (x + y*z) ` Ohm;
 
 /* test new definitions of pound_mass, gallon, slug */

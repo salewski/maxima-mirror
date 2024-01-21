@@ -596,6 +596,15 @@ simp : true;
 matchdeclare (uu%, unitop_p);
 defrule (rununitify, uu%, maybe_subst_qty (uu%) * subst_units (uu%));
 
+/* qtys_gensyms and units_gensyms are referenced by maybe_subst_qty and subst_units
+ * which are called from dimensionally via rununitify, which doesn't take any arguments;
+ * I don't see another way to get everybody to refer to the same symbols and also
+ * save/restore temporary values, short of the following declaration (or implementation
+ * of a nonlexical block, which I'll consider out of scope for the time being).
+ */
+
+declare ([qtys_gensyms, units_gensyms], nonlexical);
+
 maybe_subst_qty (u) :=
   if qty (u) = 0 or qty (u) = 0.0 or qty (u) = 0b0
     then (if qtys_gensyms [units (u)] = false
@@ -625,6 +634,8 @@ dimensionally (e%) ::=
       rezeroified : subst (makelist (x = 0, x, listarray (qtys_gensyms)), reunitified),
       killcontext (context_name),
       rezeroified));
+
+remove ([qtys_gensyms, units_gensyms], nonlexical);
 
 gensym_map (h) := map ("=", rest (arrayinfo (h), 2), listarray (h));
 inverse_gensym_map (h) := map ("=", listarray (h), rest (arrayinfo (h), 2));
