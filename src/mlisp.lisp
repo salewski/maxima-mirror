@@ -1369,7 +1369,7 @@ wrapper for this."
 	   (dolist (var vars) (nonsymchk var '$declare) (add2lnc var $features)))
 	  (t (merror (intl:gettext "declare: unknown property ~:M") (cadr l))))))
 
-(defun declare1 (vars val prop mpropp)
+(defun declare1 (vars val prop mpropp &key (declare-invisibly nil))
   (dolist (var vars)
     (unless (or (symbolp var) (stringp var))
       (merror (intl:gettext "declare: argument must be a symbol or a string; found: ~M") var))
@@ -1394,7 +1394,7 @@ wrapper for this."
           (if (and (safe-get var 'op) (operatorp1 var)
                    (not (member (setq var (get var 'op)) (cdr $props) :test #'eq)))
             (setq *mopl* (cons var *mopl*)))
-          (add2lnc (getop var) $props)))))
+          (unless declare-invisibly (add2lnc (getop var) $props))))))
 
 (defun linchk (var)
   (if (member var '($sum $integrate $limit $diff $transpose) :test #'eq)
