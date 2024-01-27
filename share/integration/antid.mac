@@ -15,6 +15,8 @@
 nonzeroandfreeof(xargumentx, eargumente) :=
   is(eargumente # 0 and freeof(xargumentx, eargumente))$
 
+declare ([aargumenta, bargumentb], nonlexical);
+
 matchdeclare(aargumenta,
              nonzeroandfreeof(xargumentx),
              bargumentb,
@@ -66,3 +68,5 @@ antidiff(fn, var, unk) :=
     tvariablet : antid(fn, var, unk),
     return(part(tvariablet, 1)+'integrate(part(tvariablet, 2), var))
   )$
+
+remove ([aargumenta, bargumentb], nonlexical);
