@@ -21,6 +21,8 @@ partition_expression(operator,pred,init,combiner,action,res,E):=
 
  inargs(z):=substinpart("[",z,0)$ /* utility like args, but avoids / or - */
 
+declare (%voi, nonlexical);
+
  (
 /* %voi = variable of integration, a global variable wrt these entries */
 
@@ -126,3 +128,5 @@ defrule(jdn,[[%u,%m],[%u,%m]], [jacobi_dn(%u,%m),-%m*diff(%u,%voi)])$
 intable2[nounify('jacobi_cn),nounify('jacobi_dn)]:jsn$
 intable2[nounify('jacobi_dn),nounify('jacobi_sn)]:jcn$
 intable2[nounify('jacobi_cn),nounify('jacobi_sn)]:jdn$
+
+remove (%voi, nonlexical);

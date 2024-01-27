@@ -2,7 +2,6 @@
  reset (),
  load("abs_integrate.mac"),
  start : elapsed_real_time(),
- declare(signum,real),
  0);
 0$
 
@@ -842,7 +841,7 @@ true$
 (print("time = ", elapsed_real_time () - start), 0);
 0$
 
-(kill(functions), kill(values),remove(x,noninteger,kk,integer), forget(signum,real),0);
+(remove(x,noninteger,kk,integer),0);
 0$ 
 
 setify(map(lambda([q], if inpart(q,0)='kind then true else false), facts()));
