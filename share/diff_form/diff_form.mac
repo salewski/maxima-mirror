@@ -3,6 +3,8 @@ infix("@")$
 infix("&")$
 infix("|")$
 
+declare ([basis, coords, dim, extsub, extsubb, extsubb2, norm_table, scale_factor, volume], nonlexical);
+
 /*matrix_element_mult:lambda([x,y],x@y)$*/
 load("hodge_test3.mac")$
 load("f_star_test4.mac")$
@@ -18,3 +20,5 @@ fstar_with_clf([phi,theta],[sin(phi)*cos(theta),sin(phi)*sin(theta),cos(phi)],
  	(pu1:sin(phi)*cos(theta),pu2:sin(phi)*sin(theta),pu3:cos(phi),
 		h_st(pu1*d(pu2)@d(pu3)++pu2*d(pu3)@d(pu1)+pu3*d(pu1)@d(pu2))))$
 */
+
+remove ([basis, coords, dim, extsub, extsubb, extsubb2, norm_table, scale_factor, volume], nonlexical);
