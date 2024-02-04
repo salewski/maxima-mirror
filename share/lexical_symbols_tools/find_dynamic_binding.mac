@@ -14,7 +14,9 @@ nonlexical_variables (e) :=
            else (if symbolp(e) or subvarp(e) then (if e # true and e # false and not false_symbol(e) then {e} else {}) else {})
     else block ([op_e: op(e), args_e: args(e), args_vars],
                 args_vars: apply (union, map (nonlexical_variables, args_e)),
-                if member (verbify(op_e), '[sum, lsum, integrate, makelist])
+                if not atom (op_e)
+                  then union (nonlexical_variables (op_e), args_vars)
+                elseif member (verbify(op_e), '[sum, lsum, integrate, makelist])
                   then setdifference (args_vars, { second(e) })
                 elseif verbify(op_e) = 'at
                   then setdifference (args_vars, if listp (second (e)) then setify (map (first, second (e))) else { second(e) })
@@ -46,7 +48,9 @@ local_variables (e) :=
     then if explode_mapatoms and not atom(e)
            then union (local_variables (op(e)), local_variables (args(e)))
            else (if symbolp(e) or subvarp(e) then (if apparently_lexical(e) then {e} else {}) else {})
-    else block ([op_e: op(e)],
+    else block ([op_e: op(e), args_e: args(e)],
+                if not atom (op_e)
+                  then union (local_variables (op_e), local_variables (args_e))
                 /* NOT SURE IF WE WANT THESE; CAN'T CALL ANOTHER FUNCTION (I THINK)
                  * WHEN LOCAL VARIABLE IS BOUND IN THESE CONSTRUCTS.
                  * WELL, EXCEPT FOR MAKELIST.
@@ -54,9 +58,8 @@ local_variables (e) :=
                   then apply (union, cons ({second(e)}, map (local_variables, list_except_index (args(e), 2))))
                 elseif verbify(op_e) = 'at
                   then ???
-                  else
                   */
-                if member (verbify(op_e), '[?mdo, ?mdoin]) and first(e) # false
+                elseif member (verbify(op_e), '[?mdo, ?mdoin]) and first(e) # false
                   then apply (union, cons ({first(e)}, map (local_variables, list_except_index (args(e), 1))))
                 elseif verbify(op_e) = verbify("block")
                   then (if length(e) > 0 and listp (first (e))
