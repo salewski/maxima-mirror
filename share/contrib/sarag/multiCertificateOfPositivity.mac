@@ -559,7 +559,7 @@ the multiindex associated to a minimal Berstein coefficient among L.
 --------------------------------------*/
 
 bisection_castel(V,L,d):=
-	block([arete,w,k,c,j,alpha,N,W,w,res,C],
+	block([arete,w,k,c,j,alpha,N,W,res,C],
 	res:[],
 	k:length(V)-1,
 	c:compositions(d,k+1),

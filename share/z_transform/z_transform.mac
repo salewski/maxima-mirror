@@ -21,6 +21,8 @@ apply_z_transform (e) := apply1 (e, r0);
 matchdeclare ([nn, zz], symbolp);
 matchdeclare (aa, all);
 
+declare ([nn%, zz%], nonlexical);
+
 defrule (r0,
     z_transform (aa, nn, zz),
     block ([nn% : nn, zz% : zz],
@@ -268,3 +270,4 @@ simp : true;
 
 declare (z_transform, linear);
 
+remove ([nn%, zz%], nonlexical);

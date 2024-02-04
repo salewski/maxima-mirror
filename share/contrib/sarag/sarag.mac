@@ -11,6 +11,8 @@ modLoad(modName) :=
 
   load(concat(dir,modName));
 
+declare ([A, B, C, Comp2, CompInfo2, CompSigma, CompSigma2, D, E, F, Mat, Sigma, c, certificate, color, d, degP, dnorm, i, j, l, l0, l1, leftEnd, lines, ls, middlePoint, nBlockCols, p, pol, pos, q, ratnorm, rightEnd, s, style, tempCompSigma, var, x], nonlexical);
+
 modLoad("sarag_initialization.mac");
 
 modLoad("settings.mac");
@@ -37,5 +39,4 @@ modLoad("certificateOfPositivity.mac");
 
 modLoad("multiCertificateOfPositivity.mac");
 
-
-
+remove ([A, B, C, Comp2, CompInfo2, CompSigma, CompSigma2, D, E, F, Mat, Sigma, c, certificate, color, d, degP, dnorm, i, j, l, l0, l1, leftEnd, lines, ls, middlePoint, nBlockCols, p, pol, pos, q, ratnorm, rightEnd, s, style, tempCompSigma, var, x], nonlexical);
