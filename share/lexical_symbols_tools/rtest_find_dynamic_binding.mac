@@ -1,0 +1,10 @@
+(if ?mget ('find_possible_dynamic_binding, '?mexpr) = false
+     then load ("find_dynamic_binding.mac"),
+ 0);
+0;
+
+find_possible_dynamic_binding_in_expressions ('[f (x, y) := block ([z: x*y], g ()), g () := print (z)]);
+[z];
+
+find_possible_shadowed_functions_in_expressions ('[f (x) := x, g () := block ([f: lambda ([u], u + 1)], f (1))]);
+[f(1)];

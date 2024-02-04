@@ -94,7 +94,10 @@ find_possible_callers1 (x) := sublist (all_finfo, lambda ([e], member (x, e@lexi
 find_possible_dynamic_binding ([filenames]) :=
  (exprs_lists: map (lambda ([f], map (second, slurp_exprs (file_search (f)))), filenames),
   all_exprs: apply (append, exprs_lists),
-  all_functions: sublist (all_exprs, lambda ([e], not atom(e) and op(e) = ":=")),
+  find_possible_dynamic_binding_in_expressions (all_exprs));
+
+find_possible_dynamic_binding_in_expressions (all_exprs) :=
+ (all_functions: sublist (all_exprs, lambda ([e], not atom(e) and op(e) = ":=")),
   all_finfo: map (make_finfo, all_functions),
   
   map (find_possible_callers, all_finfo),
@@ -121,6 +124,11 @@ global_with_no_refs: map (lambda ([x], [x@callee, x@nonlexicalvar]), no_callers)
  * foo(x) does not refer to the global function foo.
  */
 
+find_possible_shadowed_functions ([filenames]) :=
+   (exprs_lists: map (lambda ([f], map (second, slurp_exprs (file_search (f)))), filenames),
+    all_exprs: apply (append, exprs_lists),
+    find_possible_shadowed_functions_in_expressions (all_exprs));
+
 block
  ([e, b, foolist, barlist, r0, r1],
   matchdeclare (e, lambda ([x], not mapatom(x) and member (op(x), foolist))),
@@ -133,10 +141,8 @@ block
                    false)),
   defrule (r1, e, push(e, barlist)),
 
-  find_possible_shadowed_functions ([filenames]) :=
-   (exprs_lists: map (lambda ([f], map (second, slurp_exprs (file_search (f)))), filenames),
-    all_exprs: apply (append, exprs_lists),
-    barlist: [],
+  find_possible_shadowed_functions_in_expressions (all_exprs) :=
+   (barlist: [],
     map (lambda ([x], apply1 (x, r0)), all_exprs),
-    barlist));
+    unique (barlist)));
   
