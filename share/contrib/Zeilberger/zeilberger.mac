@@ -5,6 +5,8 @@ dir : '"Zeilberger/";
 
 modLoad(modName) := load(concat(dir,modName));
 
+declare ([ZAnsatzCoeff, count, i__, k, n], nonlexical);
+
 modLoad("constants.mac");
 
 modLoad("numerical.mac");
@@ -33,3 +35,4 @@ modLoad("zb_prover.mac");
 
 modLoad("testZeilberger.mac");
 
+remove ([ZAnsatzCoeff, count, i__, k, n], nonlexical);

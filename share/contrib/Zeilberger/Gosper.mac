@@ -64,7 +64,7 @@ zTelescope(GSol,gfP,r,denNF) :=
 
 /* Postprocessing function that computes the rational function "certificate" */
 zTelescopeSimplified(GSol,gfP,r,denNF) :=
-   r*Gsol/(gfP*denNF); /* BOGUS */
+   r*GSol/(gfP*denNF); /* BOGUS */
 
 
 printGosperSummary(fRat,GosperForm,AnsatzDegree,Gpoly,GosperSol,mode) := 
