@@ -365,7 +365,7 @@ extendMat(Mat,l0,ls):=
   
 
 quickZerononzeroDeterminationwithcardinals(polylist,P,Qu,var):=
-  block([r,Sigma_i,CompressedSigma_i,c_i,comp_i,Info_i,Ada_i,Mat_i,AdaQulist,i,temppolylist,usefullpoly,InvQu,cPidiffzero,vprime,AuxSigma,AuxSigma2,InfoAux,AuxMat,v,c,Xiprime_i,InfoXiprime_i,AdaXiprime_i,CompletedAdaXiprime_i,AdaQuPrime,M,N,R,Mat_i],
+  block([r,Sigma_i,CompressedSigma_i,c_i,comp_i,Info_i,Ada_i,Mat_i,AdaQulist,i,temppolylist,usefullpoly,InvQu,cPidiffzero,vprime,AuxSigma,AuxSigma2,InfoAux,AuxMat,v,c,Xiprime_i,InfoXiprime_i,AdaXiprime_i,CompletedAdaXiprime_i,AdaQuPrime,M,N,R],
   r : Qu(1,P,var),
   if equal(r,0) then [[],[]]
   else
