@@ -85,7 +85,7 @@ intLinCreate(expr,k) :=
         return([expr])
   else
      (
-     length:length(expr),
+     length:(unlexicalize ('length))(expr),
 
      for i:1 thru length-1 do
        (
@@ -123,7 +123,7 @@ intLinSep(expr,k) :=
         return([[expr],[]])
   else
      (
-     length:length(expr),
+     length:(unlexicalize ('length))(expr),
 
      for i:1 thru length-1 do
        (
@@ -154,7 +154,7 @@ factored2List(expr) :=
      return([expr])
   else
      (
-     length:length(expr),
+     length:(unlexicalize ('length))(expr),
      for i:1 thru length-1 do
        (
        list:cons(first(expr),list),

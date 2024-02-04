@@ -132,7 +132,7 @@ makeGosperFormPrHypCheckVerboseOpt(expr,k,mode) :=
     num:factor(num(expr)),
     den:factor(denom(expr)),
 */
-    num : num(expr),
+    num : (unlexicalize ('num))(expr),
     den : denom(expr),
 
 
@@ -195,7 +195,7 @@ print("numList : ", numList),
 print("denList : ", denList)
 ),
 
-constSep : constSep(numList),
+constSep : (unlexicalize ('constSep))(numList),
 normNonIntLinNum : constSep[1],
 nonIntLinNumConst : constSep[2],
 if mode>= verbose then
@@ -204,7 +204,7 @@ print("normIntLinNum : ", normNonIntLinNum),
 print("intLinNumConst : ", nonIntLinNumConst)
 ),
 
-constSep : constSep(denList),
+constSep : (unlexicalize ('constSep))(denList),
 normNonIntLinDen : constSep[1],
 nonIntLinDenConst : constSep[2],
 if mode>= verbose then

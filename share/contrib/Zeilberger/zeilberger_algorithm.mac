@@ -27,11 +27,11 @@ normalizeGZ(Gsol,Zsol) :=
   lcm : 1,
   for i : 1 thru length(Gsol) do
     (
-    lcm : lcm(lcm,denom(Gsol[i]))
+    lcm : (unlexicalize ('lcm))(lcm,denom(Gsol[i]))
     ),
   for i : 1 thru length(Zsol) do
     (
-    lcm : lcm(lcm,denom(Zsol[i]))
+    lcm : (unlexicalize ('lcm))(lcm,denom(Zsol[i]))
 
     ),
 
@@ -391,7 +391,7 @@ if mode>=very_verbose then
   GSol : sol2Poly(GAnsatzCoeff,k),
   if mode>= verbose then
     print("GSol : ", GSol),
-  if Gsol = 0 then
+  if GSol = 0 then
      (
      grat:0,
      tlscope:0

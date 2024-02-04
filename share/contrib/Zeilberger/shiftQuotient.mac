@@ -60,7 +60,7 @@ niceForm(hyp,var,parName,ord,sumVar) :=
       return([])
     else shQuo : first(shQuo),
 
-    numConst : extractConstant(poly2list(factor(num(shQuo))),sumVar),
+    numConst : extractConstant(poly2list(factor((unlexicalize ('num))(shQuo))),sumVar),
     denConst : extractConstant(poly2list(factor(denom(shQuo))),sumVar),
 
     num : numConst[1],
