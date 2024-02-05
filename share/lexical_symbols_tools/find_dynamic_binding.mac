@@ -64,7 +64,7 @@ local_variables (e) :=
                 elseif verbify(op_e) = verbify("block")
                   then (if length(e) > 0 and listp (first (e))
                           then block ([local_vars: setify (map (lambda ([e1], if atom(e1) then e1 else lhs(e1)), first(e)))],
-                                      union (local_vars, local_variables (map (lambda ([e1], if not atom(e1) then rhs(e1)), first(e))), local_variables (rest (e))))
+                                      union (local_vars, local_variables (map (lambda ([e1], if not atom(e1) then rhs(e1)), first(e))), local_variables (rest (args (e)))))
                           else local_variables (args(e)))
                 elseif verbify(op_e) = '?mdefine
                   /* This business about seeing if each formal argument is an atom
@@ -144,5 +144,5 @@ block
   find_possible_shadowed_functions_in_expressions (all_exprs) :=
    (barlist: [],
     map (lambda ([x], apply1 (x, r0)), all_exprs),
-    unique (barlist)));
+    unique (unlexicalize (barlist))));
   
