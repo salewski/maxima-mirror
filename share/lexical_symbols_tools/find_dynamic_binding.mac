@@ -97,7 +97,7 @@ find_possible_dynamic_binding ([filenames]) :=
   find_possible_dynamic_binding_in_expressions (all_exprs));
 
 find_possible_dynamic_binding_in_expressions (all_exprs) :=
- (all_functions: sublist (all_exprs, lambda ([e], not atom(e) and op(e) = ":=")),
+ ([all_functions, all_nonfunctions]: partition_list (all_exprs, lambda ([e], not atom(e) and op(e) = ":=")),
   all_finfo: map (make_finfo, all_functions),
   
   map (find_possible_callers, all_finfo),
@@ -106,7 +106,20 @@ find_possible_dynamic_binding_in_expressions (all_exprs) :=
   flatten (%%),
   all_possible_callers: sublist (%%, lambda ([x], x@callers # [])),
 
-  unique (map (lambda ([x], x@nonlexicalvar), all_possible_callers)));
+  dynamic_binding_in_functions: unique (map (lambda ([x], x@nonlexicalvar), all_possible_callers)),
+  
+  top_level_nonlexicals: apply (union, map (nonlexical_variables, all_nonfunctions)),
+  map (lambda ([i], intersection (top_level_nonlexicals, setify (unlexicalize (i@lexicals)))), all_finfo),
+  dynamic_binding_in_top_level: listify (apply (union, %%)),
+
+  ['dynamic_binding_in_functions = dynamic_binding_in_functions,
+   'dynamic_binding_in_top_level = dynamic_binding_in_top_level,
+   'dynamic_binding_combined = unique (append (dynamic_binding_in_functions, dynamic_binding_in_top_level))]);
+
+partition_list (l, p) :=
+  block ([ii: sublist_indices (l, p), jj],
+         jj: listify (setdifference (setify (makelist (i, i, 1, length (l))), setify (ii))),
+         [makelist (l[i], i, ii), makelist (l[j], j, jj)]);
 
 /*
 linel:200;
