@@ -1009,11 +1009,11 @@ random_weibull(a,b,[num]) :=
 mle_weibull (x, [w]) :=
     if x = []
         then ['shape = und, 'scale = und]
-        else block ([shape, scale],
+        else block ([shape_estimate, scale_estimate],
                     w: if w = [] then 1 else w[1],
-                    shape: mle_weibull_shape (x, w),
-                    scale: mle_weibull_scale (x, shape, w),
-                    ['shape = shape, 'scale = scale]);
+                    shape_estimate: mle_weibull_shape (x, w),
+                    scale_estimate: mle_weibull_scale (x, shape_estimate, w),
+                    ['shape = shape_estimate, 'scale = scale_estimate]);
 
 mle_weibull_shape (x, [w]) :=
     block ([listarith: true, shape_eq, eq1],
