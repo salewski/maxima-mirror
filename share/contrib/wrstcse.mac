@@ -111,7 +111,7 @@ wc_typicalvalues(wc_x):=
 
 /* Convenience function: Get the minimum, the typical and the maximal value */
 
-wc_mintypmax(wc_x,[wc_params]):=block([wc_allvalues,wc_param1,min,wc_typ,max],
+wc_mintypmax(wc_x,[wc_params]):=block([wc_allvalues,wc_param1,min_value,wc_typ,max_value],
     if length(wc_params) < 1 then
         wc_param1:3
     else
@@ -123,10 +123,10 @@ wc_mintypmax(wc_x,[wc_params]):=block([wc_allvalues,wc_param1,min,wc_typ,max],
     (
         wc_allvalues:wc_montecarlo(wc_x,-wc_param1)    
     ),
-    min:apply('min,wc_allvalues),
+    min_value:apply('min,wc_allvalues),
     wc_typ:wc_typicalvalues(wc_x),
-    max:apply('max,wc_allvalues),
-        ['min=min,'typ=wc_typ,'max=max]
+    max_value:apply('max,wc_allvalues),
+        ['min=min_value,'typ=wc_typ,'max=max_value]
 );
 /* Make this function map over equations */
  ?putprop('mintypmax, ?cdr([?mlist,?mequal]), '?distribute_over)$
