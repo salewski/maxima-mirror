@@ -974,12 +974,12 @@ _denester(nested,av0,h,max_depth_level):= block(
 _cardano_poly(n,c,x):= block(
 /*  "Cardano" polynomials as defined in [3] */
     [poly,poly1,poly2],
-    poly2: rat('x),         /* degree n-2 */
-    poly1: rat('x^2-2*c),   /* degree n-1 */
+    poly2: rat(x),         /* degree n-2 */
+    poly1: rat(x^2-2*c),   /* degree n-1 */
     if n=1 then return(poly2)
     elseif n=2 then return(poly1),
     for i:3 thru n do (
-        poly: 'x*poly1-c*poly2,
+        poly: x*poly1-c*poly2,
         poly2: poly1,
         poly1: poly
     ),
