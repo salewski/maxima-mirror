@@ -121,6 +121,8 @@ partition_list (l, p) :=
          jj: listify (setdifference (setify (makelist (i, i, 1, length (l))), setify (ii))),
          [makelist (l[i], i, ii), makelist (l[j], j, jj)]);
 
+find_functions_shadowing_nonlexical (x) :=
+    makelist (first (i), i, sublist (all_finfo, lambda ([i], member (x, unlexicalize (second (i))))));
 /*
 linel:200;
 for x in all_possible_callers
