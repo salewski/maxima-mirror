@@ -46,18 +46,18 @@ The following command line options are available for Maxima:
     @item --init-lisp=@var{file}
               Load the Lisp initialization file file at startup.
 
- @need 150
+@need 150
     @item -l  @var{lisp}, --lisp=@var{lisp}
               Use Lisp implementation lisp. Use @code{--list-avail} to see the list of possible values.
 
- @need 150
+@need 150
     @item --list-avail
               List the available Lisp and Maxima versions.
 @need 150
     @item -p  @var{lisp_file}, --preload-lisp=@var{lisp_file}
               Preload @code{lisp_file}.
 
- @need 150
+@need 150
     @item -q, --quiet
               Suppress Maxima start-up message.
 @need 150
@@ -67,7 +67,7 @@ The following command line options are available for Maxima:
     @item -r  @var{string}, --run-string=@var{string}
               Process string in interactive mode.
 
- @need 150
+@need 150
     @item -s  @var{port}, --server=@var{port}
               Connect Maxima to server on port.  Note that this does not create a Maxima server; Maxima is the client.
 
