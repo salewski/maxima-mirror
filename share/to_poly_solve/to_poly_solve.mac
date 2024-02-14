@@ -38,7 +38,7 @@ compose_functions(l) := block([z : new_variable('general), f],
     l : reverse(l),
     f : z,
     for lk in l do f : funmake(lk, [f]),
-    buildq([z,f], lambda([z], f)))
+    funmake (lambda, [[z], f]))
   else error("The argument to 'compose_functions' must be a list."));
 
 /* The function dfloat is similar to float, but dfloat applies rectform if dfloat fails
@@ -207,6 +207,8 @@ non_symbol_subst (e, v) := block([vars, listconstvars : false],
   e : fullratsubst(vars, e),
   [e, map('reverse, vars)]);
 
+declare (%exp, nonlexical);
+
 (one_to_one_reduce[a,b] := false,
   one_to_one_reduce['sin,'sin] : lambda([a,b], 
       (a - b - 2 * %pi * new_variable('integer)) * (a + b - 2 * %pi * new_variable('integer) + %pi)),
@@ -243,6 +245,7 @@ one_to_one_crunch(e) := block([inflag : true, f, nv : set(), %exp, q, opl, opr],
   e : subst(%exp = lambda([a], %e^a),e),
   [e, nv]);
 
+remove (%exp, nonlexical);
 
 (function_inverse[otherwise]:= false,
   function_inverse['acos] : lambda([s], cos(s)),
@@ -390,6 +393,8 @@ lambertify(e,vars) := block([ee, eee, expargs : set(), cexpargs, nexpargs,
   [e, subs]);
 
 alias(%solve, to_poly_solve);
+
+declare ([simpfuncs, field, use_grobner, parameters, maxdepth], nonlexical);
 
 simp_%solve(e,v,[extraargs]) := block([vc, all_vars, sol, solvedomain, parameter_list,
                 algexact : assoc('algexact,extraargs,true),
@@ -592,6 +597,8 @@ to_poly_solve_h(e,v, simpfuncs, maxdepth, grob,use_algexact) := block([eqs : set
         nsol : %if(%cnds, nsol, %union()),
         true_sol : adjoin(nsol, true_sol))),
     xreduce('%union, true_sol, %union()));
+
+remove ([simpfuncs, field, use_grobner, parameters, maxdepth], nonlexical);
 
 /* Maybe all this should be fixed higher up; for now ...*/
 
