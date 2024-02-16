@@ -44,8 +44,8 @@ map(lambda([s], is(abs(1-s) < 1.0e-10)), makelist(sum(bernstein_poly(k,n,0.4 + %
 (reset(fpprec), listarith : true,0);
 0$
 
-(q : block([bernstein_explicit : false,k,n,x], makelist(diff(bernstein_poly(k,n,x),v),v,[k,n,x]))
-    -block([bernstein_explicit : true,k,n,x], makelist(diff(bernstein_poly(k,n,x),v),v,[k,n,x])),
+(q : block([bernstein_explicit : false], makelist(diff(bernstein_poly(k,n,x),v),v,[k,n,x]))
+    -block([bernstein_explicit : true], makelist(diff(bernstein_poly(k,n,x),v),v,[k,n,x])),
  expand(subst([k=5,n=8],q)));
 [0,0,0]$
 
