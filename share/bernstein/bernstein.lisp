@@ -21,6 +21,8 @@
 
 (defmvar $bernstein_explicit nil)
 
+(declare1 (list '$bernstein_explicit) t '$nonlexical 'kind :declare-invisibly t)
+
 ;; numerical (complex rational, float, or big float) evaluation of bernstein polynomials
 (in-package #:bigfloat)
 
