@@ -226,13 +226,13 @@ resolvante_bipartite(polynome,x) :=
         for r:degre step -1 thru 1 do
              (print(r),
              pui_resol : cons(pui(pui_pol,
-                                   polynome_bipartite(r),
+                                   polynome_bipartite(r, degre, n),
                                    makelist(concat(a,j),j,1,n)),
                                pui_resol)),
         elem_resol : pui2ele(degre,cons(degre,pui_resol)),
         ele2polynome(elem_resol,y))$
 
-polynome_bipartite(r) :=
+polynome_bipartite(r, degre, n) :=
            block([s,borne],
            s : 0,
            borne:quotient(r,2)+remainder(r,2),
