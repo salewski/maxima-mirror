@@ -17,7 +17,6 @@ run_testsuite (tests = rtest_lexical_symbols, display_all = true);
  LEXICAL SYMBOLS
 
  * A lexical symbol is a symbol defined in a lexical extent.
-
  * A lexical extent is one of the following operators and its arguments:
   * `block`
   * `lambda`
@@ -25,13 +24,10 @@ run_testsuite (tests = rtest_lexical_symbols, display_all = true);
   * array function (both `f[x]` and `f[x](y)`)
   * `for` loop
   * macro (defined by `::=`)
-
  * Lexical symbols defined in different lexical extents are distinct, even if they have the same name.
-
  * Every symbol which is not a lexical symbol is a nonlexical symbol.
   * There is a unique nonlexical symbol for any given name.
   * Dynamic binding is applied to nonlexical symbols.
-
  * In addition, a symbol may be declared nonlexical so that it is a nonlexical symbol
    even if it is defined in a lexical extent.
   * A nonlexical declaration applies to any lexical extents parsed after the declaration is evaluated.
@@ -59,13 +55,11 @@ run_testsuite (tests = rtest_lexical_symbols, display_all = true);
 
  * Apply lexical symbol substitution to expressions created by evaluation?
    e.g. `define(f(x), x)`, `funmake(lambda, [[x], x])`
-
  * Additional lexical extents?
   * `buildq`
   * `makelist` / `create_list`/ `makeset` 
   * `sum`
   * `integrate`
   * `diff`
-
  * Lexical environments, a.k.a. closures
   * There exists a proof of concept implementation at: https://github.com/maxima-packages/robert-dodier/lexical\_symbols
