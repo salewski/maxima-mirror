@@ -62,4 +62,4 @@ run_testsuite (tests = rtest_lexical_symbols, display_all = true);
      * `integrate`
      * `diff`
  * Lexical environments, a.k.a. closures
-     * There exists a proof of concept implementation at: https://github.com/maxima-packages/robert-dodier/lexical\_symbols
+     * There exists a proof of concept implementation at: https://github.com/maxima-project-on-github/maxima-packages/tree/master/robert-dodier/lexical_symbols
