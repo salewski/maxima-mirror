@@ -109,12 +109,12 @@ find_possible_dynamic_binding_in_expressions (all_exprs) :=
   dynamic_binding_in_functions: unique (map (lambda ([x], x@nonlexicalvar), all_possible_callers)),
   
   top_level_nonlexicals: apply (union, map (nonlexical_variables, all_nonfunctions)),
-  map (lambda ([i], intersection (top_level_nonlexicals, setify (unlexicalize (i@lexicals)))), all_finfo),
-  dynamic_binding_in_top_level: listify (apply (union, %%)),
+  map (lambda ([i], intersection (top_level_nonlexicals, setify (unlexicalize (i@nonlexicals)))), all_finfo),
+  dynamic_binding_from_top_level: listify (apply (union, %%)),
 
   ['dynamic_binding_in_functions = dynamic_binding_in_functions,
-   'dynamic_binding_in_top_level = dynamic_binding_in_top_level,
-   'dynamic_binding_combined = unique (append (dynamic_binding_in_functions, dynamic_binding_in_top_level))]);
+   'dynamic_binding_from_top_level = dynamic_binding_from_top_level,
+   'dynamic_binding_combined = unique (append (dynamic_binding_in_functions, dynamic_binding_from_top_level))]);
 
 partition_list (l, p) :=
   block ([ii: sublist_indices (l, p), jj],
