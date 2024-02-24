@@ -1,0 +1,26 @@
+generate_intermediate_result_test_cases (functions_names, globals_names) :=
+    for f in functions_names
+        do block ([fdef: apply (fundef, [f]), args_names, f_wrapper],
+                  if some (listp, args (first (fdef)))
+                      then (print ("generate_intermediate_result_test_cases: can't handle optional function arguments for", f),
+                            return ()),
+                  args_names: makelist (gensym ("x"), length (first (fdef))),
+                  f_wrapper: funmake (lambda, [args_names,
+                                               buildq ([f, f_lambda: ?mget (f, '?mexpr), args_names, globals_names],
+                                                       block ([globals_eqs, test_case_string, args_names_mprogn,
+                                                               display2d: false, stringdisp: true],
+                                                              globals_eqs: sublist (makelist (v = ?meval (v), v,?mquote (globals_names)),
+                                                                                        lambda ([eq], rhs (eq) # lhs (eq))),
+                                                              /* This next bit is to reorganize the list of args names so that
+                                                               * printf ~m handles it correctly; workaround for SF bug #4264.
+                                                               */
+                                                              args_names_mprogn: funmake (?mprogn, args_names),
+                                                              if length (globals_eqs) > 0
+                                                                  then test_case_string: printf (false, "ev (~a ~m, ~m);",
+                                                                                                 'f, args_names_mprogn, globals_eqs)
+                                                                  else test_case_string: printf (false, "~a ~m;", 'f, args_names_mprogn),
+                                                              block ([result: apply (f_lambda, args_names)],
+                                                                     print (test_case_string),
+                                                                     printf (true, "~m;~%~%", result),
+                                                                     result)))]),
+                  ?mputprop (f, f_wrapper, '?mexpr));
