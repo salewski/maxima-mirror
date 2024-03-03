@@ -11,6 +11,8 @@ test_sum(sm, ass, use_gamma, smp, ans) := block(
     if length(ass)>0 then apply(forget, ass),
     ratsimp(cs-ans));
 
+fundef_test_sum: fundef (test_sum);
+
 list_of_functions: map (op, functions);
 
 load ("share/lexical_symbols_tools/generate_intermediate_result_test_cases.mac");
@@ -21,7 +23,7 @@ generate_intermediate_result_test_cases (list_of_functions, simplify_sum_globals
 
 with_stdout ("share/solve_rec/rtest_simplify_sum_results.mac",
     printf (true, "(load (simplify_sum), 0);~%0;~%~%"),
-    printf (true, "(~a,~%0);~%0;~%~%", fundef (test_sum)),
+    printf (true, "(~a,~%0);~%0;~%~%", fundef_test_sum),
     establish_prevailing_assignments (simplify_sum_globals),
     print_prevailing_assignments (),
     test_sum(sum((-1)^k*binomial(2*n,k)^2,k,0,2*n),[],false,[],(product(2*%j1-1,%j1,1,n)*(-1)^n*2^n)/n!));
