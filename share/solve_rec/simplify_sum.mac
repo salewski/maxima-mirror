@@ -48,7 +48,7 @@ eval_when(batch,
 
 put('simplify_sum, 1.0, 'version)$
 
-declare ([%k%, hi, i, sm, sum, sum_min, summand, support, var_], nonlexical);
+declare ([Gosper_in_Zeilberger, %k%, a, hi, i, k, n, p, sm, summand, support, var_], nonlexical);
 
 define_variable(zeilberger_check, true, boolean)$
 define_variable(sum_min, 0, any)$
@@ -977,7 +977,7 @@ telescoping_sum(expr, var, lo, hi) := block(
     (if hi=inf then limit(quotient, var, hi) else subst(var=hi+1, quotient))
   else false)$
 
-remove ([%k%, hi, i, sm, sum, sum_min, summand, support, var_], nonlexical);
+remove ([Gosper_in_Zeilberger, %k%, a, hi, i, k, n, p, sm, summand, support, var_], nonlexical);
 
 eval_when(batch,
           ttyoff : false,

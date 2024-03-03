@@ -1025,7 +1025,7 @@ reduce_order(eqn, sol, fn) := block(
 
 simplify_product(myprod) := block(
   [term, %n, lo, hi, %kk : 0, nu, de, comm : [], p% : 1,
-   deg : simplify_products_deg, %j1],
+   deg : simplify_products_deg, %j1: '%j1],
   if simplify_products=false then return(myprod),
   if atom(myprod) then return(myprod),
   if member(part(myprod, 0), ["+", "-", "*", "/", "^"]) then
