@@ -1,0 +1,27 @@
+load (simplify_sum);
+
+/* patched version of makeGosperForm.mac just cuts out calls to nonlexicalize */
+batchload ("share/contrib/Zeilberger/makeGosperForm.mac-nonlexical-patched");
+
+test_sum(sm, ass, use_gamma, smp, ans) := block(
+    [product_use_gamma : use_gamma, cs, f],
+    if length(ass)>0 then apply(assume, ass),
+    cs : simplify_sum(sm),
+    for f in smp do cs : apply(f, [cs]),
+    if length(ass)>0 then apply(forget, ass),
+    ratsimp(cs-ans));
+
+list_of_functions: map (op, functions);
+
+load ("share/lexical_symbols_tools/generate_intermediate_result_test_cases.mac");
+
+simplify_sum_globals: '[Gosper_in_Zeilberger, %k%, a, hi, i, k, n, p, sm, summand, support, var_, zeilberger_check, sum_min, use_simpsum, use_harmonic, use_integral, use_gosper, use_ratfun, use_zeilberger, use_hypergeometric, use_telescoping, simplify_sum_depth, simplify_sum_max_depth, verbose_level, harmonic_number_expand, sum_by_integral_transforms, solve_rec_warn, simplify_products, normalize_products, distribute_products, simplify_products_deg, product_use_gamma, use_hyper, use_ratsol, hyper_factor_solve, hyper_all_solutions, hyper_to_product, solve_rec_method, shift_op, %n, %f, %m, %n, %l, %j, %k, %x, %u, %z];
+
+generate_intermediate_result_test_cases (list_of_functions, simplify_sum_globals);
+
+with_stdout ("share/solve_rec/rtest_simplify_sum_results.mac",
+    printf (true, "(load (simplify_sum), 0);~%0;~%~%"),
+    printf (true, "(~a,~%0);~%0;~%~%", fundef (test_sum)),
+    establish_prevailing_assignments (simplify_sum_globals),
+    print_prevailing_assignments (),
+    test_sum(sum((-1)^k*binomial(2*n,k)^2,k,0,2*n),[],false,[],(product(2*%j1-1,%j1,1,n)*(-1)^n*2^n)/n!));

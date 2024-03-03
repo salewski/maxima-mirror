@@ -9,8 +9,7 @@ generate_intermediate_result_test_cases (functions_names, globals_names) :=
                                                buildq ([f, f_lambda: ?mget (f, '?mexpr), args_names, globals_names],
                                                        block ([globals_eqs, test_case_string, args_names_mprogn,
                                                                display2d: false, stringdisp: true],
-                                                              globals_eqs: sublist (makelist (v = ?meval (v), v,?mquote (globals_names)),
-                                                                                        lambda ([eq], rhs (eq) # lhs (eq))),
+                                                              globals_eqs: detect_reassigned_globals (globals_names),
                                                               /* This next bit is to reorganize the list of args names so that
                                                                * printf ~m handles it correctly; workaround for SF bug #4264.
                                                                */
@@ -24,3 +23,24 @@ generate_intermediate_result_test_cases (functions_names, globals_names) :=
                                                                      printf (true, "~m;~%~%", result),
                                                                      result)))]),
                   ?mputprop (f, f_wrapper, '?mexpr));
+
+/* These functions maintain a lookup table of the values of global variables,
+ * namely prevailing_assignments.
+ */
+
+establish_prevailing_assignments (globals_names) :=
+    (prevailing_assignments: make_array (hashed, 1),
+     for v in globals_names
+         do prevailing_assignments[v]: ?meval (v));
+
+print_prevailing_assignments () :=
+    (printf (true, "(~%"),
+     for v in simplify_sum_globals do printf (true, " ~a: '~a,~%", v, prevailing_assignments[v]),
+     printf (true, " 0);~%0;~%~%"));
+
+detect_reassigned_globals ('globals_names) :=
+    block ([L: [], v_value],
+           for v in globals_names
+               do if (v_value: ?meval (v)) # prevailing_assignments[v]
+                      then push (v = v_value, L),
+           reverse (L));
