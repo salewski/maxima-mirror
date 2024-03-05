@@ -11,6 +11,15 @@ test_sum(sm, ass, use_gamma, smp, ans) := block(
     if length(ass)>0 then apply(forget, ass),
     ratsimp(cs-ans));
 
+test_sum1 (sm, ass, use_gamma, smp, ans) ::= 
+    if length (ass) > 0
+        then buildq ([sm, ass, use_gamma, smp, ans],
+                     (printf (true, "(apply ('assume, ~a), 0);~%0;~%~%", ass),
+                      test_sum (sm, ass, use_gamma, smp, ans),
+                      printf (true, "(apply ('forget, ~a), 0);~%0;~%~%", ass)))
+        else buildq ([sm, use_gamma, smp, ans],
+                     test_sum (sm, [], use_gamma, smp, ans));
+
 fundef_test_sum: fundef (test_sum);
 
 list_of_functions: map (op, functions);
@@ -21,9 +30,25 @@ simplify_sum_globals: '[Gosper_in_Zeilberger, %k%, a, hi, i, k, n, p, sm, summan
 
 generate_intermediate_result_test_cases (list_of_functions, simplify_sum_globals);
 
-with_stdout ("share/solve_rec/rtest_simplify_sum_results.mac",
-    printf (true, "(load (simplify_sum), 0);~%0;~%~%"),
-    printf (true, "(~a,~%0);~%0;~%~%", fundef_test_sum),
-    establish_prevailing_assignments (simplify_sum_globals),
-    print_prevailing_assignments (),
-    test_sum(sum((-1)^k*binomial(2*n,k)^2,k,0,2*n),[],false,[],(product(2*%j1-1,%j1,1,n)*(-1)^n*2^n)/n!));
+output_test_cases (rtest_filename, e) ::=
+    buildq ([rtest_filename, e],
+            with_stdout (rtest_filename,
+                printf (true, "(load (simplify_sum), 0);~%0;~%~%"),
+                printf (true, "(~a,~%0);~%0;~%~%", fundef_test_sum),
+                establish_prevailing_assignments (simplify_sum_globals),
+                print_prevailing_assignments (),
+                e));
+
+output_test_cases ("share/solve_rec/rtest_simplify_sum_results5.mac",
+                   test_sum1 (sum((-1)^k*binomial(2*n,k)^2,k,0,2*n),[],false,[],(product(2*%j1-1,%j1,1,n)*(-1)^n*2^n)/n!));
+
+output_test_cases ("share/solve_rec/rtest_simplify_sum_results6.mac",
+                   test_sum1 (sum((binomial(3*k+1,k)*binomial(3*(n-k),n-k))/(3*k+1),k,0,n),[],false,[],
+                            (product(3*%j1-1,%j1,1,n)*product(3*%j1+1,%j1,1,n)*3^n)/(product(2*%j1+1,%j1,1,n)*2^n*n!)));
+
+output_test_cases ("share/solve_rec/rtest_simplify_sum_results10.mac",
+                   test_sum1 (sum((-1)^s*binomial(2*m,s)^3,s,0,2*m),[],false,[],(product(3*%j1-2,%j1,1,m)*product(3*%j1-1,%j1,1,m)*(-1)^m*3^m)/m!^2));
+
+output_test_cases ("share/solve_rec/rtest_simplify_sum_results12.mac",
+                   test_sum1 (sum(binomial(n,k)^2*binomial(3*n+k,2*n),k,-inf,inf),[n > 0],false,[],
+                            (product(3*%j1-2,%j1,1,n)^2*product(3*%j1-1,%j1,1,n)^2*9^n)/(product(2*%j1-1,%j1,1,n)^2*4^n*n!^2)));
