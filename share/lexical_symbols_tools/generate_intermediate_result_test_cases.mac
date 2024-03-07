@@ -35,7 +35,8 @@ establish_prevailing_assignments (globals_names) :=
 
 print_prevailing_assignments () :=
     (printf (true, "(~%"),
-     for v in simplify_sum_globals do printf (true, " ~a: '~a,~%", v, prevailing_assignments[v]),
+     block ([display2d: false, stringdisp: true],
+            for v in simplify_sum_globals do printf (true, " ~a: '~m,", v, prevailing_assignments[v])),
      printf (true, " 0);~%0;~%~%"));
 
 detect_reassigned_globals ('globals_names) :=
