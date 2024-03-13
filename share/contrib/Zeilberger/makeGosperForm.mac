@@ -400,7 +400,7 @@ print("denList : ", denList)
 
 
 candListSplit : splitList(numList,
-                buildq ([denItem1: first(denItem)], lambda([x],intDistance(first(x),'denItem1)))),
+                lambda([x],intDistance(first(x),first(denItem)))),
 
 if mode>= verbose then
   print("num) candListSplit : ", candListSplit),
@@ -410,7 +410,7 @@ candNumList : first(candListSplit),
 
 numList : second(candListSplit),
 candListSplit : splitList(denList,
-                 buildq ([denItem1: first(denItem)], lambda([x],intDistance(first(x),'denItem1)))),
+                 lambda([x],intDistance(first(x),first(denItem)))),
 
 if mode>= verbose then
   print("den) candListSplit : ", candListSplit),
