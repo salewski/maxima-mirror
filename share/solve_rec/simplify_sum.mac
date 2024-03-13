@@ -37,11 +37,6 @@
  *                                                                           *
  *****************************************************************************/
 
-load("zeilberger")$
-load("solve_rec/solve_rec")$
-load("simplifying.lisp")$
-load("opsubst")$
-
 eval_when(batch,
           ttyoff : true,
           nolabels : true)$
@@ -66,6 +61,11 @@ define_variable(simplify_sum_max_depth, 3, fixnum)$
 
 declare(simplify_sum, evfun)$
 declare(split_sum, evfun)$
+
+load("zeilberger")$
+load("solve_rec/solve_rec")$
+load("simplifying.lisp")$
+load("opsubst")$
 
 /*******************
  *

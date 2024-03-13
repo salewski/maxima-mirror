@@ -187,7 +187,7 @@
     #-allegro
     "rtest_numericalio"
     ((mlist simp) "rtest_simplify_sum"
-     ((mlist simp) 57))
+     ((mlist simp) 58))
     "rtest_solve_rec"
     ;; ACL 10.1 cannot load stringproc as it has no (get-encoding) function.
     #-allegro

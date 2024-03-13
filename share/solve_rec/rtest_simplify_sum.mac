@@ -6,16 +6,25 @@
  *   batch("rtest_simplify_sum.mac", test);
  *
  ***************************************/
+
+/* need to load simplify_sum first in order to ensure
+ * product_use_gamma is known to be nonlexical when defining test_sum.
+ */
+
 (
   kill(all),
   load (simplify_sum),
+  0);
+0;
+
+(
   test_sum(sm, ass, use_gamma, smp, ans) := block(
     [product_use_gamma : use_gamma, cs, f],
     if length(ass)>0 then apply(assume, ass),
     cs : simplify_sum(sm),
     for f in smp do cs : apply(f, [cs]),
     if length(ass)>0 then apply(forget, ass),
-    ratsimp(cs-ans)),
+    if ratsimp(cs-ans) = 0 then 0 else ['actual = cs, 'expected = ans, 'difference = ratsimp (cs - ans)]),
   0
 );
 0;

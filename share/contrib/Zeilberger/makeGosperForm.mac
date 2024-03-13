@@ -109,6 +109,7 @@ makeGosperPrHypCheck(expr,k) :=
 /* into irreducible factors */
 /* */
 /* The numerator is q(k) and the denominator is r(k) */
+
 makeGosperFormPrHypCheckVerboseOpt(expr,k,mode) :=
   block(
   /* Local variables */
@@ -399,7 +400,7 @@ print("denList : ", denList)
 
 
 candListSplit : splitList(numList,
-                buildq ([denItem1: first(denItem)], lambda([x],intDistance(first(x),denItem1)))),
+                buildq ([denItem1: first(denItem)], lambda([x],intDistance(first(x),'denItem1)))),
 
 if mode>= verbose then
   print("num) candListSplit : ", candListSplit),
@@ -409,7 +410,7 @@ candNumList : first(candListSplit),
 
 numList : second(candListSplit),
 candListSplit : splitList(denList,
-                 buildq ([denItem1: first(denItem)], lambda([x],intDistance(first(x),denItem1)))),
+                 buildq ([denItem1: first(denItem)], lambda([x],intDistance(first(x),'denItem1)))),
 
 if mode>= verbose then
   print("den) candListSplit : ", candListSplit),
