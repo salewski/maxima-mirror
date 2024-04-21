@@ -79,10 +79,8 @@
 
 (defun plot-to-ir (form)
   `(funcall
-    (element-array ,*maxima-function-dictionary-name*
-		   (string
-		    ,(cond ((eql (list-length (cddr form)) 1) "plot2d")
-			   (t "plot3d"))))
+     ;; NOT SURE IF THE LOGIC FOR DISTINGUISHING PLOT2D FROM PLOT3D IS RIGHT HERE
+     (symbol ,(cond ((eql (list-length (cddr form)) 1) "plot2d") (t "plot3d")))
     ,(maxima-to-ir (cadr form))
     ,@(mapcar
        (lambda (elm) (cond ((and (consp elm)
@@ -94,10 +92,10 @@
        (cddr form))))
 
 (defun mfactorial-to-ir (form)
-  `(funcall (element-array (symbol ,*maxima-function-dictionary-name*) (string "factorial")) ,@(mapcar #'maxima-to-ir (cdr form))))
+  `(funcall (symbol "math.factorial") ,@(mapcar #'maxima-to-ir (cdr form))))
 
 (defun mexpt-to-ir (form)
-  `(funcall (element-array (symbol ,*maxima-function-dictionary-name*) (string "pow")) ,@(mapcar #'maxima-to-ir (cdr form))))
+  `(funcall (symbol "math.pow") ,@(mapcar #'maxima-to-ir (cdr form))))
 
 (defun assignment-to-ir (form)
   (cond ((consp (cadr form)) `(op-no-bracket = ,@(mapcar #'maxima-to-ir (cdr form))))
@@ -271,7 +269,8 @@
   (if (> (length form) 1)
     (if (mlist-p (second form))
       (let ((args (rest (second form))))
-        (mapcar (lambda (x) (if (consp x) (list (second x) (third x)) (list x "None"))) args)))))
+        ;; I'D RATHER SAY (SYMBOL "None") IN THIS NEXT LINE, BUT THAT DOESN'T SEEM TO HAVE THE EXPECTED EFFECT
+        (mapcar (lambda (x) (if (consp x) (list (second x) (third x)) (list x '|$None|))) args)))))
 
 (defun mprog-to-ir (form &key (py-context nil))
   (let*
@@ -374,7 +373,7 @@
 				     (cons `((string ,(symbol-name-to-string (cadr x))) (funcall (symbol "list") ,(symbol-to-ir (cadr x)))))
 				     (t `((string ,(symbol-name-to-string x)) ,(symbol-to-ir x)))))
 		           (cdadr form))))))
-     ,@(cond ((and (consp (caddr form))
+     ,(cond ((and (consp (caddr form))
 		   (consp (caaddr form))
 		   (eq (car (caaddr form)) 'mprog))
 	      `(,@(mprog-to-ir (caddr form) :py-context 'function)))
@@ -403,7 +402,10 @@
 								  (maxima-to-ir (cadr elm)))
 								 (t (maxima-to-ir elm))))
 					     (caddr form))))))))
-    (op-no-bracket =
+    ;; I'M INCLINED TO OMIT THE BUSINESS ABOUT THE FUNCTION NAME LOOKUP TABLE;
+    ;; WITHOUT THIS, PYTRANSLATE CANNOT HANDLE LISP-2 (I.E. DIFFERENT FUNCTION AND VALUE SLOTS)
+    ;; BUT WITH IT, THERE IS CRUFT FOR EVERY FUNCTION CALL.
+    #+nil (op-no-bracket =
 		   ,(symbol-to-dictionary-ir (caaadr form) *maxima-function-dictionary-name*)
 		   ,(symbol-to-ir (caaadr form)))))
 
@@ -441,7 +443,9 @@
 	  (array-ref-to-ir (caar form) (cdr form)))
 	 (t
 	  (append `(funcall
-		    ,(cond
+                     ;; SEE REMARKS ABOUT FUNCTION NAME LOOKUP TABLE ABOVE
+		    ,#-nil (symbol-to-ir (caar form))
+                     #+nil (cond
 		       ((member (caar form) *symbols-directly-convert*) (symbol-to-ir (caar form)))
 		       (t `(element-array ,*maxima-function-dictionary-name* (string ,(symbol-name-to-string (caar form)))))))
 		  (mapcar
