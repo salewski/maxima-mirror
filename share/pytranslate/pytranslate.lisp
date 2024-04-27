@@ -54,8 +54,6 @@
     (setf (gethash 'mfactorial ht) 'mfactorial-to-ir)
     ht))
 
-(defvar *ir-forms-to-append* '())
-
 (defun clast (l)
   (car (last l)))
 
@@ -189,13 +187,9 @@
          `(lambda ,func-args ,(maxima-to-ir (clast form)))))
 	  (t
 	   (let ((func_name (gensym "$LAMBDA")) (func-args (mapcar #'func-arg-to-ir (cdadr form))))
-	     (setf *ir-forms-to-append*
-		   (cons (func-def-to-ir
-			  `((MDEFINE SIMP)
-			    ((,func_name) ,@(cdadr form))
-			    ((MPROGN) ,@(cddr form))))
-			 *ir-forms-to-append*))
-		(symbol-to-ir func_name))))))
+         `(body-indented
+            ,(func-def-to-ir `((mdefine) ((,func_name) ,@(cdadr form)) ((mprogn) ,@(cddr form))))
+		    ,(symbol-to-ir func_name)))))))
 
 (defun conditional-auxiliary (forms)
   `(,(maxima-to-ir (car forms))
@@ -279,14 +273,8 @@
      (blambda-defn `((lambda) ((mlist) ,@(mapcar #'first aa)) ,@(but-first-mlist form))))
     (maxima-to-ir `((mprogn) ((msetq) ,blambda-var ,blambda-defn) ((,blambda-var) ,@(mapcar #'second aa))))))
 
-(defun mprogn-to-ir (form &optional (func-args '()))
-  (declare (ignore func-args))
-  (let ((func_name (symbol-to-ir (gensym "$BLOCK"))))
-    (setf *ir-forms-to-append*
-                        (cons `(func-def
-				,func_name
-				((symbol ,*maxima-variables-dictionary-name*))
-				(body-indented
+(defun mprogn-to-ir (form)
+			`(body-indented
 				 ,@(mapcar (lambda (elm) (cond ((and (consp elm)
 								     (consp (car elm))
 								     (eq (caar elm) 'mcond))
@@ -304,8 +292,6 @@
 								 (maxima-to-ir (cadr elm)))
 								(t (maxima-to-ir elm))))
 					    (clast form)))))
-                              *ir-forms-to-append*))
-    `(funcall ,func_name (symbol ,*maxima-variables-dictionary-name*))))
 
 ;;; Recursively generates IR for a multi-dimensional array and fills all cells with Null value
 (defun array-gen-ir (dimensions)
@@ -373,7 +359,7 @@
 				     (cons `((string ,(symbol-name-to-string (cadr x))) (funcall (symbol "list") ,(symbol-to-ir (cadr x)))))
 				     (t `((string ,(symbol-name-to-string x)) ,(symbol-to-ir x)))))
 		           (cdadr form))))))
-     ,(cond ((and (consp (caddr form))
+     ,@(cond ((and (consp (caddr form))
 		   (consp (caaddr form))
 		   (eq (car (caaddr form)) 'mprog))
 	      `(,@(mprog-to-ir (caddr form) :py-context 'function)))
@@ -454,22 +440,16 @@
 
 ;;; Generates IR for Maxima expression
 (defun maxima-to-ir (form &optional (is_stmt nil))
-  (let
-      ((ir (cond ((atom form)
+      (cond ((atom form)
 		  (atom-to-ir form))
 		 ((and (consp form) (consp (car form)))
 		  (cons-to-ir form))
 		 (t
-		  (cons 'no-convert form)))))
-    (cond (is_stmt (append '(body)
-			   *ir-forms-to-append*
-			   `(,ir)))
-	  (t ir))))
+		  (cons 'no-convert form))))
 
 ;;; Driver function for the translator, calls the function
 ;;; maxima-to-ir and then ir-to-python
 (defun $pytranslate (form &optional (print-ir nil))
-  (setq *ir-forms-to-append* '())
   (setf form (nformat form))
   (cond (print-ir (ir-to-python (print (maxima-to-ir form t))))
 	(t (ir-to-python (maxima-to-ir form t)))))
