@@ -4946,3 +4946,147 @@ first kind:
         ((%elliptic_e) ((%jacobi_am) $z $m) $m)))))
   nil)
   grad)
+
+;; Reference:  https://kensala.com/publications/Sala_TransformationsOfTheJacobianAmplitudeFunctionAndItsCalculationViaTheArithmeticGeometricMean_SiamJMathsAnalysis_20_1989.pdf
+;;
+(in-package #:bigfloat)
+(defvar *debug-jacobi-am-gd* nil)
+
+#+nil
+(defun gd (z)
+  (flet
+      ((sech (z)
+         (/ (cosh z)))
+       (csch (z)
+         (/ (sinh z))))
+    ;; Gudermannian function.  See eqn 2.11 and surrounding text.
+    ;; The Gudermannian can be defined by
+    ;;
+    ;;  gd(z) = alpha + beta*%i = integrate(sech(u),u,0,z)
+    ;;
+    ;; which is a single-valued, analytic function provided the
+    ;; complex plane is cut along the branch lines lying on the
+    ;; imaginary axis from (4*t+1)*%i*%pi/2 to (4*t+3)*%i*%pi/2
+    ;; where t is an arbitrary integer.
+    ;;
+    ;; The components of gd(z) for x /= 0 are given by
+    ;;
+    ;;   alpha = gd(x) + atan(csch(x)) - atan(cos(y)*csch(x))
+    ;;   beta  = atanh(sin(y)*sech(x))
+    ;;
+    ;; and gd(x) = 2*atan(tanh(x/2))
+    ;;
+    ;; But if x = 0, csch(x) = inf
+    (flet ((gd-real (x)
+             ;; Gudermannian function for real x.
+             (* 2 (atan (tanh (/ x 2))))))
+      (let ((x (realpart z))
+            (y (imagpart z)))
+        (let* ((alpha1 (cond
+                         ((zerop x)
+                          ;; atan(csch(x)) = +%pi/2 if x > 0
+                          ;;                 -%pi/2 if x < 0
+                          (format t "zerop x, sign ~A~%" (float-sign x))
+                          (* (float-sign x)
+                             (/ (%pi z) 2)))
+                         (t
+                          (atan (csch x)))))
+               (alpha2 (cond
+                         ((zerop x)
+                          (format t "zerop x, sign ~A ~A~%"
+                                  (float-sign x) (float-sign (cos y)))
+                          (* (float-sign x)
+                             (float-sign (cos y))
+                             (/ (%pi z) 2)))
+                         (t
+                          (atan (* (cos y) (csch x))))))
+               (alpha (+ (gd-real x)
+                         alpha1
+                         alpha2))
+               (beta (atanh (* (sin y) (sech x)))))
+          (complex alpha beta))))))
+
+(defun gd (z)
+  #+nil
+  (atan (sinh z))
+  #+nil
+  (let ((maxima::$ratprint nil))
+    (* 2 (atan (tanh (/ z 2)))))
+  #+nil
+  (let* ((maxima::$ratprint nil)
+         (tt (tanh (/ z 2)))
+         (at (atan tt)))
+    (* 2 at))
+  ;;
+  (flet ((my-atan (z)
+           ;; atan(z) = -%i*atanh(%i*z)
+           ;;         = %i*atanh(x*%i-y)
+           (let* ((iz (complex (- (imagpart z))
+                               (realpart z)))
+                  (at (atanh iz)))
+             (complex (imagpart at)
+                      (- (realpart at))))))
+    (* 2 (my-atan (tanh (/ z 2))))))
+
+(defun jacobi-am-gd (z m tol)
+  (let* ((K (bf-elliptic-k m))
+         (K-prime (bf-elliptic-k (- 1 m)))
+         (pi-K-ratio (* (%pi m) (/ K K-prime)))
+         (z/2K (/ z (* 2 K)))
+         (sum 0))
+    (when *debug-jacobi-am-gd*
+      (format t "K, K' = ~A ~A~%" K K-prime)
+      (format t "pi-K-ratio = ~A~%" pi-K-ratio)
+      (format t"z/2K = ~A~%" z/2K))
+    ;;
+    ;; am(z;m) = sum(gd(%pi*K/K'*(n + z/(2*K))), n, minf, inf)
+    ;;         = gd(%pi*z/(2*K')) +
+    ;;             sum(gd(%pi*K/K'*(n + z/(2*K))) - gd(%pi*K/K'*(n - z/(2*K))), n, 1, inf)
+    ;;
+    ;; where K = elliptic_kc(m), K' = elliptic_kc(1-m)
+    (do* ((n 1 (1+ n))
+          (term (- (gd (* pi-K-ratio (+ n z/2K)))
+                   (gd (* pi-K-ratio (- n z/2K))))
+                (let ((sum (+ n z/2K))
+                      (dif (- n z/2K)))
+                  (- (gd (* pi-K-ratio sum))
+                     (gd (* pi-K-ratio dif))))))
+         ((< (abs term) tol)
+          (when *debug-jacobi-am-gd*
+            (format t "~4D: Final term = ~A prev sum ~A~%" n term sum)
+            (format t "arg ~A~%" (/ (* z (%pi z))
+                                    (* 2 K-prime)))
+            (format t "gd arg = ~A~%" (gd (/ (* z (%pi z))
+                                             (* 2 K-prime)))))
+          (let ((result
+                  (+ sum (gd (/ (* z (%pi z))
+                                (* 2 K-prime))))))
+            (when *debug-jacobi-am-gd*
+              (format t "result = ~A~%" result))
+            result))
+      (when *debug-jacobi-am-gd* 
+        (format t "~4D: term = ~A prev sum = ~A~%" n term sum))
+      (incf sum term))))
+
+(defun sn (u m)
+  (cond ((zerop m)
+	 ;; jacobi_sn(u,0) = sin(u).  Should we use A&S 16.13.1 if m
+	 ;; is small enough?
+	 ;;
+	 ;; sn(u,m) = sin(u) - 1/4*m(u-sin(u)*cos(u))*cos(u)
+	 (sin u))
+	((= m 1)
+	 ;; jacobi_sn(u,1) = tanh(u).  Should we use A&S 16.15.1 if m
+	 ;; is close enough to 1?
+	 ;;
+	 ;; sn(u,m) = tanh(u) + 1/4*(1-m)*(sinh(u)*cosh(u)-u)*sech(u)^2
+	 (tanh u))
+	(t
+	 ;; Use the ascending Landen transformation to compute sn.
+         (maxima::to (sin (jacobi-am-gd u
+                                        m
+                                        (min (epsilon u)
+                                             (epsilon m))))))))
+  
+(defun bf-jacobi-am (u m tol)
+  (jacobi-am-gd u m tol))
