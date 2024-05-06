@@ -5083,10 +5083,15 @@ first kind:
 	 (tanh u))
 	(t
 	 ;; Use the ascending Landen transformation to compute sn.
-         (maxima::to (sin (jacobi-am-gd u
-                                        m
-                                        (min (epsilon u)
-                                             (epsilon m))))))))
+         (let ((result
+                 (sin (jacobi-am-gd u
+                                    m
+                                    (min (epsilon u)
+                                         (epsilon m))))))
+           ;; Return a real result when u is real and 0 <= m <= 1.
+           (if (and (realp u) (realp m) (<= 0 m 1))
+               (realpart result)
+               result)))))
   
 (defun bf-jacobi-am (u m tol)
   (jacobi-am-gd u m tol))
