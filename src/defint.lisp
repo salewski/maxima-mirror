@@ -3415,6 +3415,12 @@ in the interval of integration.")
 			  (not (eq ($asksign c) '$neg)))))
 	    (return (list a b c))))))
 
+;; Compute diff(e, ivar, m) at the point pt.  Then multiply by
+;; (-1)^m*gamma(pwr)/gamma(3/2+m).
+;;
+;; Note: this differs slightly from Wang's paper where H is
+;; (-1)^m*sqrt(%pi)/2/gamma(3/2+m).  However this function is always
+;; called with PWR = 3/2 and gamma(3/2) = sqrt(%pi)/2.
 (defun difap1 (e pwr ivar m pt)
   (m// (mul* (cond ((eq (ask-integer m '$even) '$yes)
 		    1)
@@ -3469,7 +3475,7 @@ in the interval of integration.")
 ;;
 (defun bydif (r s d ivar)
   (let ((b 1)  p)
-    ;; D = a*x^2+b*x+c+*z*.  Basically, computing c+z3.
+    ;; D = a*x^2+b*x+c.  Then add z2*x to D.
     (setq d (m+ (m*t '*z* ivar) d))
     (cond ((or (zerop1 (setq p (m+ s (m*t -1 r))))
 	       (and (zerop1 (m+ 1 p))
@@ -3477,10 +3483,23 @@ in the interval of integration.")
            ;; Let P = S - R.  If P = 0 or P - 1 = 0, we have the first
            ;; case.  If P = 0, we have 1/d^(3/2).  Otherwise, we have
            ;; x/d^(3/2).
+           ;;
+           ;; Note: Because we add *z* to the quadratic, the call to
+           ;; DINTRAD0 will as questions about *z*.  That's bad.
 	   (difap1 (dintrad0 b (m^ d '((rat) 3 2)) ivar)
 		   '((rat) 3 2) '*z* r 0))
 	  ((eq ($asksign p) '$pos)
-           ;; P > 1.
+           ;; P > 0. Differentiate with respect to z3 and z1 to get
+           ;; the answer.
+           ;;
+           ;; Note: this doesn't seem to match Wang's thesis.  He
+           ;; says, if M (the variable R here) is even, we
+           ;; differentiate U.  Otherwise differentiate V.  But the
+           ;; call to DINTRAD0 has a numerator of 1, so we always
+           ;; differentiate U.  Also DIFAP1 multiples by H, so the two
+           ;; calls to DIFAP1 multiplies by H twice.
+           ;;
+           ;; z** is z3 in Wang's paper.
 	   (difap1 (difap1 (dintrad0 1 (m^ (m+t 'z** d)
 					   '((rat) 3 2))
                                      ivar)
