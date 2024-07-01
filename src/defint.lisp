@@ -3365,12 +3365,18 @@ in the interval of integration.")
 	      (not (among ivar (caddr e))))
 	 (caddr e))))
 
+;; L is a list of values computed by SQDTC.  Let the elements be a1,
+;; a2, and a3.  Then returns 1/(sqrt(a3)*(a2 + sqrt(a1*a3))).
 (defun tbf (l)
   (m^ (m* (m^ (caddr l) '((rat) 1 2))
 	  (m+ (cadr l) (m^ (m* (car l) (caddr l))
 			   '((rat) 1 2))))
       -1))
 
+;; Handles integrate(p(x)/(a*x^2+b*x+c)^(n+3/2) where p(x) is a
+;; polynomial in x.  Break up the integral into a sum of terms of the
+;; form C*x^m/(a*x^2+b*x+c)^(n+3/2) and computes each integral and
+;; adds them all up, returning a list of each integral.
 (defun radbyterm (d l ivar)
   (do ((l l (cdr l))
        (ans ()))
@@ -3380,6 +3386,17 @@ in the interval of integration.")
       (setq ans (cons (m* const (dintrad0 integrand d ivar))
 		      ans)))))
 
+;; E is an expression of the form a*x^2+b*x+c, where IVAR is variable
+;; of the quadratic.
+;;
+;; Returns a list (a b/2 c).
+;;
+;; This basically implements the formulas for U(A,B,C) and V(A,B,C) in
+;; Wang's thesis, sec 2.4, page 74.  When IND = T, we handle U(A,B,C)
+;; and when IND = NIL, we handle V(A,B,C).
+;;
+;; This verifies that for U(A,B,C), we have A >= 0, C > 0, and B >
+;; -SQRT(A*C).  For V(A,B,C), we have A > 0, C >= 0, B > -SQRT(A*c).
 (defun sqdtc (e ind ivar)
   (prog (a b c varlist)
      (setq varlist (list ivar))
@@ -3420,31 +3437,78 @@ in the interval of integration.")
                      (sqrtinvolve a ivar))
                  (cdr e)))))
 
+;; Computes integral(x^r/(a*x^2+b*x+c)^(s+3/2), x, 0, inf).
+;;
+;; D = a*x^2+b*x+c.  We must have 2*R+2 <= S, R > 1, and N > 0.  
+;;
+;; Let
+;;   U(a,b,c) = 1/(sqrt(c)*(b/2+sqrt(a*c)))
+;;   V(a,b,c) = 1/(sqrt(a)*(b/2+sqrt(a*c)))
+;;
+;; and
+;;
+;;  H = (-1)^r*sqrt(%pi)/2/gamma(3/2+n)
+;;
+;; If r >= s, the integral is
+;;
+;;   H(diff(U(a,b+z2,c+z3), z3, s-r, z2, r))
+;;
+;; If s = r + 1, then
+;;
+;;   H(diff(V(a,b+z2,c),z2,r))
+;;
+;; If 2*(s+1) > s > r+1, then there are two cases
+;;
+;;   (1) s is even, set p = s/2.  Then
+;;
+;;       H*diff(U(a+z1,b,c+z3),z3,s-p,z1,p)
+;;
+;;   (2) s is odd, set p = (s-1)/2.  Then
+;;
+;;       H*diff(V(a+z1,b,c+z3),z3,s-p,z1,p)
+;;
 (defun bydif (r s d ivar)
   (let ((b 1)  p)
+    ;; D = a*x^2+b*x+c+*z*.  Basically, computing c+z3.
     (setq d (m+ (m*t '*z* ivar) d))
     (cond ((or (zerop1 (setq p (m+ s (m*t -1 r))))
 	       (and (zerop1 (m+ 1 p))
 		    (setq b ivar)))
+           ;; Let P = S - R.  If P = 0 or P - 1 = 0, we have the first
+           ;; case.  If P = 0, we have 1/d^(3/2).  Otherwise, we have
+           ;; x/d^(3/2).
 	   (difap1 (dintrad0 b (m^ d '((rat) 3 2)) ivar)
 		   '((rat) 3 2) '*z* r 0))
 	  ((eq ($asksign p) '$pos)
+           ;; P > 1.
 	   (difap1 (difap1 (dintrad0 1 (m^ (m+t 'z** d)
 					   '((rat) 3 2))
                                      ivar)
 			   '((rat) 3 2) '*z* r 0)
 		   '((rat) 3 2) 'z** p 0)))))
 
+;; Handle integrate(x^m/(a*x^2+b*x+c)^(n+3/2),x,0,inf)
+;;
+;; N is the numerator and D is the denominator of the integrand.
+;;
+;; And example from Wang's thesis is
+;; integrate(x^6/(x^2+x+1)^(15/2),x,0,inf) = 2048/6567561.  (His paper
+;; is wrong.)
 (defun dintrad0 (n d ivar)
   (let (l r s)
     (cond ((and (mexptp d)
 		(equal (deg-var (cadr d) ivar) 2.))
+           ;; Checks that the denominator is a base^power, and the
+           ;; base is a polynomial of order 2.
 	   (cond ((alike1 (caddr d) '((rat) 3. 2.))
+                  ;; Handle the case where the power = 3/2.
 		  (cond ((and (equal n 1.)
 			      (setq l (sqdtc (cadr d) t ivar)))
+                         ;; Handles 1/(a*x^2+b*x+1)^(3/2)
 			 (tbf l))
 			((and (eq n ivar)
 			      (setq l (sqdtc (cadr d) nil ivar)))
+                         ;; Handles x/(a*x^2+b*x+1)^(3/2).
 			 (tbf (reverse l)))))
 		 ((and (setq r (findp n ivar))
 		       (or (eq ($asksign (m+ -1. (m-  r) (m*t 2.
@@ -3454,8 +3518,21 @@ in the interval of integration.")
 		       (setq s (m+ '((rat) -3. 2.) (caddr d)))
 		       (eq ($asksign s) '$pos)
 		       (eq (ask-integer s '$integer) '$yes))
+                  ;; Handle the case x^r/(a*x^2+b*x+c)^p).
+                  ;;
+                  ;; Extract the power of x from the numerator.
+                  ;;
+                  ;; First check that 2*p-r-1 is pos.  Integral
+                  ;; diverges if not.  Second S = P - 3/2.  Third,
+                  ;; check that S is positive.  Fourth, check that S
+                  ;; is an integer.  If these conditions hold, we can
+                  ;; use BYDIF to compute the result.
 		  (bydif r s (cadr d) ivar))
 		 ((polyinx n ivar nil)
+                  ;; Handle the case where the numerator is a
+                  ;; polynomial in x.  Then we can integrate the
+                  ;; polynomial by summing up each term of the
+                  ;; polynomial.
 		  (radbyterm d (cdr n) ivar)))))))
 
 
