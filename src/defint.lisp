@@ -3123,10 +3123,10 @@ in the interval of integration.")
 ;;
 ;; This basically picks off b*x^n+a and returns the list
 ;; (b n a).
-(defun maybpc (e ivar nd-var)
+(defun maybpc (e ivar nd-var mtoinf-var)
   (let (zd zn)
-    (cond (*mtoinf* (throw 'ggrm (linpower0 e ivar)))
-	  ((and (not *mtoinf*)
+    (cond (mtoinf-var (throw 'ggrm (linpower0 e ivar)))
+	  ((and (not mtoinf-var)
 	        (null (setq e (bx**n+a e ivar)))) ;bx**n+a --> (a n b) or nil.
 	   nil)                                   ;with ivar being x.
 	  ;; At this point, e is of the form (a n b)
@@ -3208,7 +3208,7 @@ in the interval of integration.")
      (setq c (car e))
      (setq e (cdr e))
      (cond ((multiple-value-setq (e zd)
-              (ggr1 e ivar nd-var))
+              (ggr1 e ivar nd-var *mtoinf*))
 	    ;; e = (m b n a).  That is, the integral is of the form
 	    ;; x^m*exp(b*x^n+a).  I think we want to compute
 	    ;; gamma((m+1)/n)/b^((m+1)/n)/n.
@@ -3250,7 +3250,7 @@ in the interval of integration.")
 
 
 ;; Match x^m*exp(b*x^n+a).  If it does, return (list m b n a).
-(defun ggr1 (e ivar nd-var)
+(defun ggr1 (e ivar nd-var mtoinf-var)
   (let (zd)
     (cond ((atom e) nil)
 	  ((and (mexptp e)
@@ -3259,7 +3259,7 @@ in the interval of integration.")
 	   ;; of the form b*x^n+a, and return (list 0 b n a).  (The 0 is
 	   ;; so we can graft something onto it if needed.)
 	   (cond ((multiple-value-setq (e zd)
-                    (maybpc (caddr e) ivar nd-var))
+                    (maybpc (caddr e) ivar nd-var mtoinf-var))
 		  (values (cons 0. e) zd))))
 	  ((and (mtimesp e)
 	        ;; E should be the product of exactly 2 terms
@@ -3272,12 +3272,12 @@ in the interval of integration.")
 		         (ratgreaterp (setq nd-var ($realpart dn*))
 				      -1.)
 		         (multiple-value-setq (nn* zd)
-                           (ggr1 (caddr e) ivar nd-var)))
+                           (ggr1 (caddr e) ivar nd-var mtoinf-var)))
 		    (and (setq dn* (xtorterm (caddr e) ivar))
 		         (ratgreaterp (setq nd-var ($realpart dn*))
 				      -1.)
 		         (multiple-value-setq (nn* zd)
-                           (ggr1 (cadr e) ivar nd-var)))))
+                           (ggr1 (cadr e) ivar nd-var mtoinf-var)))))
 	   ;; Both terms have the right form and nn* contains the ivar of
 	   ;; the exponential term.  Put dn* as the car of nn*.  The
 	   ;; result is something like (m b n a) when we have the
