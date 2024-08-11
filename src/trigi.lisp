@@ -308,7 +308,8 @@
   (frob %asinh #'big-float-asinh)
   (frob %acosh #'big-float-acosh)
   (frob %atanh #'big-float-atanh)
-  (frob %acoth 'big-float-acoth))
+  (frob %acoth 'big-float-acoth)
+  (frob %asech 'big-float-asech))
 
 ;; Here is a general scheme for defining and applying reflection rules. A 
 ;; reflection rule is something like f(-x) --> f(x), or  f(-x) --> %pi - f(x). 
