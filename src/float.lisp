@@ -2554,6 +2554,18 @@
         (t
          (big-float-acosh (bcons (fpquotient (fpone) (cdr x)))))))
 
+(defun big-float-acsch (x &optional y)
+  ;; acsch(z) = asinh(1/z)
+  (cond (y
+         ;; 1/(x+%i*y) = (x-%i*y)/(x^2+y^2).
+         (let ((denom (add (power x 2)
+                           (power y 2))))
+           (big-float-asinh (div x denom)
+                            (div (neg y)
+                                 denom))))
+        (t
+         (big-float-asinh (bcons (fpquotient (fpone) (cdr x)))))))
+
 ;; acos(x) for real x.  X is a bigfloat, and a maxima number is returned.
 (defun fpacos (x)
   ;; acos(x) = %pi/2 - asin(x)
