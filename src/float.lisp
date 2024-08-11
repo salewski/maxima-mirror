@@ -2151,6 +2151,7 @@
            (fpminus (cdr (fpsinh (bcons (fpminus (cdr (bigfloatp x)))))))))))
 
 (defun big-float-sinh (x &optional y)
+  "Compute sinh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   ;; The rectform for sinh for complex args should be numerically
   ;; accurate, so return nil in that case.
   (unless y
@@ -2208,6 +2209,7 @@
     (values v (bcons (fpminus (cdr u))))))
 
 (defun big-float-asinh (x &optional y)
+  "Compute asinh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   (if y
       (multiple-value-bind (u v)
 	  (complex-asinh x y)
@@ -2215,6 +2217,7 @@
       (fpasinh x)))
 
 (defun big-float-acosh (x &optional y)
+  "Compute acosh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   ;; acosh(z) = log(sqrt(z-1)*sqrt(z+1)+z);
   (cond (y
          (let ((sqrt-z-1 (big-float-sqrt (sub x 1) y))
@@ -2389,6 +2392,7 @@
 						  re-sqrt-1+z)))))))))
 
 (defun big-float-asin (x &optional y)
+  "Compute asin(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   (if y
       (multiple-value-bind (u v) (complex-asin x y)
 	(add u (mul '$%i v)))
@@ -2417,6 +2421,7 @@
 	    (bcons (fpquotient tv den)))))
 
 (defun big-float-tanh (x &optional y)
+  "Compute tanh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   (if y
       (multiple-value-bind (u v) (complex-tanh x y)
 	(add u (mul '$%i v)))
@@ -2523,12 +2528,14 @@
 	    (bcons (fpminus (fptimes* beta nu))))))
 
 (defun big-float-atanh (x &optional y)
+  "Compute atanh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   (if y
       (multiple-value-bind (u v) (complex-atanh x y)
 	(add u (mul '$%i v)))
       (fpatanh x)))
 
 (defun big-float-acoth (x &optional y)
+  "Compute acoth(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   ;; acoth(z) = atanh(1/z) for all z.
   ;;
   ;; See https://functions.wolfram.com/ElementaryFunctions/ArcCoth/27/02/10/01/02/0001/
@@ -2543,6 +2550,7 @@
          (big-float-atanh (bcons (fpquotient (fpone) (cdr x)))))))
 
 (defun big-float-asech (x &optional y)
+  "Compute asech(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   ;; asech(z) = acosh(1/z)
   (cond (y
          ;; 1/(x+%i*y) = (x-%i*y)/(x^2+y^2).
@@ -2555,6 +2563,7 @@
          (big-float-acosh (bcons (fpquotient (fpone) (cdr x)))))))
 
 (defun big-float-acsch (x &optional y)
+  "Compute acsch(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   ;; acsch(z) = asinh(1/z)
   (cond (y
          ;; 1/(x+%i*y) = (x-%i*y)/(x^2+y^2).
