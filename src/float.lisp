@@ -2466,6 +2466,13 @@
 	    (bcons (fproot x 2))))))
 
 
+(defun big-float-asin (x &optional y)
+  "Compute asin(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (if y
+      (multiple-value-bind (u v) (complex-asin x y)
+	(add u (mul '$%i v)))
+      (fpasin x)))
+
 (defun big-float-acos (x &optional y)
   (if y
       (multiple-value-bind (u v) (complex-acos x y)
@@ -2538,6 +2545,13 @@
   (unless y
     (fpsinh x)))
 
+(defun big-float-tanh (x &optional y)
+  "Compute tanh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (if y
+      (multiple-value-bind (u v) (complex-tanh x y)
+	(add u (mul '$%i v)))
+      (fptanh x)))
+
 (defun big-float-asinh (x &optional y)
   "Compute asinh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   (if y
@@ -2597,22 +2611,6 @@
                 (big-float-atanh (div (big-float-sqrt (mul (sub x 1)
                                                            (add x 1)))
                                       x)))))))
-
-(defun big-float-asin (x &optional y)
-  "Compute asin(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  (if y
-      (multiple-value-bind (u v) (complex-asin x y)
-	(add u (mul '$%i v)))
-      (fpasin x)))
-
-
-(defun big-float-tanh (x &optional y)
-  "Compute tanh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  (if y
-      (multiple-value-bind (u v) (complex-tanh x y)
-	(add u (mul '$%i v)))
-      (fptanh x)))
-
 
 (defun big-float-atanh (x &optional y)
   "Compute atanh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
