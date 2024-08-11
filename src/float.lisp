@@ -2528,6 +2528,20 @@
 	(add u (mul '$%i v)))
       (fpatanh x)))
 
+(defun big-float-acoth (x &optional y)
+  ;; acoth(z) = atanh(1/z) for all z.
+  ;;
+  ;; See https://functions.wolfram.com/ElementaryFunctions/ArcCoth/27/02/10/01/02/0001/
+  (cond (y
+         ;; 1/(x+%i*y) = (x-%i*y)/(x^2+y^2).
+         (let ((denom (add (power x 2)
+                           (power y 2))))
+           (big-float-atanh (div x denom)
+                            (div (neg y)
+                                 denom))))
+        (t
+         (big-float-atanh (bcons (fpquotient (fpone) (cdr x)))))))
+
 ;; acos(x) for real x.  X is a bigfloat, and a maxima number is returned.
 (defun fpacos (x)
   ;; acos(x) = %pi/2 - asin(x)
