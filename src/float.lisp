@@ -2214,6 +2214,57 @@
 	(add u (mul '$%i v)))
       (fpasinh x)))
 
+(defun big-float-acosh (x &optional y)
+  ;; acosh(z) = log(sqrt(z-1)*sqrt(z+1)+z);
+  (cond (y
+         (let ((sqrt-z-1 (big-float-sqrt (sub x 1) y))
+               (sqrt-z+1 (big-float-sqrt (add x 1) y)))
+           (displa ($expand (mul sqrt-z-1 sqrt-z+1)))
+           (ftake '%log
+                  ($expand
+                   (add (add x (mul '$%i y))
+                        (mul sqrt-z-1 sqrt-z+1))))))
+        (t
+         ;; Three cases: x < -1, -1 < x < 1 and x >= 1.  Handle these carefully so we
+         ;; don't get spurious real or imaginary values very close to
+         ;; 0.
+         (cond ((fplessp (cdr x) (fpminus (fpone)))
+                (format t "x < -1~%")
+                ;; x < -1
+                ;;
+                ;; acosh(z) = %pi*%i - atanh(sqrt(z^2-1)/z) for real z
+                ;; nad z < -1.  See
+                ;; https://functions.wolfram.com/ElementaryFunctions/ArcCosh/27/02/09/01/01/0002/
+                (sub (mul (bcons (fppi)) '$%i)
+                     (big-float-atanh (div (big-float-sqrt (mul (sub x 1)
+                                                                (add x 1)))
+                                           x))))
+               ((fplessp (cdr x) (fpone))
+                (format t "x < 1~%")
+                ;; x < 1, sqrt(x-1) = %i*sqrt(1-x)
+                ;; sqrt(x-1)*sqrt(x+1)+x = %i*sqrt(1-x)*sqrt(1+x)+x
+                ;; log(sqrt(x-1)*sqrt(x+1)+x)
+                ;;   = log(%i*sqrt(1-x)*sqrt(1+x)+x)
+                ;;   = log(1) + %i*atan2(sqrt(1-x)*sqrt(1+x),x)
+                ;;   = %i*atan2(sqrt(1-x)*sqrt(1+x),x)
+                (mformat t "sqrt(1-x) = ~M~%" (big-float-sqrt (sub 1 x)))
+                (mformat t "sqrt(1+x) = ~M~%" (big-float-sqrt (add 1 x)))
+                (mul '$%i
+                     (bcons (fpatan2 (cdr (mul (big-float-sqrt (sub 1 x))
+                                               (big-float-sqrt (add 1 x))))
+                                     (cdr x)))))
+               (t
+                (format t "x >= 1~%")
+                ;; x >= 1
+                ;;
+                ;; acosh(z) = atanh(sqrt(z^2-1)/z), Re(z) > 0.
+                ;;
+                ;; See
+                ;; https://functions.wolfram.com/ElementaryFunctions/ArcCosh/27/02/09/01/01/0001/
+                (big-float-atanh (div (big-float-sqrt (mul (sub x 1)
+                                                           (add x 1)))
+                                      x)))))))
+
 (defun fpasin-core (x)
   ;; asin(x) = atan(x/(sqrt(1-x^2))
   ;;         = sgn(x)*[%pi/2 - atan(sqrt(1-x^2)/abs(x))]
