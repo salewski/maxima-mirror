@@ -936,19 +936,6 @@
          (t
          (bcons (fpatan (cdr x))))))
 
-#+nil
-(defun big-float-acot (x &optional y)
-  "Compute acot(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  (cond (y
-         ;; acot(z) = -%i/2*(log(%i/z+1) - log(1-%i/z))
-         (let* ((i/z ($rectform (div '$%i (add x (mul '$%i y))))))
-           (mul (div (neg '$%i) 2)
-                (sub (ftake '%log (add i/z 1))
-                     (ftake '%log (sub 1 i/z))))))
-        (t
-         ;; acot(x) = atan(1/x)
-         (bcons (fpatan (cdr (div 1 x)))))))
-
 (defun big-float-acot (x &optional y)
   "Compute acot(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
   (cond (y

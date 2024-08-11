@@ -408,24 +408,6 @@
 ;; special-cased, the *big-float-op* hash table contains the special
 ;; cases.
 
-#+nil
-(defun big-float-eval (op z)
-  (when (complex-number-p z 'bigfloat-or-number-p)
-    (let ((x ($realpart z))
-	  (y ($imagpart z))
-	  (bop (gethash op *big-float-op*)))
-      ;; If bop is non-NIL, we want to try that first.  If bop
-      ;; declines (by returning NIL), we silently give up and use the
-      ;; rectform version.
-      (format t "BOP = ~A~%" bop)
-      (cond ((and ($bfloatp x) (like 0 y))
-	     (or (and bop (funcall bop x))
-		 ($bfloat `((,op simp) ,x))))
-	    ((or ($bfloatp x) ($bfloatp y))
-	     (or (and bop (funcall bop ($bfloat x) ($bfloat y)))
-		 (let ((z (add ($bfloat x) (mul '$%i ($bfloat y)))))
-		   (setq z ($rectform `((,op simp) ,z)))
-		   ($bfloat z))))))))
 (defun big-float-eval (op z)
   (when (complex-number-p z 'bigfloat-or-number-p)
     (destructuring-let
