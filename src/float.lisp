@@ -924,64 +924,6 @@
 		      ans (fpplus ans (fpquotient term (intofp n))))))))
      (return ans)))
 
-(defun big-float-atan (x &optional y)
-  "Compute atan(x+%i*y) when X and Y are bigfloat objects.  Y is optional." 
-  (cond (y
-         ;; atan(z) = -i*atanh(i*z)
-         (multiple-value-bind (u v)
-             (complex-atanh (neg y) x)
-           ;; -%i*(u+%i*v) = v - %i*u
-           (sub v
-                (mul '$%i u))))
-         (t
-         (bcons (fpatan (cdr x))))))
-
-(defun big-float-acot (x &optional y)
-  "Compute acot(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  (cond (y
-         ;; logarc(acot(z)) = -%i/2*(log(%i/z+1) - log(1-%i/z))
-         (destructuring-let (((i/z-re . i/z-im)
-                             (risplit (div '$%i (add x (mul '$%i y))))))
-           ($expand
-            (mul (div (neg '$%i) 2)
-                 (sub (big-float-log (add 1 i/z-re) i/z-im)
-                      (big-float-log (sub 1 i/z-re) (neg i/z-im)))))))
-        (t
-         ;; acot(x) = atan(1/x)
-         (bcons (fpatan (cdr (div 1 x)))))))
-
-(defun big-float-asec (x &optional y)
-  "Compute asec(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  (cond (y
-         ;; logarc(asec(z)) = -(%i*log(1/z+%i*sqrt(1-1/z^2)))
-         (let ((z (add x (mul '$%i y))))
-           ($expand
-            (mul (neg '$%i)
-                 (ftake '%log
-                        (add ($rectform (div 1 z))
-                             (mul '$%i
-                                  (ftake '%sqrt
-                                         (sub 1
-                                              (power z -2))))))))))
-        (t
-         ;; asec(x) = acos(1/x)
-         (fpacos (div 1 x)))))
-
-(defun big-float-acsc (x &optional y)
-  "Compute acsc(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  (cond (y
-         ;; logarc(acsc(z)) = -(%i*log(%i/z+sqrt(1-1/z^2)))
-         (let ((z (add x (mul '$%i y))))
-           ($expand
-            (mul (neg '$%i)
-                 (ftake '%log
-                        (add ($rectform (div '$%i z))
-                             (ftake '%sqrt
-                                    ($rectform (sub 1
-                                                    (power z -2))))))))))
-        (t
-         ;; acsc(x) = asin(1/x)
-         (fpasin (div 1 x)))))
          
 ;; atan(y/x) taking into account the quadrant.  (Also equal to
 ;; arg(x+%i*y).)
@@ -2137,13 +2079,6 @@
          (bcons 
            (fpminus (cdr (fpsinh (bcons (fpminus (cdr (bigfloatp x)))))))))))
 
-(defun big-float-sinh (x &optional y)
-  "Compute sinh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  ;; The rectform for sinh for complex args should be numerically
-  ;; accurate, so return nil in that case.
-  (unless y
-    (fpsinh x)))
-
 ;; asinh(x) for real x.  X is a bigfloat, and a bigfloat is returned.
 (defun fpasinh (x)
   ;; asinh(x) = sign(x) * log(|x| + sqrt(1+x*x))
@@ -2194,66 +2129,6 @@
   (multiple-value-bind (u v)
       (complex-asin (mul -1 y) x)
     (values v (bcons (fpminus (cdr u))))))
-
-(defun big-float-asinh (x &optional y)
-  "Compute asinh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  (if y
-      (multiple-value-bind (u v)
-	  (complex-asinh x y)
-	(add u (mul '$%i v)))
-      (fpasinh x)))
-
-(defun big-float-acosh (x &optional y)
-  "Compute acosh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  ;; acosh(z) = log(sqrt(z-1)*sqrt(z+1)+z);
-  (cond (y
-         (let ((sqrt-z-1 (big-float-sqrt (sub x 1) y))
-               (sqrt-z+1 (big-float-sqrt (add x 1) y)))
-           (displa ($expand (mul sqrt-z-1 sqrt-z+1)))
-           (ftake '%log
-                  ($expand
-                   (add (add x (mul '$%i y))
-                        (mul sqrt-z-1 sqrt-z+1))))))
-        (t
-         ;; Three cases: x < -1, -1 < x < 1 and x >= 1.  Handle these carefully so we
-         ;; don't get spurious real or imaginary values very close to
-         ;; 0.
-         (cond ((fplessp (cdr x) (fpminus (fpone)))
-                (format t "x < -1~%")
-                ;; x < -1
-                ;;
-                ;; acosh(z) = %pi*%i - atanh(sqrt(z^2-1)/z) for real z
-                ;; nad z < -1.  See
-                ;; https://functions.wolfram.com/ElementaryFunctions/ArcCosh/27/02/09/01/01/0002/
-                (sub (mul (bcons (fppi)) '$%i)
-                     (big-float-atanh (div (big-float-sqrt (mul (sub x 1)
-                                                                (add x 1)))
-                                           x))))
-               ((fplessp (cdr x) (fpone))
-                (format t "x < 1~%")
-                ;; x < 1, sqrt(x-1) = %i*sqrt(1-x)
-                ;; sqrt(x-1)*sqrt(x+1)+x = %i*sqrt(1-x)*sqrt(1+x)+x
-                ;; log(sqrt(x-1)*sqrt(x+1)+x)
-                ;;   = log(%i*sqrt(1-x)*sqrt(1+x)+x)
-                ;;   = log(1) + %i*atan2(sqrt(1-x)*sqrt(1+x),x)
-                ;;   = %i*atan2(sqrt(1-x)*sqrt(1+x),x)
-                (mformat t "sqrt(1-x) = ~M~%" (big-float-sqrt (sub 1 x)))
-                (mformat t "sqrt(1+x) = ~M~%" (big-float-sqrt (add 1 x)))
-                (mul '$%i
-                     (bcons (fpatan2 (cdr (mul (big-float-sqrt (sub 1 x))
-                                               (big-float-sqrt (add 1 x))))
-                                     (cdr x)))))
-               (t
-                (format t "x >= 1~%")
-                ;; x >= 1
-                ;;
-                ;; acosh(z) = atanh(sqrt(z^2-1)/z), Re(z) > 0.
-                ;;
-                ;; See
-                ;; https://functions.wolfram.com/ElementaryFunctions/ArcCosh/27/02/09/01/01/0001/
-                (big-float-atanh (div (big-float-sqrt (mul (sub x 1)
-                                                           (add x 1)))
-                                      x)))))))
 
 (defun fpasin-core (x)
   ;; asin(x) = atan(x/(sqrt(1-x^2))
@@ -2378,14 +2253,6 @@
 					(fptimes* im-sqrt-1-z
 						  re-sqrt-1+z)))))))))
 
-(defun big-float-asin (x &optional y)
-  "Compute asin(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  (if y
-      (multiple-value-bind (u v) (complex-asin x y)
-	(add u (mul '$%i v)))
-      (fpasin x)))
-
-
 ;; tanh(x) for real x.  X is a bigfloat, and a bigfloat is returned.
 (defun fptanh (x)
   ;; X is Maxima bigfloat
@@ -2406,13 +2273,6 @@
 	 (den (fpplus (fpone) (fptimes* beta s^2))))
     (values (bcons (fpquotient (fptimes* beta (fptimes* rho s)) den))
 	    (bcons (fpquotient tv den)))))
-
-(defun big-float-tanh (x &optional y)
-  "Compute tanh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  (if y
-      (multiple-value-bind (u v) (complex-tanh x y)
-	(add u (mul '$%i v)))
-      (fptanh x)))
 
 ;; atanh(x) for real x, |x| <= 1.  X is a bigfloat, and a bigfloat is
 ;; returned.
@@ -2514,54 +2374,6 @@
 	    ;; signed zeroes, which we don't have in maxima.
 	    (bcons (fpminus (fptimes* beta nu))))))
 
-(defun big-float-atanh (x &optional y)
-  "Compute atanh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  (if y
-      (multiple-value-bind (u v) (complex-atanh x y)
-	(add u (mul '$%i v)))
-      (fpatanh x)))
-
-(defun big-float-acoth (x &optional y)
-  "Compute acoth(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  ;; acoth(z) = atanh(1/z) for all z.
-  ;;
-  ;; See https://functions.wolfram.com/ElementaryFunctions/ArcCoth/27/02/10/01/02/0001/
-  (cond (y
-         ;; 1/(x+%i*y) = (x-%i*y)/(x^2+y^2).
-         (let ((denom (add (power x 2)
-                           (power y 2))))
-           (big-float-atanh (div x denom)
-                            (div (neg y)
-                                 denom))))
-        (t
-         (big-float-atanh (bcons (fpquotient (fpone) (cdr x)))))))
-
-(defun big-float-asech (x &optional y)
-  "Compute asech(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  ;; asech(z) = acosh(1/z)
-  (cond (y
-         ;; 1/(x+%i*y) = (x-%i*y)/(x^2+y^2).
-         (let ((denom (add (power x 2)
-                           (power y 2))))
-           (big-float-acosh (div x denom)
-                            (div (neg y)
-                                 denom))))
-        (t
-         (big-float-acosh (bcons (fpquotient (fpone) (cdr x)))))))
-
-(defun big-float-acsch (x &optional y)
-  "Compute acsch(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
-  ;; acsch(z) = asinh(1/z)
-  (cond (y
-         ;; 1/(x+%i*y) = (x-%i*y)/(x^2+y^2).
-         (let ((denom (add (power x 2)
-                           (power y 2))))
-           (big-float-asinh (div x denom)
-                            (div (neg y)
-                                 denom))))
-        (t
-         (big-float-asinh (bcons (fpquotient (fpone) (cdr x)))))))
-
 ;; acos(x) for real x.  X is a bigfloat, and a maxima number is returned.
 (defun fpacos (x)
   ;; acos(x) = %pi/2 - asin(x)
@@ -2584,13 +2396,10 @@
 			   (fptimes* re-sqrt-1+z im-sqrt-1-z)
 			   (fptimes* im-sqrt-1+z re-sqrt-1-z)))))))))
 
-
-(defun big-float-acos (x &optional y)
-  (if y
-      (multiple-value-bind (u v) (complex-acos x y)
-	(add u (mul '$%i v)))
-      (fpacos x)))
-
+
+;;; Evaluation of elementary special functions for bigfloat args.
+;;; Used by BIG-FLOAT-EVAL and possibly also by functions in
+;;; src/numeric.lisp.
 (defun complex-log (x y)
   (let* ((x (cdr (bigfloatp x)))
 	 (y (cdr (bigfloatp y)))
@@ -2655,6 +2464,203 @@
 	(if (fplessp fp-x (intofp 0))
 	    (mul '$%i (bcons (fproot (bcons (fpminus fp-x)) 2)))
 	    (bcons (fproot x 2))))))
+
+
+(defun big-float-acos (x &optional y)
+  (if y
+      (multiple-value-bind (u v) (complex-acos x y)
+	(add u (mul '$%i v)))
+      (fpacos x)))
+
+(defun big-float-atan (x &optional y)
+  "Compute atan(x+%i*y) when X and Y are bigfloat objects.  Y is optional." 
+  (cond (y
+         ;; atan(z) = -i*atanh(i*z)
+         (multiple-value-bind (u v)
+             (complex-atanh (neg y) x)
+           ;; -%i*(u+%i*v) = v - %i*u
+           (sub v
+                (mul '$%i u))))
+         (t
+         (bcons (fpatan (cdr x))))))
+
+(defun big-float-acot (x &optional y)
+  "Compute acot(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (cond (y
+         ;; logarc(acot(z)) = -%i/2*(log(%i/z+1) - log(1-%i/z))
+         (destructuring-let (((i/z-re . i/z-im)
+                             (risplit (div '$%i (add x (mul '$%i y))))))
+           ($expand
+            (mul (div (neg '$%i) 2)
+                 (sub (big-float-log (add 1 i/z-re) i/z-im)
+                      (big-float-log (sub 1 i/z-re) (neg i/z-im)))))))
+        (t
+         ;; acot(x) = atan(1/x)
+         (bcons (fpatan (cdr (div 1 x)))))))
+
+(defun big-float-asec (x &optional y)
+  "Compute asec(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (cond (y
+         ;; logarc(asec(z)) = -(%i*log(1/z+%i*sqrt(1-1/z^2)))
+         (let ((z (add x (mul '$%i y))))
+           ($expand
+            (mul (neg '$%i)
+                 (ftake '%log
+                        (add ($rectform (div 1 z))
+                             (mul '$%i
+                                  (ftake '%sqrt
+                                         (sub 1
+                                              (power z -2))))))))))
+        (t
+         ;; asec(x) = acos(1/x)
+         (fpacos (div 1 x)))))
+
+(defun big-float-acsc (x &optional y)
+  "Compute acsc(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (cond (y
+         ;; logarc(acsc(z)) = -(%i*log(%i/z+sqrt(1-1/z^2)))
+         (let ((z (add x (mul '$%i y))))
+           ($expand
+            (mul (neg '$%i)
+                 (ftake '%log
+                        (add ($rectform (div '$%i z))
+                             (ftake '%sqrt
+                                    ($rectform (sub 1
+                                                    (power z -2))))))))))
+        (t
+         ;; acsc(x) = asin(1/x)
+         (fpasin (div 1 x)))))
+
+(defun big-float-sinh (x &optional y)
+  "Compute sinh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  ;; The rectform for sinh for complex args should be numerically
+  ;; accurate, so return nil in that case.
+  (unless y
+    (fpsinh x)))
+
+(defun big-float-asinh (x &optional y)
+  "Compute asinh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (if y
+      (multiple-value-bind (u v)
+	  (complex-asinh x y)
+	(add u (mul '$%i v)))
+      (fpasinh x)))
+
+(defun big-float-acosh (x &optional y)
+  "Compute acosh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  ;; acosh(z) = log(sqrt(z-1)*sqrt(z+1)+z);
+  (cond (y
+         (let ((sqrt-z-1 (big-float-sqrt (sub x 1) y))
+               (sqrt-z+1 (big-float-sqrt (add x 1) y)))
+           (displa ($expand (mul sqrt-z-1 sqrt-z+1)))
+           (ftake '%log
+                  ($expand
+                   (add (add x (mul '$%i y))
+                        (mul sqrt-z-1 sqrt-z+1))))))
+        (t
+         ;; Three cases: x < -1, -1 < x < 1 and x >= 1.  Handle these carefully so we
+         ;; don't get spurious real or imaginary values very close to
+         ;; 0.
+         (cond ((fplessp (cdr x) (fpminus (fpone)))
+                (format t "x < -1~%")
+                ;; x < -1
+                ;;
+                ;; acosh(z) = %pi*%i - atanh(sqrt(z^2-1)/z) for real z
+                ;; nad z < -1.  See
+                ;; https://functions.wolfram.com/ElementaryFunctions/ArcCosh/27/02/09/01/01/0002/
+                (sub (mul (bcons (fppi)) '$%i)
+                     (big-float-atanh (div (big-float-sqrt (mul (sub x 1)
+                                                                (add x 1)))
+                                           x))))
+               ((fplessp (cdr x) (fpone))
+                (format t "x < 1~%")
+                ;; x < 1, sqrt(x-1) = %i*sqrt(1-x)
+                ;; sqrt(x-1)*sqrt(x+1)+x = %i*sqrt(1-x)*sqrt(1+x)+x
+                ;; log(sqrt(x-1)*sqrt(x+1)+x)
+                ;;   = log(%i*sqrt(1-x)*sqrt(1+x)+x)
+                ;;   = log(1) + %i*atan2(sqrt(1-x)*sqrt(1+x),x)
+                ;;   = %i*atan2(sqrt(1-x)*sqrt(1+x),x)
+                (mformat t "sqrt(1-x) = ~M~%" (big-float-sqrt (sub 1 x)))
+                (mformat t "sqrt(1+x) = ~M~%" (big-float-sqrt (add 1 x)))
+                (mul '$%i
+                     (bcons (fpatan2 (cdr (mul (big-float-sqrt (sub 1 x))
+                                               (big-float-sqrt (add 1 x))))
+                                     (cdr x)))))
+               (t
+                (format t "x >= 1~%")
+                ;; x >= 1
+                ;;
+                ;; acosh(z) = atanh(sqrt(z^2-1)/z), Re(z) > 0.
+                ;;
+                ;; See
+                ;; https://functions.wolfram.com/ElementaryFunctions/ArcCosh/27/02/09/01/01/0001/
+                (big-float-atanh (div (big-float-sqrt (mul (sub x 1)
+                                                           (add x 1)))
+                                      x)))))))
+
+(defun big-float-asin (x &optional y)
+  "Compute asin(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (if y
+      (multiple-value-bind (u v) (complex-asin x y)
+	(add u (mul '$%i v)))
+      (fpasin x)))
+
+
+(defun big-float-tanh (x &optional y)
+  "Compute tanh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (if y
+      (multiple-value-bind (u v) (complex-tanh x y)
+	(add u (mul '$%i v)))
+      (fptanh x)))
+
+
+(defun big-float-atanh (x &optional y)
+  "Compute atanh(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (if y
+      (multiple-value-bind (u v) (complex-atanh x y)
+	(add u (mul '$%i v)))
+      (fpatanh x)))
+
+(defun big-float-acoth (x &optional y)
+  "Compute acoth(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  ;; acoth(z) = atanh(1/z) for all z.
+  ;;
+  ;; See https://functions.wolfram.com/ElementaryFunctions/ArcCoth/27/02/10/01/02/0001/
+  (cond (y
+         ;; 1/(x+%i*y) = (x-%i*y)/(x^2+y^2).
+         (let ((denom (add (power x 2)
+                           (power y 2))))
+           (big-float-atanh (div x denom)
+                            (div (neg y)
+                                 denom))))
+        (t
+         (big-float-atanh (bcons (fpquotient (fpone) (cdr x)))))))
+
+(defun big-float-asech (x &optional y)
+  "Compute asech(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  ;; asech(z) = acosh(1/z)
+  (cond (y
+         ;; 1/(x+%i*y) = (x-%i*y)/(x^2+y^2).
+         (let ((denom (add (power x 2)
+                           (power y 2))))
+           (big-float-acosh (div x denom)
+                            (div (neg y)
+                                 denom))))
+        (t
+         (big-float-acosh (bcons (fpquotient (fpone) (cdr x)))))))
+
+(defun big-float-acsch (x &optional y)
+  "Compute acsch(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  ;; acsch(z) = asinh(1/z)
+  (cond (y
+         ;; 1/(x+%i*y) = (x-%i*y)/(x^2+y^2).
+         (let ((denom (add (power x 2)
+                           (power y 2))))
+           (big-float-asinh (div x denom)
+                            (div (neg y)
+                                 denom))))
+        (t
+         (big-float-asinh (bcons (fpquotient (fpone) (cdr x)))))))
 
 (eval-when
     (:load-toplevel :execute)
