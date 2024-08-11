@@ -935,7 +935,67 @@
                 (mul '$%i u))))
          (t
          (bcons (fpatan (cdr x))))))
-      
+
+#+nil
+(defun big-float-acot (x &optional y)
+  "Compute acot(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (cond (y
+         ;; acot(z) = -%i/2*(log(%i/z+1) - log(1-%i/z))
+         (let* ((i/z ($rectform (div '$%i (add x (mul '$%i y))))))
+           (mul (div (neg '$%i) 2)
+                (sub (ftake '%log (add i/z 1))
+                     (ftake '%log (sub 1 i/z))))))
+        (t
+         ;; acot(x) = atan(1/x)
+         (bcons (fpatan (cdr (div 1 x)))))))
+
+(defun big-float-acot (x &optional y)
+  "Compute acot(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (cond (y
+         ;; logarc(acot(z)) = -%i/2*(log(%i/z+1) - log(1-%i/z))
+         (destructuring-let (((i/z-re . i/z-im)
+                             (risplit (div '$%i (add x (mul '$%i y))))))
+           ($expand
+            (mul (div (neg '$%i) 2)
+                 (sub (big-float-log (add 1 i/z-re) i/z-im)
+                      (big-float-log (sub 1 i/z-re) (neg i/z-im)))))))
+        (t
+         ;; acot(x) = atan(1/x)
+         (bcons (fpatan (cdr (div 1 x)))))))
+
+(defun big-float-asec (x &optional y)
+  "Compute asec(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (cond (y
+         ;; logarc(asec(z)) = -(%i*log(1/z+%i*sqrt(1-1/z^2)))
+         (let ((z (add x (mul '$%i y))))
+           ($expand
+            (mul (neg '$%i)
+                 (ftake '%log
+                        (add ($rectform (div 1 z))
+                             (mul '$%i
+                                  (ftake '%sqrt
+                                         (sub 1
+                                              (power z -2))))))))))
+        (t
+         ;; asec(x) = acos(1/x)
+         (fpacos (div 1 x)))))
+
+(defun big-float-acsc (x &optional y)
+  "Compute acsc(x+%i*y) when X and Y are bigfloat objects.  Y is optional."
+  (cond (y
+         ;; logarc(acsc(z)) = -(%i*log(%i/z+sqrt(1-1/z^2)))
+         (let ((z (add x (mul '$%i y))))
+           ($expand
+            (mul (neg '$%i)
+                 (ftake '%log
+                        (add ($rectform (div '$%i z))
+                             (ftake '%sqrt
+                                    ($rectform (sub 1
+                                                    (power z -2))))))))))
+        (t
+         ;; acsc(x) = asin(1/x)
+         (fpasin (div 1 x)))))
+         
 ;; atan(y/x) taking into account the quadrant.  (Also equal to
 ;; arg(x+%i*y).)
 (defun fpatan2 (y x)

@@ -295,15 +295,18 @@
   ;; All big-float implementation functions MUST support a required x
   ;; arg and an optional y arg for the real and imaginary parts.  The
   ;; imaginary part does not have to be given.
-  (frob %asin #'big-float-asin)
-  (frob %sinh #'big-float-sinh)
-  (frob %asinh #'big-float-asinh)
-  (frob %tanh #'big-float-tanh)
-  (frob %atanh #'big-float-atanh)
-  (frob %acos 'big-float-acos)
   (frob %log 'big-float-log)
   (frob %sqrt 'big-float-sqrt)
-  (frob %atan 'big-float-atan))
+  (frob %asin #'big-float-asin)
+  (frob %acos 'big-float-acos)
+  (frob %atan 'big-float-atan)
+  (frob %acot 'big-float-acot)
+  (frob %asec 'big-float-asec)
+  (frob %acsc 'big-float-acsc)
+  (frob %sinh #'big-float-sinh)
+  (frob %tanh #'big-float-tanh)
+  (frob %asinh #'big-float-asinh)
+  (frob %atanh #'big-float-atanh))
 
 ;; Here is a general scheme for defining and applying reflection rules. A 
 ;; reflection rule is something like f(-x) --> f(x), or  f(-x) --> %pi - f(x). 
