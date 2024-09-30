@@ -40,8 +40,15 @@
 
     NO-RESET
         - If given, the variable will not be reset.
-    FIXNUM, BOOLEAN, STRING, FLONUM
+    FIXNUM, FLONUM
         - The type of variable.  Currently ignored.
+    BOOLEAN, STRING
+        - Declares the variable to have this type and adds a property
+          so that this variable can only be assigned an appropriate type.
+          This takes precedence over other options so :SETTING-PREDICATE,
+          and :SETTING-LIST cannot also be specified.  In addition,
+          :PROPERTIES can be specified, but it cannot contain an
+          ASSIGN property.
     :PROPERTIES
         - A list of properties to be applied for this variable.  It is
           a list of lists.  Each sublist is a list of the property and
@@ -129,6 +136,9 @@
          ;; Ignore this
          )
         (string
+         ;; Declares the variable to be a string and adds a predicate
+         ;; to verify that only strings can be assigned to the
+         ;; variable.
          (let ((assign-func
                 `#'(lambda (var val)
                      (unless (stringp val)
@@ -256,12 +266,14 @@
          (warn "Ignoring unknown defmvar option for ~S: ~S"
                var (car opts)))))
     (flet ((validate-type-predicate (type-predicate type-name)
+             "If TYPE-PREDICATE is non-NIL, verify that the other options like
+             :SETTING-PREDICATE, :SETTING-LIST, and :PROPERTIES option
+             has an ASSIGN property are not also given.  The type
+             declaration takes precedence."
              (when type-predicate
                (if (or setting-predicate-p setting-list-p assign-property-p)
                    (error "Do not use ~A option when :SETTING-PREDICATE, :SETTING-LIST, or :PROPERTIES is used."
                           type-name)
-                   ;; Check that boolean predicate isn't used with any other
-                   ;; predicate.  The other predicates supersede boolean.
                    (setf maybe-predicate type-predicate)))))
       (validate-type-predicate maybe-boolean-predicate "BOOLEAN")
       (validate-type-predicate maybe-string-predicate "STRING"))
