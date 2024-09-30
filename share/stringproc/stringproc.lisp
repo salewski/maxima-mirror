@@ -728,21 +728,15 @@ Please use `unicode' for code points larger than 127." )))
 ;;
 (defmvar $newline (string #\newline)
   "Maxima newline character"
-  :setting-predicate #'(lambda (x)
-                         (values (stringp x)
-                                 "must be a string")))
+  string)
 
 (defmvar $tab (string #\tab)
   "Maxima tab character"
-  :setting-predicate #'(lambda (x)
-                           (values (stringp x)
-                                   "must be a string")))
+  string)
 
 (defmvar $space (string #\space)
   "Maxima space character"
-  :setting-predicate #'(lambda (x)
-                         (values (stringp x)
-                                 "must be a string")))
+  string)
 
 (defun $tab () $tab) ;; returns Maxima tab character; can be autoloaded
 
