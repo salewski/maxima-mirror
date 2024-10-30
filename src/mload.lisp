@@ -169,6 +169,7 @@
                &aux tem   (possible '(:demo :batch :test)))
   "giving a second argument makes it use demo mode, ie pause after evaluation
    of each command line"
+  #+nil
   (declare (special $batch_answers_from_file))
 
   ;; Try to get rid of testsuite failures on machines that are low on RAM.
@@ -192,6 +193,7 @@
             (batch-stream in-stream demo)))))))
 
 (defun batch-stream (in-stream demo)
+  #+nil
   (declare (special $batch_answers_from_file))
   (let ($load_pathname)
     (let*
@@ -379,6 +381,7 @@
 (defun test-batch (filename expected-errors
 			    &key (out *standard-output*) (show-expected nil)
 			    (show-all nil) (showtime nil))
+  #+nil
   (declare (special $batch_answers_from_file))
   (let (result
 	next-result
@@ -407,7 +410,8 @@
 	(test-end-real-time 0)
 	(*query-io* *query-io*)
 	(*standard-input* *standard-input*))
-    
+
+    (format t "batch_answers_from_file = ~A~%" $batch_answers_from_file)
     (cond (*collect-errors*
 	   (setq error-log
 		 (if (streamp *collect-errors*) *collect-errors*
@@ -824,6 +828,7 @@
   debug                Set to enable some debugging prints
   answers_from_file    Read interactive answers from source file.
 "
+  #+nil
   (declare (special $batch_answers_from_file))
   (enable-some-lisp-warnings)
   (let ((test-file)
@@ -888,6 +893,9 @@
 	(unless tests-to-run
 	  (mwarning "No tests to run")
 	  (return-from $run_testsuite '$done))
+
+        (when debug
+          (mformat t "batch_answers_from_file = ~M~%" $batch_answers_from_file))
 
 	(flet
 	    ((testsuite ()

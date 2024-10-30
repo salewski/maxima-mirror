@@ -1934,3 +1934,14 @@
 (defvar *integer-info* nil
   "If LIMITP is non-null ASK-INTEGER conses its assumptions onto this
   list.")
+
+(defmvar $batch_answers_from_file nil
+  "If T, then during batch testing, if Maxima asks a question, then the
+answer is read from the input file that is being batched. This flag is
+set to T by the command-line option --batch-string.
+
+To disable it,
+
+maxima [options] --batch-string='batch_answers_from_file:false; ...'
+
+")
