@@ -447,7 +447,6 @@ non-zero exit code. Should only be set by the command-line option
 	 (make-cl-option :names '("--batch-string")
 			 :argument "<string>"
 			 :action #'(lambda (string)
-				     (declare (special $batch_answers_from_file))
 				     (setf $batch_answers_from_file t
 					   input-stream (make-string-input-stream string))
 				     ;; see RETRIEVE in macsys.lisp
