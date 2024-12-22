@@ -50,10 +50,8 @@ El elemento que denota el tipo de expresión en Maxima es también una lista, la
 
 @defvr  {Operador} [
 @defvrx {Operador} ]
-@ifinfo
 @fnindex Acotador de listas
 @fnindex Operador para subíndices
-@end ifinfo
 
 @code{[} y @code{]} marcan, respectivamente, el comienzo y el final de una lista.
 

@@ -196,9 +196,7 @@ Con las siguientes funciones es posible formatear los resultados:
 
 
 @defvr {Variable del sistema} __
-@ifinfo
 @vrindex Expresión actual de entrada
-@end ifinfo
 
 @code{__} es la expresión de entrada que está siendo actualmente evaluada.
 Esto es, mientras se está evaluando una expresión de entrada, 
@@ -256,9 +254,7 @@ Current input expression = --------------
 
 
 @defvr {Variable del sistema} _
-@ifinfo
 @vrindex Entrada anterior
-@end ifinfo
 
 El símbolo @code{_} representa la última expresión de entrada (esto es, @code{%i1}, @code{%i2}, @code{%i3}, ...).
 
@@ -323,9 +319,7 @@ Ejemplos:
 
 
 @defvr {Variable del sistema} %
-@ifinfo
 @vrindex Salida anterior
-@end ifinfo
 
 El símbolo @code{%} representa la expresión de salida (esto es, @code{%o1}, @code{%o2}, @code{%o3}, ...)
 más reciente calculada por Maxima, independientemente de que la haya mostrado o no.
@@ -346,9 +340,7 @@ Véanse también @code{_}, @code{%%} y @code{%th}.
 
 
 @defvr {Variable del sistema} %%
-@ifinfo
 @vrindex Resultado anterior en una sentencia compuesta
-@end ifinfo
 
 En una sentencia compuesta, como @code{block}, @code{lambda} o 
 @code{(@var{s_1}, ..., @var{s_n})}, @code{%%} es el valor de la sentencia previa.
@@ -405,9 +397,7 @@ _
 
 
 @deffn {Función} %th (@var{i})
-@ifinfo
 @fnindex i-ésima salida anterior
-@end ifinfo
 
 Es el valor de la expresión de la @var{i}-ésima salida anterior.
 Esto es, si la siguiente expresión a calcular es la salida @var{n}-ésima,
@@ -441,9 +431,7 @@ recién obtenidos.  En este ejemplo se asigna a @code{s} la suma de los cinco re
 
 
 @deffn {Símbolo especial} ?
-@ifinfo
 @fnindex Busca en la documentaci&oacute;n
-@end ifinfo
 
 Como prefijo de una función o nombre de variable, @code{?} significa que el nombre es de Lisp, no de Maxima.
 Por ejemplo, @code{?round} representa la función de Lisp @code{ROUND}.
@@ -459,9 +447,7 @@ no se reconoce como una solicitud de documentación.
 @end deffn
 
 @deffn {Símbolo especial} ??
-@ifinfo
 @fnindex Busca coincidencias inexactas en la documentaci&oacute;n
-@end ifinfo
 
 La notación @code{?? palabra} (@code{??} seguido de un espacio
 y una palabra) equivale a @code{describe("palabra", inexact)}.

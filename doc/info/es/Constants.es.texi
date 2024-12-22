@@ -11,11 +11,9 @@
 @subsection Funciones y variables para Constantes
 
 @defvr {Constante} %e
-@ifinfo
 @vrindex e
 @vrindex Número de Euler
 @vrindex Base de los logaritmos naturales
-@end ifinfo
 El símbolo @code{%e} representa a la base de los logaritmos
 naturales, también conocido como número de Euler. El valor numérico
 de @code{%e} es el número decimal en coma flotante 2.718281828459045d0.
@@ -24,10 +22,8 @@ de @code{%e} es el número decimal en coma flotante 2.718281828459045d0.
 
 
 @defvr {Constante} %i
-@ifinfo
 @vrindex i
 @vrindex Unidad imaginaria
-@end ifinfo
 El símbolo @code{%i} representa la unidad imaginaria, @math{sqrt(- 1)}.
 
 @end defvr
@@ -42,9 +38,8 @@ Lisp.
 
 
 @defvr {Constante} %gamma
-@ifinfo
 @vrindex Constante de Euler-Mascheroni
-@end ifinfo
+
 Es la constante de Euler-Mascheroni, 0.5772156649015329 ....
 
 @end defvr
@@ -52,9 +47,7 @@ Es la constante de Euler-Mascheroni, 0.5772156649015329 ....
 
 
 @defvr {Constante} ind
-@ifinfo
 @vrindex Indeterminado
-@end ifinfo
 
 @code{ind} representa un resultado acotado indeterminado.
 
@@ -72,32 +65,27 @@ Ejemplo:
 @end defvr
 
 @defvr {Constante} inf
-@ifinfo
 @vrindex Más infinito
-@end ifinfo
+
 El símbolo @code{inf} representa al infinito real positivo.
 @end defvr
 
 @defvr {Constante}  infinity
-@ifinfo
 @vrindex Infinito complejo
-@end ifinfo
+
 El símbolo @code{infinity} representa al infinito complejo.
 @end defvr
 
 @defvr {Constante} minf
-@ifinfo
 @vrindex Menos infinito
 @vrindex Infinito negativo
-@end ifinfo
+
 El símbolo @code{minf} representa al infinito real negativo.
 @end defvr
 
 @defvr {Constante} %phi
-@ifinfo
 @vrindex phi
 @vrindex Razón áurea
-@end ifinfo
 
 El símbolo @code{%phi} representa a la llamada @i{razón áurea},
 @math{(1 + sqrt(5))/2}.
@@ -174,9 +162,8 @@ que contengan @code{%phi}.
 
 
 @defvr {Constante} %pi
-@ifinfo
 @vrindex pi
-@end ifinfo
+
 El símbolo @code{%pi} representa la razón entre la longitud de
 una circunferencia y su radio. 
 El valor numérico de @code{%pi} es el número decimal en coma flotante 3.141592653589793d0.
@@ -189,9 +176,7 @@ Lisp.
 @end defvr
 
 @defvr {Constante} und
-@ifinfo
 @vrindex Indefinido
-@end ifinfo
 
 @code{und} representa un resultado indefinido.
 

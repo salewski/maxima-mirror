@@ -193,25 +193,15 @@ Incorrect syntax: # is not a prefix operator
 
 
 @deffn {Operador} +
-@ifinfo
 @fnindex Suma
-@end ifinfo
 @deffnx {Operador} -
-@ifinfo
 @fnindex Resta
-@end ifinfo
 @deffnx {Operador} *
-@ifinfo
 @fnindex Multiplicación
-@end ifinfo
 @deffnx {Operador} /
-@ifinfo
 @fnindex División
-@end ifinfo
 @deffnx {Operador} ^
-@ifinfo
 @fnindex Exponenciación
-@end ifinfo
 
 Los símbolos @code{+} @code{*} @code{/} y @code{^} representan
 la suma, resta, multiplicación, división y exponenciación, respectivamente.
@@ -464,9 +454,7 @@ Ejemplos:
 
 
 @deffn {Operator} ^^
-@ifinfo
 @fnindex Exponenciación no conmutativa
-@end ifinfo
 
 Operador de exponenciación no conmutativa.
 Se trata del operador de exponenciación correspondiente a la
@@ -498,9 +486,8 @@ Ejemplos:
 
 
 @deffn {Operador} .
-@ifinfo
 @fnindex Multiplicación no conmutativa
-@end ifinfo
+
 El operador punto, para multiplicación de matrices (no-conmutativo). 
 Cuando @code{"."} se usa de esta forma, se dejarán espacios a
 ambos lados de éste, como en @code{A . B}. Así se evita que se confunda con el punto decimal de los números. 
@@ -532,21 +519,13 @@ y
 
 
 @deffn {Operator} <
-@ifinfo
 @fnindex Menor que
-@end ifinfo
 @deffnx {Operator} <=
-@ifinfo
 @fnindex Menor o igual que
-@end ifinfo
 @deffnx {Operator} >=
-@ifinfo
 @fnindex Mayor o igual que
-@end ifinfo
 @deffnx {Operator} >
-@ifinfo
 @fnindex Mayor que
-@end ifinfo
 
 Los símbolos @code{<}, @code{<=}, @code{>=} y @code{>}
 representan menor que, menor o igual que, mayor o igual que y mayor que, respectivamente.
@@ -636,9 +615,7 @@ argumentos sí sean evaluados.
 
 
 @deffn {Operador} and
-@ifinfo
 @fnindex Conjunción lógica
-@end ifinfo
 Operador de conjunción lógica.
 El operador @code{and} es un operador infijo @code{n}-ario;
 sus operandos son expresiones booleanas y su resultado es un valor lógico.
@@ -665,9 +642,8 @@ El operador @code{and} no es conmutativo:
 
 
 @deffn {Operador} not
-@ifinfo
 @fnindex Negación lógica
-@end ifinfo
+
 Operador de negación lógica. El operador @code{not} es un operador prefijo;
 su operando es una expresión booleana y su resultado es un valor lógico.
 
@@ -686,9 +662,8 @@ al ser evaluados, el resultado es una expresión booleana.
 
 
 @deffn {Operador} or
-@ifinfo
 @fnindex Disyunción lógica
-@end ifinfo
+
 Operador de disyunción lógica. El operador @code{or} es un operador infijo @code{n}-ario;
 sus operandos son expresiones booleanas y su resultado es un valor lógico.
 
@@ -720,9 +695,8 @@ El operador @code{or} no es conmutativo: @code{a or b} puede no ser igual a @cod
 
 
 @deffn {Operador} #
-@ifinfo
 @fnindex Negación de la igualdad sintáctica
-@end ifinfo
+
 Representa la negación de la igualdad sintáctica @code{=}.
 
 Nótese que debido a las reglas de evaluación de expresiones
@@ -762,10 +736,9 @@ Ejemplos:
 
 
 @deffn {Operador} =
-@ifinfo
 @fnindex Operador de ecuación
 @fnindex Igualdad sintáctica
-@end ifinfo
+
 Operador de ecuación.
 
 La expresión @code{@var{a} = @var{b}} representa una ecuación
@@ -916,9 +889,8 @@ obliga a la evaluación previa de @var{expr},
 
 
 @deffn {Operador} :
-@ifinfo
 @fnindex Operador de asignación
-@end ifinfo
+
 Operador de asignación.
 
 Cuando el miembro de la izquierda es una variable simple (no subindicada),
@@ -1043,9 +1015,8 @@ de @code{a} y @code{b} se intercambian en este ejemplo.
 
 
 @deffn {Operador} ::
-@ifinfo
 @fnindex Operador de asignación (evalúa el miembro izquierdo)
-@end ifinfo
+
 Operador de asignación.
 
 El operador @code{::} es similar a @code{:}, excepto que @code{::}
@@ -1087,9 +1058,8 @@ Ejemplos:
 
 
 @deffn {Operador} ::=
-@ifinfo
 @fnindex Operador de definición de funciones macro
-@end ifinfo
+
 El operador de definición de macros @code{::=} define una función (llamada macro por razones históricas) que no evalúa sus argumentos, siendo la expresión que retorna (llamada "macroexpansión") evaluada dentro del contexto desde el cual se ha invocado la macro. En cualquier otro sentido, una función macro es igual que una función ordinaria.
 
 @code{macroexpand} devuelve la expresión que a su vez fue devuelta por una macro (sin evaluar la expresión);
@@ -1199,9 +1169,7 @@ x is equal to 1234 - 1729 w
 
 
 @deffn {Operador} :=
-@ifinfo
 @fnindex Operador de definición de funciones
-@end ifinfo
 
 El operador de definición de funciones. 
 La expresión @code{@var{f}(@var{x_1}, ..., @var{x_n}) := @var{expr}}

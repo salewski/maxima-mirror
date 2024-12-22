@@ -20,9 +20,7 @@ fue escrito por Barton Willis de la Universidad de Nebraska en Kearney.
 
 
 @deffn {Operador} %and
-@ifinfo
 @fnindex Conjunción lógica
-@end ifinfo
 
 El operador @code{%and} es una conjunción lógica. Maxima simplifica
 una expresión @code{%and} a @code{true}, @code{false} o a una expresión
@@ -115,9 +113,7 @@ Véanse también @code{%or}, @code{%if}, @code{and}, @code{or} y @code{not}.
 
 
 @deffn {Operador} %if ( @var{bool}, @var{a}, @var{b})
-@ifinfo
 @fnindex Evaluación condicionada
-@end ifinfo
 
 El operador @code{%if} es un condicional. La condición @var{bool}
 debe tomar un valor lógico; cuando sea @code{true}, se devolverá
@@ -163,9 +159,7 @@ Para hacer uso de este operador, ejecútese @code{load("to_poly_solve")}.
 
   
 @deffn {Operador} %or
-@ifinfo
 @fnindex Disyunción lógica
-@end ifinfo
 
 El operador @code{%or} es una disyunción lógica. Maxima simplifica
 una expresión @code{%or} a @code{true}, @code{false} o a una expresión

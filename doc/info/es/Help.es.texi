@@ -182,9 +182,7 @@ _
 @deffn {Función} describe (@var{string})
 @deffnx {Función} describe (@var{string}, exact)
 @deffnx {Función} describe (@var{string}, inexact)
-@ifinfo
 @fnindex Ayuda
-@end ifinfo
 La sentencia @code{describe(@var{string})} equivale a @code{describe(@var{string}, exact)}.
 
 La sentencia @code{describe(@var{string}, exact)} encuentra el elemento, si

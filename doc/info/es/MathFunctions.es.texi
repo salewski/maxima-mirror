@@ -559,9 +559,8 @@ Devuelve una expresión de la forma @code{a + b %i} equivalente a @var{expr}, co
 
 
 @deffn {Operador} !!
-@ifinfo
 @fnindex Doble factorial
-@end ifinfo
+
 El operador doble factorial.
 
 Para un número entero, de punto flotante o racional @code{n},
