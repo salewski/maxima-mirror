@@ -659,3 +659,12 @@ foo(1)(x)^3;
 [acos(1), acos(1.0), acos(1b0)];
 [0, 0.0, 0b0];
 
+/* Bug 4461: funny error message from sec(%pi/2)
+ *
+ * Test that the error messages are reasonable and correct now.
+ */
+block([errormsg: false], errcatch(sec(%pi/2)), error);
+["~A: argument ~:M isn't in the domain of ~A.",sec,%pi/2,sec];
+
+block([errormsg: false], errcatch(cot(%pi)), error);
+["~A: argument ~:M isn't in the domain of ~A.",cot,%pi,cot];
