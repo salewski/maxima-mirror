@@ -45,7 +45,24 @@
   (setf (get x 'distribute_over) '(mlist $matrix mequal)))
 
 (defun domain-error (x f)
-  (merror (intl:gettext "~A: argument ~:M isn't in the domain of ~A.") f (if (complexp x) (complexify x) x) f))
+  (merror (intl:gettext "~A: argument ~:M isn't in the domain of ~A.")
+          f
+          (if (complexp x) (complexify x) x)
+          f))
+
+(defun handle-%piargs-trig (form y name)
+  "Handle errors from calling %piargs-tan/cot and %piargs-csc/sec. Any
+  errors from these functions get resignaled with a domain-error with
+  the given Y value and NAME.
+
+  FORM should basically be a call to %piargs-tan/cot or
+  %piargs-csc/sec, possibly with a different arg than Y."
+  (handler-case
+      (let ((errcatch t)
+            ($errormsg nil))
+        (funcall form))
+    (maxima-$error ()
+      (domain-error y name))))
 
 ;; Some Lisp implementations goof up branch cuts for ASIN, ACOS, and/or ATANH.
 ;; Here are definitions which have the right branch cuts
@@ -559,26 +576,11 @@
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) (domain-error y 'cot))
 			       ((and (has-const-or-int-term y '$%pi)
-				     (setq z 
-                                           ;; cot(x) = -tan(x+%pi/2).
-                                           ;;
-                                           ;; Catch the domain
-                                           ;; error from
-                                           ;; %piargs-tan/cot and
-                                           ;; resignal it with the
-                                           ;; correct message and
-                                           ;; function.
-                                           (handler-case
-                                               (let ((errcatch t)
-                                                     ($errormsg nil))
-                                                 (%piargs-tan/cot (add %pi//2 y)))
-                                             (maxima-$error ()
-                                               ;; Resignal the
-                                               ;; domain error
-                                               ;; with the correct
-                                               ;; arg and function
-                                               ;; name.
-                                               (domain-error y 'cot)))))
+				     (setq z
+                                           (handle-%piargs-trig
+                                            #'(lambda ()
+                                                (%piargs-tan/cot (add %pi//2 y)))
+                                            y 'cot)))
 				(neg z)))))
 	  ((and $%iargs (multiplep y '$%i)) (mul -1 '$%i (ftake* '%coth (coeff y '$%i 1))))
 	  ((and $triginverses (not (atom y))
@@ -644,12 +646,9 @@
 	  ((and $%piargs
                 (cond ((zerop1 y) (domain-error y 'csc))
 		      ((has-const-or-int-term y '$%pi)
-                       (handler-case
-                           (let ((errcatch t)
-                                 ($errormsg nil))
-                             (%piargs-csc/sec y))
-                         (maxima-$error ()
-                           (domain-error y 'csc)))))))
+                       (handle-%piargs-trig #'(lambda ()
+                                                (%piargs-csc/sec y))
+                                            y 'csc)))))
 	  ((and $%iargs (multiplep y '$%i)) (mul -1 '$%i (ftake* '%csch (coeff y '$%i 1))))
 	  ((and $triginverses (not (atom y))
 		(cond ((eq '%acsc (setq z (caar y))) (cadr y))
@@ -674,12 +673,9 @@
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) 1)
 			       ((has-const-or-int-term y '$%pi)
-                                (handler-case
-                                    (let ((errcatch t)
-                                          ($errormsg nil))
-                                      (%piargs-csc/sec (add %pi//2 y)))
-                                  (maxima-$error ()
-                                    (domain-error y 'sec)))))))
+                                (handle-%piargs-trig #'(lambda ()
+                                                         (%piargs-csc/sec (add %pi//2 y)))
+                                                     y 'sec)))))
 	  ((and $%iargs (multiplep y '$%i)) (ftake* '%sech (coeff y '$%i 1)))
 	  ((and $triginverses (not (atom y))
 		(cond ((eq '%asec (setq z (caar y))) (cadr y))
