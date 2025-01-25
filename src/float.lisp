@@ -748,6 +748,13 @@
 		      (if (free y '$%i)
 			  y (let ($ratprint) (fparcsimp ($rectform y)))))
 		     ((member (caar x) '(%cot %sec %csc) :test #'eq)
+                      (when (equal (second x) bigfloatzero)
+                        ;; Ideally we should use DOMAIN-ERROR, but
+                        ;; that doesn't handle bfloats.
+                        (merror (intl:gettext "~M: argument ~:M isn't in the domain of ~M.")
+                                (caar x)
+                                (second x)
+                                (caar x)))
 		      (invertbigfloat
 		       ($bfloat (list (ncons (safe-get (caar x) 'recip)) y))))
 		     (t ($bfloat (exponentialize (caar x) y))))
