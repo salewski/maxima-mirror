@@ -45,7 +45,7 @@
   (setf (get x 'distribute_over) '(mlist $matrix mequal)))
 
 (defun domain-error (x f)
-  (merror (intl:gettext "~A: argument ~:M isn't in the domain of ~A.") f (complexify x) f))
+  (merror (intl:gettext "~A: argument ~:M isn't in the domain of ~A.") f (if (complexp x) (complexify x) x) f))
 
 ;; Some Lisp implementations goof up branch cuts for ASIN, ACOS, and/or ATANH.
 ;; Here are definitions which have the right branch cuts
@@ -428,7 +428,7 @@
 (def-simplifier sin (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (car form) :test #'eq)) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) 0)
 			       ((has-const-or-int-term y '$%pi) (%piargs-sin/cos y)))))
@@ -451,7 +451,7 @@
 (def-simplifier cos (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (car form) :test #'eq)) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) 1)
 			       ((has-const-or-int-term y '$%pi)
@@ -532,7 +532,7 @@
 (def-simplifier tan (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (car form) :test #'eq)) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) 0)
 			       ((has-const-or-int-term y '$%pi) (%piargs-tan/cot y)))))
@@ -555,7 +555,7 @@
 (def-simplifier cot (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (car form) :test #'eq)) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) (domain-error y 'cot))
 			       ((and (has-const-or-int-term y '$%pi)
@@ -603,7 +603,7 @@
       (cond ((zerop1 sin-of-coeff-pi) 
 	     0)		;; tan(integer*%pi)
 	    ((zerop1 cos-of-coeff-pi)
-	     (merror (intl:gettext "tan: ~M isn't in the domain of tan.") x))
+	     (domain-error x 'tan))
 	    (cos-of-coeff-pi
 	     (div sin-of-coeff-pi cos-of-coeff-pi))))
 
@@ -620,7 +620,7 @@
 (def-simplifier csc (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (car form) :test #'eq)) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) (domain-error y 'csc))
 			       ((has-const-or-int-term y '$%pi) (%piargs-csc/sec y)))))
@@ -644,7 +644,7 @@
 (def-simplifier sec (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (car form) :test #'eq)) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) 1)
 			       ((has-const-or-int-term y '$%pi) (%piargs-csc/sec (add %pi//2 y))))))
@@ -679,7 +679,7 @@
 
 (def-simplifier atan (y)
   (cond ((flonum-eval (mop form) y))
-        ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+        ((and (not (member 'simp (car form) :test #'eq)) (big-float-eval (mop form) y)))
         ((taylorize (mop form) (second form)))
         ;; Simplification for special values
         ((zerop1 y) y)
