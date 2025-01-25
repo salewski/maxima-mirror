@@ -748,7 +748,16 @@
 		      (if (free y '$%i)
 			  y (let ($ratprint) (fparcsimp ($rectform y)))))
 		     ((member (caar x) '(%cot %sec %csc) :test #'eq)
-                      (when (equal (second x) bigfloatzero)
+                      ;; Compute these functions using the reciprocal
+                      ;; function.  Thus cot(x) = 1/tan(x).
+                      ;;
+                      ;; sec(x) = 1/cos(x) and 0 is in the domain of
+                      ;; sec, so we don't need a domain error for sec.
+                      ;; However, sec(%pi/2) is not in the domain, but
+                      ;; we can never have a bigfloat exactly equal to
+                      ;; %pi/2, so no problem there.
+                      (when (and (not (eq (caar x) '%sec))
+                                 (equal (second x) bigfloatzero))
                         ;; Ideally we should use DOMAIN-ERROR, but
                         ;; that doesn't handle bfloats.
                         (merror (intl:gettext "~M: argument ~:M isn't in the domain of ~M.")
