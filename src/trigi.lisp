@@ -641,8 +641,15 @@
     (cond ((flonum-eval (mop form) y))
 	  ((and (not (member 'simp (car form) :test #'eq)) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
-	  ((and $%piargs (cond ((zerop1 y) (domain-error y 'csc))
-			       ((has-const-or-int-term y '$%pi) (%piargs-csc/sec y)))))
+	  ((and $%piargs
+                (cond ((zerop1 y) (domain-error y 'csc))
+		      ((has-const-or-int-term y '$%pi)
+                       (handler-case
+                           (let ((errcatch t)
+                                 ($errormsg nil))
+                             (%piargs-csc/sec y))
+                         (maxima-$error ()
+                           (domain-error y 'csc)))))))
 	  ((and $%iargs (multiplep y '$%i)) (mul -1 '$%i (ftake* '%csch (coeff y '$%i 1))))
 	  ((and $triginverses (not (atom y))
 		(cond ((eq '%acsc (setq z (caar y))) (cadr y))
