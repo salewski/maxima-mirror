@@ -559,7 +559,26 @@
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) (domain-error y 'cot))
 			       ((and (has-const-or-int-term y '$%pi)
-				     (setq z (%piargs-tan/cot (add %pi//2 y))))
+				     (setq z 
+                                           ;; cot(x) = -tan(x+%pi/2).
+                                           ;;
+                                           ;; Catch the domain
+                                           ;; error from
+                                           ;; %piargs-tan/cot and
+                                           ;; resignal it with the
+                                           ;; correct message and
+                                           ;; function.
+                                           (handler-case
+                                               (let ((errcatch t)
+                                                     ($errormsg nil))
+                                                 (%piargs-tan/cot (add %pi//2 y)))
+                                             (maxima-$error ()
+                                               ;; Resignal the
+                                               ;; domain error
+                                               ;; with the correct
+                                               ;; arg and function
+                                               ;; name.
+                                               (domain-error y 'cot)))))
 				(neg z)))))
 	  ((and $%iargs (multiplep y '$%i)) (mul -1 '$%i (ftake* '%coth (coeff y '$%i 1))))
 	  ((and $triginverses (not (atom y))
@@ -647,7 +666,13 @@
 	  ((and (not (member 'simp (car form) :test #'eq)) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) 1)
-			       ((has-const-or-int-term y '$%pi) (%piargs-csc/sec (add %pi//2 y))))))
+			       ((has-const-or-int-term y '$%pi)
+                                (handler-case
+                                    (let ((errcatch t)
+                                          ($errormsg nil))
+                                      (%piargs-csc/sec (add %pi//2 y)))
+                                  (maxima-$error ()
+                                    (domain-error y 'sec)))))))
 	  ((and $%iargs (multiplep y '$%i)) (ftake* '%sech (coeff y '$%i 1)))
 	  ((and $triginverses (not (atom y))
 		(cond ((eq '%asec (setq z (caar y))) (cadr y))
