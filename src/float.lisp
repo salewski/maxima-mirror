@@ -761,7 +761,7 @@
                       ;; are no other bfloat values where tan(x) or
                       ;; sin(x) is zero.
                       (when (equal (second x) bigfloatzero)
-                        (domain-error x (caar x)))
+                        (domain-error (second x) (caar x)))
 		      (invertbigfloat
 		       ($bfloat (list (ncons (safe-get (caar x) 'recip)) y))))
 		     (t ($bfloat (exponentialize (caar x) y))))
