@@ -574,14 +574,15 @@
     (cond ((flonum-eval (mop form) y))
 	  ((and (not (member 'simp (car form) :test #'eq)) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
-	  ((and $%piargs (cond ((zerop1 y) (domain-error y 'cot))
-			       ((and (has-const-or-int-term y '$%pi)
-				     (setq z
-                                           (handle-%piargs-trig
-                                            #'(lambda ()
-                                                (%piargs-tan/cot (add %pi//2 y)))
-                                            y '%cot)))
-				(neg z)))))
+	  ((and $%piargs
+                (cond ((zerop1 y) (domain-error y 'cot))
+		      ((and (has-const-or-int-term y '$%pi)
+			    (setq z
+                                  (handle-%piargs-trig
+                                   #'(lambda ()
+                                       (%piargs-tan/cot (add %pi//2 y)))
+                                   y '%cot)))
+		       (neg z)))))
 	  ((and $%iargs (multiplep y '$%i)) (mul -1 '$%i (ftake* '%coth (coeff y '$%i 1))))
 	  ((and $triginverses (not (atom y))
 		(cond ((eq '%acot (setq z (caar y))) (cadr y))
