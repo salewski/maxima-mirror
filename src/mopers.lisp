@@ -150,5 +150,50 @@
 (defmacro mdo-unless (x) `(seventh ,x))
 (defmacro mdo-body (x)	 `(eighth ,x))
 
-(defmacro defgrad (name arguments &body body)
-  `(defprop ,name (,arguments ,@body) grad))
+(defvar *grad-table*
+  "Hash table for the derivatives of a function.  The key is the
+  function.  The value contains information about the arglist of the
+  function and the corresponding (partial) derivatives."
+  (make-hash-table :test 'eq))
+
+;; Define the derivatives of a function.  An example is:
+;;
+;; (defgrad %jacobi_sn (u m)
+;;  "jacobi_cn(u,m)*jacobi_dn(u,m)"
+;;  "(jacobi_cn(u,m)*jacobi_dn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
+;;     /(2*m)
+;;     +(jacobi_cn(u,m)^2*jacobi_sn(u,m))/(2*(1-m))$)")
+;;
+;; NAME is the verb name of the function for which we're defining the
+;; derivatives.  ARGLIST is the arglist of the function.  Then the
+;; body consists of strings for the derivative of the function for
+;; each of the variables.  The list is in the same order as the
+;; variables in the arglist.
+(defmacro defgrad (name arglist &body body)
+  `(setf (gethash ',name *grad-table*)
+         `(,',arglist ,',body)))
+
+(defun process-grad-table ()
+  "Process the entries in *GRAD-TABLE* to set the `grad property of each
+  function in the table."
+  (flet ((ensure-semi-colon (s)
+           ;; Make sure each string ends with a semicolon by adding
+           ;; one if needed.
+           (let ((end (length s)))
+             (if (char= #\; (aref s (1- end)))
+                 s
+                 (concatenate 'string s ";")))))
+    (maphash
+     #'(lambda (name info)
+         (destructuring-bind (arglist grad-list)
+             info
+           ;; Set up the grad property.  We need to dollarify the
+           ;; arglist because we read the strings which will dollarify
+           ;; any variables in the expression.
+           (setf (get name 'grad)
+                 (list* (rest (dollarify arglist))
+                        (mapcar #'(lambda (g)
+                                    (with-input-from-string (stream (ensure-semi-colon g))
+                                      (caddr (mread stream))))
+                                grad-list)))))
+     *grad-table*)))

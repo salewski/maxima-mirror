@@ -944,3 +944,6 @@ maxima [options] --batch-string='batch_answers_from_file:false; ...'
   (let ((path *load-pathname*))
     (make-pathname :directory (pathname-directory path)
                    :device (pathname-device path))))
+
+;; Process the grad table now to set up all the defined derivatives.
+(process-grad-table)
