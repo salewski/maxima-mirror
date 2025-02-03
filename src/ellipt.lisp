@@ -784,8 +784,9 @@
 ;;
 ;;      - sn^2/dn/2
 ;;
-;;   = -1/2*sn*cn*[u-elliptic_e(asin(sn),m)/(1-m)] + dn*sn^2/2/(m-1)
+;;   = -1/2*sn*cn*[u-elliptic_e(asin(sqn),m)/(1-m)] + dn*sn^2/2/(m-1)
 ;;
+#+nil
 (defprop %jacobi_sn
     ((u m)
      ((mtimes) ((%jacobi_cn) u m) ((%jacobi_dn) u m))
@@ -800,6 +801,13 @@
 	 ((%elliptic_e simp) ((%asin simp) ((%jacobi_sn simp) u m)) m))))))
   grad)
 
+(defgrad %jacobi_sn (u m)
+  "jacobi_cn(u,m)*jacobi_dn(u,m)"
+  "(jacobi_cn(u,m)*jacobi_dn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
+     /(2*m)
+     +(jacobi_cn(u,m)^2*jacobi_sn(u,m))/(2*(1-m))$)")
+
+#+nil
 (defprop %jacobi_cn
     ((u m)
      ((mtimes simp) -1 ((%jacobi_sn simp) u m) ((%jacobi_dn simp) u m))
@@ -814,6 +822,13 @@
 	 ((%elliptic_e simp) ((%asin simp) ((%jacobi_sn simp) u m)) m))))))
   grad)
 
+(defgrad %jacobi_cn (u m)
+  "-(jacobi_dn(u,m)*jacobi_sn(u,m))"
+  "-((jacobi_dn(u,m)*jacobi_sn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
+ /(2*m))
+ -(jacobi_cn(u,m)*jacobi_sn(u,m)^2)/(2*(1-m))")
+
+#+nil
 (defprop %jacobi_dn
     ((u m)
      ((mtimes) -1 m ((%jacobi_sn) u m) ((%jacobi_cn) u m))
@@ -828,6 +843,12 @@
 	 ((mexpt simp) ((mplus simp) 1 ((mtimes simp) -1 m)) -1)
 	 ((%elliptic_e simp) ((%asin simp) ((%jacobi_sn simp) u m)) m))))))
   grad)
+
+(defgrad %jacobi_dn (u m)
+  "-(m*jacobi_cn(u,m)*jacobi_sn(u,m))"
+  "-((jacobi_cn(u,m)*jacobi_sn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
+ /2)
+ -(jacobi_dn(u,m)*jacobi_sn(u,m)^2)/(2*(1-m))")
 
 ;; The inverse elliptic functions.
 ;;
