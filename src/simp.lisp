@@ -274,9 +274,9 @@
 ;; These check for the correct number of operands within Macsyma expressions,
 ;; not arguments in a procedure call as the name may imply.
 
-(defun arg-count-check (required-arg-count expr)
+(defun arg-count-check (required-arg-count expr &optional (pretty-name (caar expr)))
   (unless (= required-arg-count (length (rest expr)))
-    (wna-err expr required-arg-count)))
+    (wna-err expr required-arg-count pretty-name)))
 
 (defun oneargcheck (expr)
   (arg-count-check 1 expr))
@@ -292,9 +292,9 @@
 ;;
 ;; Otherwise, EXPR must be a symbol and a generic message is printed.
 ;; (This is for backward compatibility for existing uses of WNA-ERR.)
-(defun wna-err (exprs &optional required-arg-count)
+(defun wna-err (exprs &optional required-arg-count (pretty-name (caar exprs)))
   (if required-arg-count
-      (let ((op (caar exprs))
+      (let ((op pretty-name)
 	    (actual-count (length (rest exprs))))
 	(merror (intl:gettext "~M: expected exactly ~M arguments but got ~M: ~M")
 		op required-arg-count actual-count (list* '(mlist) (rest exprs))))
