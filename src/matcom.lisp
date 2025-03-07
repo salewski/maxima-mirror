@@ -351,6 +351,7 @@
 	      (return name)))))
 
 (defmspec $tellsimp (form)
+  (twoargcheck form)
   (let ((meta-prop-p nil))
     (proc-$tellsimp (cdr form))))
 
@@ -457,6 +458,7 @@
 
 
 (defmspec $tellsimpafter (form)
+  (twoargcheck form)
   (let ((meta-prop-p nil))
     (proc-$tellsimpafter (cdr form))))
 
@@ -554,8 +556,8 @@
   (prog (pt rhs boundlist reflist topreflist name a program lhs* rhs*   tem) 
      (if (not (= (length l) 3)) (wna-err '$defrule))
      (setq name (car l))
-     (if (or (not (symbolp name)) (mopp name) (member name '($all $%) :test #'eq))
-	 (merror (intl:gettext "defrule: rule name must be a symbol, and not an operator or 'all' or '%'; found: ~M") name))
+     (if (or (not (symbolp name)) (eq t name) (eq nil name) (mopp name) (member name '($all $%) :test #'eq))
+       (merror (intl:gettext "defrule: rule name must be a symbol other than 'true', 'false', an operator, 'all' or '%'; found: ~M") name))
      (setq pt (copy-tree (setq lhs* (simplify (cadr l)))))
      (setq rhs (copy-tree (setq rhs* (simplify (caddr l)))))
      (setq a (genref))

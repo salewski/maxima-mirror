@@ -255,7 +255,7 @@
     `(progn
        ,@maybe-reset
        ,@maybe-declare-type
-       (defvar ,var ,val ,doc)
+       ,(if doc `(defvar ,var ,val ,doc) `(defvar ,var ,val))
        ,@maybe-set-props
        ,@maybe-predicate)))
 
@@ -684,7 +684,7 @@
 (defmvar $display2d t
   "Causes equations to be drawn in two dimensions.  Otherwise, drawn
   linearly."
-  :setting-list (nil t))
+  :setting-list (nil t $emaxima $imaxima))
 
 (defmvar $lispdisp nil
   "Causes symbols not having $ as the first character in their pnames to

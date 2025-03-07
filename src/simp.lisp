@@ -92,32 +92,6 @@
        (consp (car x))
        (eq (caar x) 'bigfloat)))
 
-(declaim (inline decompose-bigfloat))
-(defun decompose-bigfloat (x)
-  "Returns precision, mantissa and exponent of bigfloat X"
-  (values
-    (car (last (car x))) ; precision
-    (cadr x)             ; mantissa
-    (caddr x)))          ; exponent
-
-(declaim (inline bigfloat-as-m/2^n))
-(defun bigfloat-as-m/2^n (x)
-  "For bigfloat X, returns m, n such that X = m/(2^n)"
-  (multiple-value-bind (precision mantissa exponent) (decompose-bigfloat x)
-    (if (> exponent 0)
-      (values (ash mantissa exponent) precision)
-      (values mantissa (- precision exponent)))))
-
-(defun compare-bigfloats (x y)
-  "For bigfloats X and Y, returns signum(X-Y) without computing X-Y"
-  (multiple-value-bind (xm xn) (bigfloat-as-m/2^n x)
-    (multiple-value-bind (ym yn) (bigfloat-as-m/2^n y)
-      (let ((n-diff (- xn yn)))
-        (cond
-          ((> n-diff 0) (signum (- xm (ash ym n-diff))))
-          ((< n-diff 0) (signum (- (ash xm (- n-diff)) ym)))
-          (t (signum (- xm ym))))))))
-
 (declaim (inline zerop1))
 (defun zerop1 (x)
   "Returns non-NIL if X is an integer, float, or bfloat that is equal
@@ -135,8 +109,12 @@
     ((integerp x) (= 1 x))
     ((floatp x) (= 1.0 x))
     (($bfloatp x)
-      ;; Bigfloats representing 1 are of the form '((BIGFLOAT ... n) 2^(n-1) 1).
-      (and (= 1 (caddr x)) (= (ash 1 (1- (car (last (car x))))) (cadr x))))))
+      ;; Binary bigfloat ones are of the form '((BIGFLOAT [SIMP] <P>) 2^(<P>-1) 1).
+      ;; Decimal bigfloat ones are of the form '((BIGFLOAT [SIMP] <P> DECIMAL) 1 0).
+      ;; The SIMP flag is optional.
+      (if (eq 'decimal (car (last (car x))))
+        (and (= 1 (cadr x)) (zerop (caddr x)))
+        (and (= 1 (caddr x)) (= (ash 1 (1- (car (last (car x))))) (cadr x)))))))
 
 (declaim (inline mnump))
 (defun mnump (x)
@@ -321,11 +299,6 @@
 
 (defun improper-arg-err (exp fn)
   (merror (intl:gettext "~:M: improper argument: ~M") fn exp))
-
-(defun subargcheck (form subsharp argsharp fun)
-  (if (or (not (= (length (subfunsubs form)) subsharp))
-	  (not (= (length (subfunargs form)) argsharp)))
-      (merror (intl:gettext "~:@M: wrong number of arguments or subscripts.") fun)))
 
 ;; Constructor and extractor primitives for subscripted functions, e.g.
 ;; F[1,2](X,Y).  SUBL is (1 2) and ARGL is (X Y).
@@ -529,8 +502,7 @@
         ((and $distribute_over
               (get (caar x) 'distribute_over)
               ;; A function with the property 'distribute_over.
-              ;; Look, if we have a bag as argument to the function.
-              (distribute-over x)))
+              (distribute-over x y)))
 	((get (caar x) 'opers)
 	 (let ((opers-list *opers-list)) (oper-apply x y)))
 	((and (eq (caar x) 'mqapply)
@@ -592,17 +564,18 @@
 	  (t
 	   (rplaca x (cons (caar x) '(simp)))))))
 
-;; A function, which distributes of bags like a list, matrix, or equation.
-;; Check, if we have to distribute of one of the bags or any other operator.
-(defun distribute-over (expr)
+;; A function which distributes over bags like a list, matrix, or equation,
+;; or any other operator.
+(defun distribute-over (expr args-simped)
   (cond ((= 1 (length (cdr expr)))
          ;; Distribute over for a function with one argument.
          (cond ((and (not (atom (cadr expr)))
                      (member (caaadr expr) (get (caar expr) 'distribute_over)))
-                (simplify
+                (simplifya
                   (cons (caadr expr)
-                        (mapcar #'(lambda (u) (simplify (list (car expr) u)))
-                                (cdadr expr)))))
+                        (mapcar #'(lambda (u) (simplifya (list (car expr) u) args-simped))
+                                (cdadr expr)))
+                  t))
                 (t nil)))
         (t
          ;; A function with more than one argument.
@@ -614,17 +587,18 @@
                               (get (caar expr) 'distribute_over)))
              ;; Distribute the function over the arguments and simplify again.
              (return 
-               (simplify 
+               (simplifya
                  (cons (ncons (caar (car args)))
                        (mapcar #'(lambda (u) 
-                                   (simplify 
+                                   (simplifya
                                      (append 
                                        (append 
                                          (cons (ncons (caar expr))
                                                (reverse first-args))
                                          (ncons u))
-                                       (rest args))))
-                               (cdr (car args)))))))
+                                       (rest args)) args-simped))
+                               (cdr (car args))))
+                 t)))
            (setq first-args (cons (car args) first-args))))))
 
 (defun rulechk (x) (or (mget x 'oldrules) (get x 'rules)))
@@ -1431,7 +1405,7 @@
               (consp y)
               (member (caar y) '(%product $product)))
          (let ((new-op (if (char= (get-first-char (caar y)) #\%) '%sum '$sum)))
-           (simplifya `((,new-op) ((%log) ,(cadr y)) ,@(cddr y)) t)))
+           (simplifya `((,new-op) ((%log) ,(cadr y)) ,@(cddr y)) nil)))
         ((and $lognegint
               (maxima-integerp y)
               (eq ($sign y) '$neg))
@@ -1463,10 +1437,10 @@
 (defmfun $sqrt (z)
   (simplify (list '(%sqrt) z)))
 
-(defun simp-sqrt (x ignored z)
-  (declare (ignore ignored))
+(defun simp-sqrt (x y z)
   (oneargcheck x)
-  (simplifya (list '(mexpt) (cadr x) '((rat simp) 1 2)) z))
+  (setq y (list '(mexpt) (cadr x) '((rat simp) 1 2)))
+  (if z y (simplifya y nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1825,7 +1799,7 @@
 	y)
     (unless (or (= l1 2) (= l1 4) (= l1 5))
       (merror (intl:gettext "limit: wrong number of arguments.")))
-    (setq y (simpmap (cdr x) z))
+    (setq y (if z (cdr x) (simpmap (cdr x) nil)))
     (cond ((and (= l1 5) (not (member (cadddr y) '($plus $minus))))
            (merror (intl:gettext "limit: direction must be either 'plus' or 'minus': ~M") (cadddr y)))
 	  ((mnump (cadr y))
@@ -1841,7 +1815,7 @@
 	y)
     (unless (or (= l1 3) (= l1 5))
       (merror (intl:gettext "integrate: wrong number of arguments.")))
-    (setq y (simpmap (cdr x) z))
+    (setq y (if z (cdr x) (simpmap (cdr x) nil)))
     (cond ((mnump (cadr y))
 	   (merror (intl:gettext "integrate: variable must not be a number; found: ~M") (cadr y)))
 	  ((and (= l1 5) (alike1 (caddr y) (cadddr y)))
@@ -1883,10 +1857,10 @@
 (defmfun $exp-form (z)
   (list '(mexpt) '$%e z))
 
-(defun simp-exp (x ignored z)
-  (declare (ignore ignored))
+(defun simp-exp (x y z)
   (oneargcheck x)
-  (simplifya (list '(mexpt) '$%e (cadr x)) z))
+  (setq y (list '(mexpt) '$%e (cadr x)))
+  (if z y (simplifya y nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1974,7 +1948,7 @@
      (cond ((not (even (length x)))
 	    (cond ((and (cdr x) (null (cdddr x))) (nconc x '(1)))
 		  (t (wna-err '%derivative)))))
-     (setq w (cons '(%derivative) (simpmap (cdr x) z)))
+     (setq w (cons '(%derivative) (if z (cdr x) (simpmap (cdr x) nil))))
      (setq y (cadr w))
      (do ((u (cddr w) (cddr u))) ((null u))
        (cond ((mnump (car u))
@@ -2909,9 +2883,9 @@
 	   $scalarmatrixp
 	   (or (eq $scalarmatrixp '$all) (member 'mult (cdar x)))
 	   ($listp (cadr x)) (cdadr x) (null (cddadr x)))
-      (simplifya (cadadr x) z)
+      (if z (cadadr x) (simplifya (cadadr x) nil))
       (let ((badp (dolist (row (cdr x)) (if (not ($listp row)) (return t))))
-	    (args (simpmap (cdr x) z)))
+	    (args (if z (cdr x) (simpmap (cdr x) nil))))
 	(if (and args (not badp)) (matcheck args))
 	(cons (if badp '(%matrix simp) '($matrix simp)) args))))
 
@@ -3006,7 +2980,7 @@
 	(funcall simpfun exp y z)
 	(progn (setq u (simpargs exp z))
 	       (if (symbolp (cadr u))
-		   (simplifya (cons (cons (cadr u) (cdar u)) (cddr u)) z)
+		   (simplifya (cons (cons (cadr u) (cdar u)) (cddr u)) t)
 		   u)))))
 
 ;; TRUE, if the symbol e is declared to be $complex or $imaginary.
@@ -3059,12 +3033,7 @@
 	     (member (caar y) '(mtimes mplus mexpt %del)))
 	 (ordfn x y))
 	((and (eq (caar x) 'bigfloat) (eq (caar y) 'bigfloat))
-	  ;; Order bigfloats by value. If they represent the same value, order by precision.
-	  (let ((diff-signum (compare-bigfloats x y)))
-	    (cond
-		  ((eql 1 diff-signum) t)
-		  ((eql -1 diff-signum) nil)
-		  (t (> (car (last (car x))) (car (last (car y))))))))
+      (ordbfloat x y))
 	((or (eq (caar x) 'mrat) (eq (caar y) 'mrat))
 	 (error "GREAT: internal error: unexpected MRAT argument"))
 	(t (do ((x1 (margs x) (cdr x1)) (y1 (margs y) (cdr y1))) (())
@@ -3099,11 +3068,27 @@
              (cond
               ((eq (caar x) 'mrat) (like x y))
               ((eq (caar x) 'mpois) (equal (cdr x) (cdr y)))
+              ((eq (caar x) 'bigfloat)
+                ;; Bigfloats need special treatment because their precision
+                ;; and an optional DECIMAL flag are stored in the CAR,
+                ;; which would otherwise be ignored.
+                ;; A bigfloat looks like this, [...] means optional:
+                ;; ((BIGFLOAT [SIMP] <PRECISION> [DECIMAL]) <MANTISSA> <EXPONENT>)
+                ;; Compare mantissas and exponents first.
+                (when (and (= (cadr x) (cadr y)) (= (caddr x) (caddr y)))
+                  ;; Mantissas and exponents are the same.
+                  ;; Still need to compare precision and maybe radix (binary/decimal).
+                  ;; If there's a SIMP flag, it must be ignored.
+                  (let ((rest-x (if (eq 'simp (cadar x)) (cddar x) (cdar x)))
+                        (rest-y (if (eq 'simp (cadar y)) (cddar y) (cdar y))))
+                    (and (= (car rest-x) (car rest-y))
+                         (eq (cadr rest-x) (cadr rest-y))))))
               ((eq (memqarr (cdar x)) (memqarr (cdar y)))
                (alike (cdr x) (cdr y)))
               (t nil))
            ;; (foo) and (foo) test non-alike because the car's aren't standard
            nil))
+        ((consp y) nil)
         ((or (symbolp x) (symbolp y)) nil)
         ((integerp x) (and (integerp y) (= x y)))
         ;; uncommon cases from here down
@@ -3187,7 +3172,9 @@
 		 (return (cond ((= l2 0) (eq cx 'mplus))
 			       ((and (eq cx cy) (= l2 1))
 				(great (cond ((eq cx 'mplus) 0) (t 1)) (car b))))))
-		((= l2 0) (return (not (ordlist b a cy cx)))))
+		((= l2 0)
+		  (return (not (if (and (eq cx cy) (= l1 1))
+				(great (cond ((eq cy 'mplus) 0) (t 1)) (car a)))))))
      (setq c (nthelem l1 a) d (nthelem l2 b))
      (cond ((not (alike1 c d)) (return (great c d))))
      (setq l1 (1- l1) l2 (1- l2))
@@ -3253,6 +3240,60 @@
 	((mnump (caddr x)) (great (cadr x) y))
 	(t (great (simpln1 x)
 		  (ftake '%log y)))))
+
+(defun ordbfloat (x y)
+  "'Greater than' predicate (in the expression ordering, not numerical sense)
+  for two bigfloats, which can differ in presence of a SIMP flag, precision and
+  presence of a DECIMAL flag (radix).
+  Bigfloats of the same precision and radix are sorted numerically among each other,
+  but only based on their internal representation, without subtracting them.
+  For bigfloats with different precision and/or radix, the sorting order is well
+  defined, but not related to their numerical value."
+  (let* ((mant-x (cadr x))
+         (mant-y (cadr y))
+         (sgn-mant-x (signum mant-x))
+         (sgn-mant-y (signum mant-y)))
+    (cond
+      ((= sgn-mant-x sgn-mant-y)
+        ;; Equal mantissa signs, compare exponents next.
+        (let ((exp-x (caddr x))
+              (exp-y (caddr y)))
+          (cond
+            ((= exp-x exp-y)
+              ;; Equal exponents, compare mantissas next.
+              (cond
+                ((= mant-x mant-y)
+                  ;; Equal mantissas, compare precisions next.
+                  ;; An optional SIMP flag must be ignored.
+                  (let* ((rest-x (if (eq 'simp (cadar x)) (cddar x) (cdar x)))
+                         (rest-y (if (eq 'simp (cadar y)) (cddar y) (cdar y)))
+                         (prec-x (car rest-x))
+                         (prec-y (car rest-y)))
+                    (cond
+                      ((= prec-x prec-y)
+                        ;; Equal precisions.
+                        ;; Finally, let decimal bigfloats "win" over binary bigfloats.
+                        (and (eq 'decimal (cadr rest-x))
+                             (not (eq 'decimal (cadr rest-y)))))
+                      (t
+                        ;; Different precisions, directly compare (greater "wins").
+                        (> prec-x prec-y)))))
+                (t
+                  ;; Different mantissas, directly compare (greater "wins").
+                  (> mant-x mant-y))))
+            (t
+              ;; Different exponents, directly compare.
+              ;; For positive mantissas, the greater exponent "wins",
+              ;; for negative mantissas, the smaller exponent "wins".
+              ;; The case of a zero mantissa doesn't need to be handled here,
+              ;; because the bigfloat package makes sure to also set the exponent
+              ;; to zero if the mantissa is zero.
+              (if (plusp sgn-mant-x)
+                (> exp-x exp-y)
+                (< exp-x exp-y))))))
+      (t
+        ;; Different mantissa signs, directly compare.
+        (> sgn-mant-x sgn-mant-y)))))
 
 (defmfun $multthru (e1 &optional e2)
   (let (arg1 arg2)
