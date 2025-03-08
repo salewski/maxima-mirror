@@ -627,6 +627,10 @@
 	     (:file "evalw")
 	     (:file "trprop")
 	     (:file "mdefun")))
+   (:module reader :source-pathname ""
+	    :depends-on ("globals" "defmfun" "compatibility-macros" "compatibility-macros1")
+	    :components
+	    ((:file "nparse")))
    (:module numerical-functions :source-pathname ""
 	    :depends-on ("globals" "defmfun" "trigonometry" "algebraic-database" "utility-macros")
 	    :components
@@ -636,10 +640,6 @@
 		    :depends-on ("ellipt"))
 	     (:file "plasma")
 	     (:file "intpol")))
-   (:module reader :source-pathname ""
-	    :depends-on ("globals" "defmfun" "compatibility-macros" "compatibility-macros1")
-	    :components
-	    ((:file "nparse")))
    (:module display :source-pathname ""
 	    :depends-on ("globals" "defmfun")
 	    :components

@@ -786,6 +786,7 @@
 ;;
 ;;   = -1/2*sn*cn*[u-elliptic_e(asin(sn),m)/(1-m)] + dn*sn^2/2/(m-1)
 ;;
+#+nil
 (defprop %jacobi_sn
     ((u m)
      ((mtimes) ((%jacobi_cn) u m) ((%jacobi_dn) u m))
@@ -800,6 +801,14 @@
 	 ((%elliptic_e simp) ((%asin simp) ((%jacobi_sn simp) u m)) m))))))
   grad)
 
+(defgrad %jacobi_sn (u m)
+  #$$jacobi_cn(u,m)*jacobi_dn(u,m)$
+  #$$(jacobi_cn(u,m)*jacobi_dn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
+  /(2*m)
+  +(jacobi_cn(u,m)^2*jacobi_sn(u,m))/(2*(1-m))$))
+
+
+#+nil
 (defprop %jacobi_cn
     ((u m)
      ((mtimes simp) -1 ((%jacobi_sn simp) u m) ((%jacobi_dn simp) u m))
@@ -812,8 +821,15 @@
        ((mplus simp) u
 	((mtimes simp) -1 ((mexpt simp) ((mplus simp) 1 ((mtimes simp) -1 m)) -1)
 	 ((%elliptic_e simp) ((%asin simp) ((%jacobi_sn simp) u m)) m))))))
-  grad)
+grad)
 
+(defgrad %jacobi_cn (u m)
+  #$$ -(jacobi_dn(u,m)*jacobi_sn(u,m))$
+  #$$ -((jacobi_dn(u,m)*jacobi_sn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
+ /(2*m))
+ -(jacobi_cn(u,m)*jacobi_sn(u,m)^2)/(2*(1-m))$)
+
+#+nil
 (defprop %jacobi_dn
     ((u m)
      ((mtimes) -1 m ((%jacobi_sn) u m) ((%jacobi_cn) u m))
@@ -829,11 +845,18 @@
 	 ((%elliptic_e simp) ((%asin simp) ((%jacobi_sn simp) u m)) m))))))
   grad)
 
+(defgrad %jacobi_dn (u m)
+  #$$ -(m*jacobi_cn(u,m)*jacobi_sn(u,m))$
+  #$$ -((jacobi_cn(u,m)*jacobi_sn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
+ /2)
+ -(jacobi_dn(u,m)*jacobi_sn(u,m)^2)/(2*(1-m))$)
+
 ;; The inverse elliptic functions.
 ;;
 ;; F(phi|m) = asn(sin(phi),m)
 ;; 
 ;; so asn(u,m) = F(asin(u)|m)
+#+nil
 (defprop %inverse_jacobi_sn
     ((x m)
      ;; Lawden 3.1.2:
@@ -857,6 +880,12 @@
 	 ((mtimes simp) -1 ((mplus simp) 1 ((mtimes simp) -1 m))
 	  ((%elliptic_f simp) ((%asin simp) x) m)))))))
   grad)
+
+(defgrad %inverse_jacobi_sn (x m)
+  #$$ 1/(sqrt(1-x^2)*sqrt(1-m*x^2))$
+  #$$ ((elliptic_e(asin(x),m)-(1-m)*elliptic_f(asin(x),m))/m
+ -(x*sqrt(1-x^2))/sqrt(1-m*x^2))
+/(1-m)$)
 
 ;; Let u = inverse_jacobi_cn(x).  Then jacobi_cn(u) = x or
 ;; sqrt(1-jacobi_sn(u)^2) = x.  Or

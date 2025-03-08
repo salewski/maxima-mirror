@@ -150,5 +150,23 @@
 (defmacro mdo-unless (x) `(seventh ,x))
 (defmacro mdo-body (x)	 `(eighth ,x))
 
+#+nil
 (defmacro defgrad (name arguments &body body)
   `(defprop ,name (,arguments ,@body) grad))
+
+(defvar *defgrad-syms* nil)
+(defmacro defgrad (name arguments &body body)
+  `(progn
+     (push ',name *defgrad-syms*)
+     (setf (get ',name 'grad)
+           `(,',arguments
+             ,,@body))))
+
+(defun simplify-defgrad ()
+  (dolist (sym *defgrad-syms*)
+    (destructuring-bind (args &rest glist)
+        (get sym 'grad)
+      (setf (get sym 'grad)
+            (list* args
+                   (mapcar #'meval*
+                           glist))))))

@@ -758,6 +758,7 @@ maxima [options] --batch-string='batch_answers_from_file:false; ...'
 		(setf $browser "open '~A'"))
 	       ((pregexp:pregexp-match-positions "(?i:linux)" *autoconf-host*)
 		(setf $browser "xdg-open '~A'")))))
+  #+nil
   (setf %e-val (mget '$%e '$numer))
 
   ;; Initialize *bigprimes* here instead of globals.lisp because we
@@ -922,6 +923,10 @@ maxima [options] --batch-string='batch_answers_from_file:false; ...'
 ;; Initialize assume database for $%pi, $%e, etc
 (dolist (c *builtin-numeric-constants*)
   (initialize-numeric-constant c))
+
+(setf %e-val (mget '$%e '$numer))
+
+(simplify-defgrad)
 
 (dolist (s *builtin-symbols*)
   (when (boundp s)
