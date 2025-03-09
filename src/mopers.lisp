@@ -167,6 +167,6 @@
     (destructuring-bind (args &rest glist)
         (get sym 'grad)
       (setf (get sym 'grad)
-            (list* args
+            (list* (rest (dollarify args))
                    (mapcar #'meval*
                            glist))))))
