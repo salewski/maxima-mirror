@@ -427,6 +427,7 @@
       ((eq loclist (cdr mpdls)))
     (munlocal)))
 
+#+nil
 (defun getalias (x)
   (cond ((get x 'alias))
 	((eq x '$false) nil)
@@ -650,6 +651,7 @@
         ($derivative $diff) ($prod $product)
 	($bothcoeff $bothcoef)))
 
+#+nil
 (defun amperchk (name)
   (cond
     ((symbolp name) name)
