@@ -805,7 +805,7 @@
   #$$jacobi_cn(u,m)*jacobi_dn(u,m)$
   #$$(jacobi_cn(u,m)*jacobi_dn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
   /(2*m)
-  +(jacobi_cn(u,m)^2*jacobi_sn(u,m))/(2*(1-m))$))
+  +(jacobi_cn(u,m)^2*jacobi_sn(u,m))/(2*(1-m))$)
 
 
 #+nil
@@ -894,6 +894,7 @@ grad)
 ;;
 ;; So u = inverse_jacobi_sn(sqrt(1-x^2),m) = inverse_jacob_cn(x,m)
 ;;
+#+nil
 (defprop %inverse_jacobi_cn
     ((x m)
      ;; Whittaker and Watson, 22.121
@@ -928,6 +929,15 @@ grad)
 	   m)))))))
   grad)
 
+(defgrad %inverse_jacobi_cn (x m)
+     ;; Whittaker and Watson, 22.121
+     ;; inverse_jacobi_cn(u,m) = integrate(1/sqrt(1-t^2)/sqrt(1-m+m*t^2), t, u, 1)
+     ;; -> -1/sqrt(1-x^2)/sqrt(1-m+m*x^2)
+  #$$-(1/(sqrt(1-x^2)*sqrt(m*x^2-m+1)))$
+  #$$((elliptic_e(asin(sqrt(1-x^2)),m)-(1-m)*elliptic_f(asin(sqrt(1-x^2)),m))/m
+ -(sqrt(1-x^2)*abs(x))/sqrt(1-m*(1-x^2)))
+ /(1-m)$)
+
 ;; Let u = inverse_jacobi_dn(x).  Then
 ;;
 ;; jacobi_dn(u) = x or
@@ -937,6 +947,7 @@ grad)
 ;; so jacobi_sn(u) = sqrt(1-x^2)/sqrt(m)
 ;;
 ;; or u = inverse_jacobi_sn(sqrt(1-x^2)/sqrt(m))
+#+nil
 (defprop %inverse_jacobi_dn
     ((x m)
      ;; Whittaker and Watson, 22.121
@@ -986,6 +997,17 @@ grad)
 	    m))))))))
   grad)
 
+(defgrad %inverse_jacobi_dn (x m)
+  ;; Whittaker and Watson, 22.121
+  ;; inverse_jacobi_dn(u,m) = integrate(1/sqrt(1-t^2)/sqrt(t^2-(1-m)), t, u, 1)
+  ;; -> -1/sqrt(1-x^2)/sqrt(x^2+m-1)
+  #$$1/(sqrt(1-x^2)*sqrt(x^2+m-1))$
+  #$$ ((elliptic_e(asin(sqrt(1-x^2)/sqrt(m)),m)
+ -(1-m)*elliptic_f(asin(sqrt(1-x^2)/sqrt(m)),m))
+ /m
+ -(sqrt(1-(1-x^2)/m)*sqrt(1-x^2))/(sqrt(m)*abs(x)))
+ /(1-m)
+ -sqrt(1-x^2)/(2*m^(3/2)*sqrt(1-(1-x^2)/m)*abs(x)) $)
 
 ;; Possible forms of a complex number:
 ;;
@@ -1857,6 +1879,7 @@ first kind:
 ;;   ----------------------------------------------------------------------
 ;; 				     1 - m
 
+#+nil
 (defprop %elliptic_f
     ((phi m)
      ;; diff wrt phi
@@ -1878,6 +1901,15 @@ first kind:
 	  ((mtimes simp) -1 m ((mexpt simp) ((%sin simp) phi) 2)))
 	 ((rat simp) -1 2))))))
   grad)
+
+(defgrad %elliptic_f (phi m)
+  ;; diff wrt phi
+  ;; 1/sqrt(1-m*sin(phi)^2)
+  #$$1/sqrt(1-m*sin(phi)^2)$
+  ;; diff wrt m
+  #$$((elliptic_e(phi,m)-(1-m)*elliptic_f(phi,m))/m
+ -(cos(phi)*sin(phi))/sqrt(1-m*sin(phi)^2))
+ /(2*(1-m))$)
 
 ;;
 ;; The derivative of E(phi|m) wrt to m is much simpler to derive than F(phi|m).
@@ -1910,6 +1942,7 @@ first kind:
 ;;   -- (elliptic_E(PHI, m)) = ---------------------------------------
 ;;   dm					        2 m
 
+#+nil
 (defprop %elliptic_e
     ((phi m)
      ;; sqrt(1-m*sin(phi)^2)
@@ -1921,6 +1954,12 @@ first kind:
       ((mplus simp) ((%elliptic_e simp) phi m)
        ((mtimes simp) -1 ((%elliptic_f simp) phi m)))))
   grad)
+
+(defgrad %elliptic_e (phi m)
+  ;; sqrt(1-m*sin(phi)^2)
+  #$$sqrt(1-m*sin(phi)^2)$   
+  ;; diff wrt m
+  #$$(elliptic_e(phi,m)-elliptic_f(phi,m))/(2*m)$)
 		    
 (def-simplifier elliptic_f (phi m)
   (let (args)
@@ -2150,6 +2189,7 @@ first kind:
 	   ;; Nothing to do
 	   (give-up)))))
 
+#+nil
 (defprop %elliptic_kc
     ((m)
      ;; diff wrt m
@@ -2162,6 +2202,10 @@ first kind:
       ((mexpt) ((mplus) 1 ((mtimes) -1 m)) -1)
       ((mexpt) m -1)))
   grad)
+
+(defgrad %elliptic_kc (m)
+  ;; diff wrt m
+  #$$(elliptic_ec(m)-(1-m)*elliptic_kc(m))/(2*(1-m)*m)$)
 
 (def-simplifier elliptic_ec (m)
   (let (args)
@@ -2229,6 +2273,7 @@ first kind:
 	   ;; Nothing to do
 	   (give-up)))))
 
+#+nil
 (defprop %elliptic_ec
     ((m)
      ((mtimes) ((rat) 1 2)
@@ -2237,6 +2282,9 @@ first kind:
 		     m)))
       ((mexpt) m -1)))
   grad)
+
+(defgrad %elliptic_ec (m)
+  #$$(elliptic_ec(m)-elliptic_kc(m))/(2*m)$)
 
 ;;
 ;; Elliptic integral of the third kind:
@@ -2384,6 +2432,7 @@ first kind:
 
 ;;; Deriviatives from functions.wolfram.com
 ;;; http://functions.wolfram.com/EllipticIntegrals/EllipticPi3/20/
+#+nil
 (defprop %elliptic_pi
   ((n z m)
    ;Derivative wrt first argument
@@ -2424,6 +2473,18 @@ first kind:
        ((rat) -1 2))
       ((%sin) ((mtimes) 2 z))))))
   grad)
+
+(defgrad %elliptic_pi (n z m)
+  ;; Derivative wrt first argument
+  #$$(-((n*sqrt(1-m*sin(z)^2)*sin(2*z))/(2*(1-n*sin(z)^2)))
+ +((m-n)*elliptic_f(z,m))/n+elliptic_e(z,m)+((n^2-m)*elliptic_pi(n,z,m))/n)
+ /(2*(m-n)*(n-1))$
+  ;; Derivative wrt second argument
+  #$$1/(sqrt(1-m*sin(z)^2)*(1-n*sin(z)^2))$
+  ;; Derivative wrt third argument
+  #$$(-((m*sin(2*z))/(2*(m-1)*sqrt(1-m*sin(z)^2)))
+ +elliptic_e(z,m)/(m-1)+elliptic_pi(n,z,m))
+ /(2*(n-m))$)
 
 ;; Define Carlson's elliptic integrals.
 
@@ -2770,6 +2831,7 @@ first kind:
 ;;; Other Jacobian elliptic functions
 
 ;; jacobi_ns(u,m) = 1/jacobi_sn(u,m)
+#+nil
 (defprop %jacobi_ns
     ((u m)
      ;; diff wrt u
@@ -2790,6 +2852,16 @@ first kind:
 	  ((%elliptic_e) ((%asin) ((%jacobi_sn) u m))
 	   m)))))))
   grad)
+
+(defgrad %jacobi_ns (u m)
+  ;; diff wrt u
+  #$$ -((jacobi_cn(u,m)*jacobi_dn(u,m))/jacobi_sn(u,m)^2)$
+  ;; diff wrt m
+  #$$ -(((jacobi_cn(u,m)*jacobi_dn(u,m)
+                  *(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
+ /(2*m)
+ +(jacobi_cn(u,m)^2*jacobi_sn(u,m))/(2*(1-m)))
+ /jacobi_sn(u,m)^2)$)
 
 (def-simplifier jacobi_ns (u m)
   (let (coef args)
@@ -2892,6 +2964,7 @@ first kind:
 	   (give-up)))))
 
 ;; jacobi_nc(u,m) = 1/jacobi_cn(u,m)
+#+nil
 (defprop %jacobi_nc
     ((u m)
      ;; wrt u
@@ -2909,6 +2982,16 @@ first kind:
 	 ((mtimes) -1 ((mexpt) ((mplus) 1 ((mtimes) -1 m)) -1)
 	  ((%elliptic_e) ((%asin) ((%jacobi_sn) u m)) m)))))))
   grad)
+
+(defgrad %jacobi_nc (u m)
+  ;; wrt u
+  #$$(jacobi_dn(u,m)*jacobi_sn(u,m))/jacobi_cn(u,m)^2$
+  ;; wrt m
+  #$$-((-((jacobi_dn(u,m)*jacobi_sn(u,m)
+                    *(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
+ /(2*m))
+ -(jacobi_cn(u,m)*jacobi_sn(u,m)^2)/(2*(1-m)))
+ /jacobi_cn(u,m)^2)$)
 
 (def-simplifier jacobi_nc (u m)
   (let (coef args)
@@ -3866,6 +3949,41 @@ first kind:
 	   ((%elliptic_e) ((%asin) ((%jacobi_sn) u m))
 	    m))))))))
   grad)
+
+(defgrad %jacobi_dc (u m)
+  ;; wrt u
+  '((mtimes) ((mplus) 1 ((mtimes) -1 m))
+    ((mexpt) ((%jacobi_cn) u m) -2)
+    ((%jacobi_sn) u m))
+  ;; wrt m
+  '((mplus)
+   ((mtimes) ((mexpt) ((%jacobi_cn) u m) -1)
+    ((mplus)
+     ((mtimes) ((rat) -1 2)
+      ((mexpt) ((mplus) 1 ((mtimes) -1 m)) -1)
+      ((%jacobi_dn) u m)
+      ((mexpt) ((%jacobi_sn) u m) 2))
+     ((mtimes) ((rat) -1 2) ((%jacobi_cn) u m)
+      ((%jacobi_sn) u m)
+      ((mplus) u
+       ((mtimes) -1
+	         ((mexpt) ((mplus) 1 ((mtimes) -1 m)) -1)
+	         ((%elliptic_e) ((%asin) ((%jacobi_sn) u m))
+	                        m))))))
+   ((mtimes) -1 ((mexpt) ((%jacobi_cn) u m) -2)
+    ((%jacobi_dn) u m)
+    ((mplus)
+     ((mtimes) ((rat) -1 2)
+      ((mexpt) ((mplus) 1 ((mtimes) -1 m)) -1)
+      ((%jacobi_cn) u m)
+      ((mexpt) ((%jacobi_sn) u m) 2))
+     ((mtimes) ((rat) -1 2) ((mexpt) m -1)
+      ((%jacobi_dn) u m) ((%jacobi_sn) u m)
+      ((mplus) u
+       ((mtimes) -1
+	         ((mexpt) ((mplus) 1 ((mtimes) -1 m)) -1)
+	         ((%elliptic_e) ((%asin) ((%jacobi_sn) u m))
+	                        m))))))))
 
 (def-simplifier jacobi_dc (u m)
   (let (coef args)

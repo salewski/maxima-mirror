@@ -52,6 +52,7 @@
 (defprop %bessel_j (mlist $matrix mequal) distribute_over)
 
 ;; Derivatives of the Bessel function.
+#+nil
 (defprop %bessel_j
     ((n x)
      ;; Derivative wrt to order n.  A&S 9.1.64.  Do we really want to
@@ -81,6 +82,19 @@
        ((mtimes) -1 ((%bessel_j) ((mplus) 1 n) x))) 
       ((rat) 1 2)))
   grad)
+
+(defgrad %bessel_j (n x)
+  ;; Derivative wrt to order n.  A&S 9.1.64.  Do we really want to
+  ;; do this?  It's quite messy.
+  ;;
+  ;; J[n](x)*log(x/2) 
+  ;;       - (x/2)^n*sum((-1)^k*psi(n+k+1)/gamma(n+k+1)*(x^2/4)^k/k!,k,0,inf)
+  #$$ bessel_j(n,x)*log(x/2)-(x^n*'sum(((-1)^%k*psi[0](n+%k+1)*abs(x)^(2*%k))
+                                  /(4^%k*%k!*gamma(n+%k+1)),%k,0,inf))
+                       /2^n$
+  ;; Derivative wrt to arg x.  
+  ;; A&S 9.1.27; changed from 9.1.30 so that taylor works on Bessel functions
+  #$$ (bessel_j(n-1,x)-bessel_j(n+1,x))/2$)
 
 ;; Integral of the Bessel function wrt z
 (defun bessel-j-integral-2 (v z)

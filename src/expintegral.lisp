@@ -150,6 +150,7 @@
 
 ;;; Differentiation of Exponential Integral E
 
+#+nil
 (defprop %expintegral_e 
   ((n z)
     ;; The derivative wrt the parameter n is expressed in terms of the
@@ -179,6 +180,15 @@
    ;; The derivative wrt the argument of the function
    ((mtimes) -1 ((%expintegral_e) ((mplus) -1 n) z)))
   grad)
+
+(defgrad %expintegral_e (n z)
+  ;; The derivative wrt the parameter n is expressed in terms of the
+  ;; Regularized Hypergeometric function 2F2 (see functions.wolfram.com)
+  #$$gamma(1-n)*z^(n-1)*(log(z)-psi[0](1-n))-hypergeometric_regularized(
+                                        [1-n,1-n],[2-n,2-n],-z)
+                                        *gamma(1-n)^2$
+  ;; The derivative wrt the argument of the function
+  #$$-expintegral_e(n-1,z)$)
 
 ;;; Integral of Exponential Integral E
 

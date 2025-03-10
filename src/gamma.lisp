@@ -1436,6 +1436,7 @@
 
 ;;; Differentiation of Generalized Incomplete Gamma function
 
+#+nil
 (defprop %gamma_incomplete_generalized
   ((a z1 z2)
    ;; The derivative wrt a in terms of hypergeometric_regularized 2F2 function
@@ -1470,6 +1471,20 @@
       ((mexpt) $%e ((mtimes) -1 z2))
       ((mexpt) z2 ((mplus) -1 a))))
   grad)
+
+(defgrad %gamma_incomplete_generalized (a z1 z2)
+  ;; The derivative wrt a in terms of hypergeometric_regularized 2F2 function
+  ;; and the Generalized Incomplete Gamma function (functions.wolfram.com)
+  #$$gamma_incomplete_generalized(a,0,z2)*log(z2)
+ -gamma(a)^2*hypergeometric_regularized([a,a],[a+1,a+1],-z2)*z2^a
+ -gamma_incomplete_generalized(a,0,z1)*log(z1)
+ +gamma(a)^2*hypergeometric_regularized([a,a],[a+1,a+1],-z1)*z1^a$
+
+  ;; The derivative wrt z1
+  #$$-(z1^(a-1)*%e^-z1)$
+
+  ;; The derivative wrt z2
+  #$$z2^(a-1)*%e^-z2$)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

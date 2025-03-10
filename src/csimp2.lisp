@@ -371,6 +371,7 @@
 ;; Derivative of beta function
 ;;   https://en.wikipedia.org/wiki/Beta_function
 ;;   https://functions.wolfram.com/GammaBetaErf/Beta/
+#+nil
 (defprop %beta
   ((a b)
     ; derivative wrt a
@@ -388,6 +389,12 @@
         ((mtimes) -1
           ((mqapply) (($psi array) 0) ((mplus) a b))))))
   grad)
+
+(defgrad %beta (a b)
+  ;; derivative wrt a
+  #$$-(beta(a,b)*(psi[0](b+a)-psi[0](a)))$
+  ;; derivative wrt b
+  #$$-(beta(a,b)*(psi[0](b+a)-psi[0](b)))$)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
