@@ -770,8 +770,8 @@ in the interval of integration.")
 (defun make-defint-assumptions (ask-or-not ivar ll ul)
   (values
    (cond ((null
-           (multiple-value-setq (result ll ul)
-             (order-limits ask-or-not ivar ll ul)))
+           (let ((result)) (multiple-value-setq (result ll ul)
+             (order-limits ask-or-not ivar ll ul)) result))
           ())
 	 (t (mapc 'forget *defint-assumptions*)
 	    (setq *defint-assumptions* ())
@@ -986,19 +986,22 @@ in the interval of integration.")
 (defun whole-intsubs (e a b ivar)
   (cond ((easy-subs e a b ivar))
 	(t
-         (let (new-ll new-ul)
            ;; Note: MAKE-DEFINT-ASSUMPTIONS may reorder the limits A
            ;; and B, but I (rtoy) don't think that's should ever
            ;; happen because the limits should already be in the
            ;; correct order when this function is called.  We don't
            ;; check for that, though.
-           (multiple-value-setq (*current-assumptions* new-ll new-ul)
+           ;; UPDATE: We do now. In integrate(exp(-x^2-1/x^2),x,-inf,inf), the
+           ;; limits were changed by MAKE-DEFINT-ASSUMPTIONS.
+           ;; Ignoring that didn't lead to a wrong result, maybe by "luck".
+           ;; So just always use the limits returned by MAKE-DEFINT-ASSUMPTIONS.
+           (multiple-value-setq (*current-assumptions* a b)
 	       (make-defint-assumptions 'ask ivar a b)) ;get forceful!
          
 	   (let (($algebraic t))
 	     (setq e (sratsimp e))
 	     (cond ((limit-subs e a b ivar))
-		   (t (same-sheet-subs e a b ivar))))))))
+		   (t (same-sheet-subs e a b ivar)))))))
 
 ;; Try easy substitutions.  Return NIL if we can't.
 (defun easy-subs (e ll ul ivar)
@@ -1427,7 +1430,7 @@ in the interval of integration.")
 		   (return (m* (m// nc dc) ans)))
 		  (t (return nil)))))
      findout
-     (cond ((setq temp (batapp grand ivar ll ul))
+     (cond ((setq temp (batapp grand ivar ll))
 	    (return temp))
 	   (t nil))
      on
@@ -1819,7 +1822,7 @@ in the interval of integration.")
 
 ;; integrate(a*sc(r*x)^k/x^n,x,0,inf).
 (defun ssp (exp ivar ll ul)
-  (prog (u n c arg)
+  (prog (n c arg)
      ;; Get the argument of the involved trig function.
      (when (null (setq arg (involve-var exp ivar '(%sin %cos))))
        (return nil))
@@ -2501,7 +2504,7 @@ in the interval of integration.")
 
 
 ;; Handles beta integrals.
-(defun batapp (e ivar ll ul)
+(defun batapp (e ivar ll)
   (cond ((not (or (equal ll 0)
 		  (eq ll '$minf)))
 	 (setq e (subin-var (m+ ll ivar) e ivar))))
@@ -3323,7 +3326,7 @@ in the interval of integration.")
 
 ;;; given (b*x^n+a)^m returns (m a n b)
 (defun bxm (e ind ivar)
-  (let (m r)
+  (let (r)
     (cond ((or (atom e)
 	       (mnump e)
 	       (involve-var e ivar '(%log %sin %cos %tan))

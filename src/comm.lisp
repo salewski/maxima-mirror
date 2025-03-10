@@ -999,9 +999,6 @@
 (defun getop (x)
   (or (and (symbolp x) (get x 'op)) x))
 
-(defun has-simp-flag-p (x)
-  (if (member 'simp (cdar x)) t))
-
 (defmfun $listp (x)
   (and (not (atom x))
        (not (atom (car x)))
@@ -1009,15 +1006,15 @@
 
 (defmfun $cons (x e)
   (atomchk (setq e (format1 e)) '$cons t)
-  (simplifya (mcons-exp-args e (cons x (margs e))) (has-simp-flag-p e)))
+  (simplifya (mcons-exp-args e (cons x (margs e))) t))
 
 (defmfun $endcons (x e)
   (atomchk (setq e (format1 e)) '$endcons t)
-  (simplifya (mcons-exp-args e (append (margs e) (ncons x))) (has-simp-flag-p e)))
+  (simplifya (mcons-exp-args e (append (margs e) (ncons x))) t))
 
 (defmfun $reverse (e)
   (atomchk (setq e (format1 e)) '$reverse nil)
-  (simplifya (mcons-exp-args e (reverse (margs e))) (has-simp-flag-p e)))
+  (simplifya (mcons-exp-args e (reverse (margs e))) t))
 
 (defmfun $append (&rest args)
   (if (null args)
@@ -1036,7 +1033,7 @@
 			      (merror (intl:gettext "append: operators of arguments must all be the same.")))
 			    (margs u))
 			args)))
-      (every #'has-simp-flag-p args)))))
+      t))))
 
 (defun mcons-exp-args (e args)
   (if (eq (caar e) 'mqapply)
@@ -1133,8 +1130,9 @@
       ($rest e (- m n)))))
 
 (defmfun $args (e)
-  (atomchk (setq e (format1 e)) '$args nil)
-	 (cons '(mlist) (margs e)))
+ (let ((formatted (format1 e)))
+  (atomchk formatted '$args nil)
+	 (simplifya (cons '(mlist) (margs formatted)) (eq e formatted))))
 
 (defmfun $delete (x l &optional (n -1 n?))
   (when (and n? (or (not (fixnump n)) (minusp n))) ; if n is set, it must be a nonneg fixnum
