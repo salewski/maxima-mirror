@@ -155,6 +155,14 @@
   `(defprop ,name (,arguments ,@body) grad))
 
 (defvar *defgrad-syms* nil)
+#+nil
+(defmacro defgrad (name arguments &body body)
+  `(progn
+     (push ',name *defgrad-syms*)
+     (setf (get ',name 'grad)
+           (list* ',arguments
+                  ,@body))))
+
 (defmacro defgrad (name arguments &body body)
   `(progn
      (push ',name *defgrad-syms*)
@@ -166,7 +174,40 @@
   (dolist (sym *defgrad-syms*)
     (destructuring-bind (args &rest glist)
         (get sym 'grad)
-      (setf (get sym 'grad)
-            (list* (rest (dollarify args))
-                   (mapcar #'meval*
-                           glist))))))
+      (labels
+          ((dollarify-if-needed (arglist)
+             ;; ARGLIST is a list of the args.  We prepend a "$" to
+             ;; the symbol name, if it doesn't already have one.
+             (mapcar #'(lambda (a)
+                         (let ((name (symbol-name a)))
+                           (format t "name = ~A~%" name)
+                           (if (char= #\$ (aref name 0))
+                               a
+                               (intern (concatenate 'string "$" name)))))
+                     arglist))
+           (find-arg (a g)
+             ;; See if the arg A exists somewhere in the expression G.
+             (cond ((atom g)
+                    (eq a g))
+                   ((consp g)
+                    (some #'(lambda (x)
+                              x)
+                          (mapcar #'(lambda (g)
+                                      (find-arg a g))
+                                  g)))
+                   (t nil))))
+        (format t "(find-arg ~A ~A) => ~A~%"
+                (car args) glist
+                (find-arg (car args) glist))
+        (setf (get sym 'grad)
+              ;; If the arg exists in the expressions for the
+              ;; derivatives, then there's nothing extra that needs to
+              ;; be done.  But if it doesn't, we take this to mean
+              ;; that the derivatives were defined using #$$.  Then
+              ;; the args needs to be dollarified so that the args
+              ;; match the derivative expressions.
+              (if (find-arg (car args) glist)
+                  (list* args glist)
+                  (list* (dollarify-if-needed args)
+                         (mapcar #'meval*
+                                 glist))))))))
