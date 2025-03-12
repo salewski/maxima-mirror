@@ -2983,7 +2983,7 @@ first kind:
 	  ((%elliptic_e) ((%asin) ((%jacobi_sn) u m)) m)))))))
   grad)
 
-(defgrad %jacobi_nc (u m)
+(defgrad %jacobi_nc ($u $m)
   ;; wrt u
   #$$(jacobi_dn(u,m)*jacobi_sn(u,m))/jacobi_cn(u,m)^2$
   ;; wrt m
