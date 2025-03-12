@@ -166,7 +166,7 @@
 
 ;; DEFGRAD defines derivatives for the function NAME having arguments ARGUMENTS.
 ;;
-;;   NAME       - the noun-form of the function
+;;   NAME       - the noun-form (%foo) of the function
 ;;   ARGUMENTS  - A list of the arguments of the function.
 ;;   BODY       - The derivatives of the function.  This should be a list of
 ;;                derivatives arranged in the same order as the ARGUMENTS.
@@ -178,6 +178,21 @@
 ;; Use of #$$ is not required.  In that case, each derivative must be
 ;; a quoted list of the maxima internal representation of the
 ;; derivative.
+;;
+;; For example here are two ways to define the derivatives of atan2:
+;;
+;;   (defgrad %atan2 ($x $y)
+;;     #$$y/(y^2+x^2)$
+;;     #$$-(x/(y^2+x^2))$)
+;;  
+;;   (defgrad %atan2 (x y)
+;;     '((mtimes) y
+;;       ((mexpt) ((mplus) ((mexpt) x 2) ((mexpt) y 2)) -1))
+;;     '((mtimes) -1 x
+;;       ((mexpt) ((mplus) ((mexpt) x 2) ((mexpt) y 2)) -1)))
+;;
+;; The first form is clearly easier to read and understand, but either
+;; scheme will work.
 
 (defmacro defgrad (name arguments &body body)
   ;; Check that the argument variables show up somewhere in the body.
