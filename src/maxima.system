@@ -254,7 +254,7 @@
 	     (:file "outmis")
 	     (:file "ar")))
    (:module commands :source-pathname ""
-	    :depends-on ("globals" "defmfun" "compatibility-macros1" "reader")
+	    :depends-on ("globals" "defmfun" "compatibility-macros1" "reader" "utility-macros")
 	    :components
 	    ((:file "comm")
 	     (:file "comm2")))
@@ -547,7 +547,7 @@
 		       )
 		      )))
    (:module simplification :source-pathname ""
-	    :depends-on ("globals" "defmfun" "reader")
+	    :depends-on ("globals" "defmfun" "reader" "utility-macros")
 	    :components
 	    ((:file "simp")
 	     (:file "float")
@@ -632,7 +632,8 @@
 	    :components
 	    ((:file "nparse")))
    (:module numerical-functions :source-pathname ""
-	    :depends-on ("globals" "defmfun" "trigonometry" "algebraic-database" "utility-macros" "reader")
+	    :depends-on ("globals" "defmfun" "trigonometry" "algebraic-database" 
+                                   "utility-macros" "reader" "utility-macros")
 	    :components
 	    ((:file "bessel")
 	     (:file "ellipt")
@@ -687,7 +688,7 @@
 	     (:file "trigo")
 	     (:file "trgred")))
    (:module special-functions :source-pathname ""
-	    :depends-on ("globals" "defmfun" "reader")
+	    :depends-on ("globals" "defmfun" "reader" "utility-macros")
 	    :components
 	    ((:file "specfn")))
    (:module matrix-algebra :source-pathname ""
@@ -728,7 +729,8 @@
 	    ((:file "mtrace")
 	     (:file "mdebug")))
    (:module miscellaneous :source-pathname ""
-	    :depends-on ("globals" "defmfun" "pattern-matching" "compatibility-macros1" "reader")
+	    :depends-on ("globals" "defmfun" "pattern-matching" "compatibility-macros1"
+                                   "reader" "utility-macros")
 	    :components
 	    ((:file "scs")
 	     (:file "asum")
