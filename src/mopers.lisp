@@ -179,51 +179,10 @@
 ;; a quoted list of the maxima internal representation of the
 ;; derivative.
 
-#+nil
 (defmacro defgrad (name arguments &body body)
-  `(progn
-     (push ',name *defgrad-syms*)
-     (setf (get ',name 'grad)
-           (list* ',arguments
-                  ,@body))))
-
-#+nil
-(defmacro defgrad (name arguments &body body)
-  (let ((arg (gensym "ARG-")))
-    `(progn
-       (push ',name *defgrad-syms*)
-       (loop for ,arg in ',arguments
-             unless (check-defgrad ,arg ',body)
-               do (let ((msg (aformat nil
-                                      "~M: Argument ~S not used in derivative expressions."
-                                      ',name ,arg)))
-                    (mwarning msg)
-                    (return nil)))
-       (setf (get ',name 'grad)
-             `(,',arguments
-               ,,@body)))))
-
-#+nil
-(defmacro defgrad (name arguments &body body)
-  (let ((arg (gensym "ARG-")))
-    `(progn
-       (push ',name *defgrad-syms*)
-       (loop for ,arg in ',arguments
-             unless (check-defgrad ,arg ',body)
-               do
-                  (progn
-                    ;; Print a warning that the definition is wrong
-                    ;; and exit the loop.  Don't use MWARNING for this
-                    ;; because DISPLA may not be defined yet to print
-                    ;; the message.
-                    (warn "~%DEFGRAD ~A: Argument ~S not used in derivative expressions."
-                          ',name ,arg)
-                    (return nil)))
-       (setf (get ',name 'grad)
-             `(,',arguments
-               ,,@body)))))
-
-(defmacro defgrad (name arguments &body body)
+  ;; Check that the argument variables show up somewhere in the body.
+  ;; Otherwise, the defintion of the derivative is potentially
+  ;; incorrect.
   (loop for arg in arguments
         unless (check-defgrad arg body)
           do
@@ -237,7 +196,6 @@
                (return nil)))
   `(progn
      (push ',name *defgrad-syms*)
-
      (setf (get ',name 'grad)
            `(,',arguments
              ,,@body)))))
