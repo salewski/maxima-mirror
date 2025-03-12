@@ -926,7 +926,9 @@ maxima [options] --batch-string='batch_answers_from_file:false; ...'
 
 (setf %e-val (mget '$%e '$numer))
 
-(simplify-defgrad)
+;; Make sure derivatives defined by DEFGRAD are simplified and that
+;; the variables and derivatives are consistent.
+(process-defgrad)
 
 (dolist (s *builtin-symbols*)
   (when (boundp s)
