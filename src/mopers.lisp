@@ -150,11 +150,35 @@
 (defmacro mdo-unless (x) `(seventh ,x))
 (defmacro mdo-body (x)	 `(eighth ,x))
 
-#+nil
-(defmacro defgrad (name arguments &body body)
-  `(defprop ,name (,arguments ,@body) grad))
+(defvar *defgrad-syms* nil
+  "A list of all the symbols whose derivatives are defined by DEFGRAD")
 
-(defvar *defgrad-syms* nil)
+(defun check-defgrad (a g)
+  ;; See if the arg A exists somewhere in the expression G.
+  (cond ((atom g)
+         (eq a g))
+        ((consp g)
+         (some #'identity
+               (mapcar #'(lambda (g)
+                           (check-defgrad a g))
+                       g)))
+        (t nil)))
+
+;; DEFGRAD defines derivatives for the function NAME having arguments ARGUMENTS.
+;;
+;;   NAME       - the noun-form of the function
+;;   ARGUMENTS  - A list of the arguments of the function.
+;;   BODY       - The derivatives of the function.  This should be a list of
+;;                derivatives arranged in the same order as the ARGUMENTS.
+;;
+;; The derivatives can be expressed using #$$...$.  In this case the
+;; names of the arguments MUST start with "$" because #$$ read
+;; expressions that way.
+;;
+;; Use of #$$ is not required.  In that case, each derivative must be
+;; a quoted list of the maxima internal representation of the
+;; derivative.
+
 #+nil
 (defmacro defgrad (name arguments &body body)
   `(progn
@@ -163,51 +187,91 @@
            (list* ',arguments
                   ,@body))))
 
+#+nil
 (defmacro defgrad (name arguments &body body)
+  (let ((arg (gensym "ARG-")))
+    `(progn
+       (push ',name *defgrad-syms*)
+       (loop for ,arg in ',arguments
+             unless (check-defgrad ,arg ',body)
+               do (let ((msg (aformat nil
+                                      "~M: Argument ~S not used in derivative expressions."
+                                      ',name ,arg)))
+                    (mwarning msg)
+                    (return nil)))
+       (setf (get ',name 'grad)
+             `(,',arguments
+               ,,@body)))))
+
+#+nil
+(defmacro defgrad (name arguments &body body)
+  (let ((arg (gensym "ARG-")))
+    `(progn
+       (push ',name *defgrad-syms*)
+       (loop for ,arg in ',arguments
+             unless (check-defgrad ,arg ',body)
+               do
+                  (progn
+                    ;; Print a warning that the definition is wrong
+                    ;; and exit the loop.  Don't use MWARNING for this
+                    ;; because DISPLA may not be defined yet to print
+                    ;; the message.
+                    (warn "~%DEFGRAD ~A: Argument ~S not used in derivative expressions."
+                          ',name ,arg)
+                    (return nil)))
+       (setf (get ',name 'grad)
+             `(,',arguments
+               ,,@body)))))
+
+(defmacro defgrad (name arguments &body body)
+  (loop for arg in arguments
+        unless (check-defgrad arg body)
+          do
+             (progn
+               ;; Print a warning that the definition is wrong
+               ;; and exit the loop.  Don't use MWARNING for this
+               ;; because DISPLA may not be defined yet to print
+               ;; the message.
+               (warn "DEFGRAD ~A: Argument ~S not used in derivative expressions."
+                     name arg)
+               (return nil)))
   `(progn
      (push ',name *defgrad-syms*)
+
      (setf (get ',name 'grad)
            `(,',arguments
-             ,,@body))))
+             ,,@body)))))
 
-(defun simplify-defgrad ()
+;; When DEFGRAD uses #$$ to define derivatives, we need to call MEVAL*
+;; on them to get them simplified appropriately.
+(defun process-defgrad ()
   (dolist (sym *defgrad-syms*)
     (destructuring-bind (args &rest glist)
         (get sym 'grad)
       (labels
-          ((dollarify-if-needed (arglist)
-             ;; ARGLIST is a list of the args.  We prepend a "$" to
-             ;; the symbol name, if it doesn't already have one.
-             (mapcar #'(lambda (a)
-                         (let ((name (symbol-name a)))
-                           (format t "name = ~A~%" name)
-                           (if (char= #\$ (aref name 0))
-                               a
-                               (intern (concatenate 'string "$" name)))))
-                     arglist))
-           (find-arg (a g)
+          ((check-defgrad (a g)
              ;; See if the arg A exists somewhere in the expression G.
              (cond ((atom g)
                     (eq a g))
                    ((consp g)
-                    (some #'(lambda (x)
-                              x)
+                    (some #'identity
                           (mapcar #'(lambda (g)
-                                      (find-arg a g))
+                                      (check-defgrad a g))
                                   g)))
                    (t nil))))
-        (format t "(find-arg ~A ~A) => ~A~%"
-                (car args) glist
-                (find-arg (car args) glist))
+        ;; Make sure that some derivative contains the arguments.
+        ;; This is to catch issues when DEFGRAD uses incorrect
+        ;; variables when derivatives are defined using #$$.  In this
+        ;; case arg names must start with "$".
+        #+nil
+        (loop for a in args
+              unless (check-defgrad a glist)
+                do (let ((msg (aformat nil
+                                       "~M: Argument ~S not used in derivative expressions."
+                                       sym a)))
+                     (mwarning msg)
+                     (return nil)))
         (setf (get sym 'grad)
-              ;; If the arg exists in the expressions for the
-              ;; derivatives, then there's nothing extra that needs to
-              ;; be done.  But if it doesn't, we take this to mean
-              ;; that the derivatives were defined using #$$.  Then
-              ;; the args needs to be dollarified so that the args
-              ;; match the derivative expressions.
-              (if (find-arg (car args) glist)
-                  (list* args glist)
-                  (list* (dollarify-if-needed args)
-                         (mapcar #'meval*
-                                 glist))))))))
+              (list* args
+                     (mapcar #'meval*
+                             glist)))))))
