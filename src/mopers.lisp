@@ -215,36 +215,14 @@
            `(,',arguments
              ,,@body)))))
 
-;; When DEFGRAD uses #$$ to define derivatives, we need to call MEVAL*
-;; on them to get them simplified appropriately.
+;; When DEFGRAD uses #$$ to define derivatives, we MUST call MEVAL* on
+;; them to get them simplified appropriately.  It's ok to call MEVAL*
+;; if we didn't use #$$.
 (defun process-defgrad ()
   (dolist (sym *defgrad-syms*)
     (destructuring-bind (args &rest glist)
         (get sym 'grad)
-      (labels
-          ((check-defgrad (a g)
-             ;; See if the arg A exists somewhere in the expression G.
-             (cond ((atom g)
-                    (eq a g))
-                   ((consp g)
-                    (some #'identity
-                          (mapcar #'(lambda (g)
-                                      (check-defgrad a g))
-                                  g)))
-                   (t nil))))
-        ;; Make sure that some derivative contains the arguments.
-        ;; This is to catch issues when DEFGRAD uses incorrect
-        ;; variables when derivatives are defined using #$$.  In this
-        ;; case arg names must start with "$".
-        #+nil
-        (loop for a in args
-              unless (check-defgrad a glist)
-                do (let ((msg (aformat nil
-                                       "~M: Argument ~S not used in derivative expressions."
-                                       sym a)))
-                     (mwarning msg)
-                     (return nil)))
-        (setf (get sym 'grad)
-              (list* args
-                     (mapcar #'meval*
-                             glist)))))))
+      (setf (get sym 'grad)
+            (list* args
+                   (mapcar #'meval*
+                           glist))))))
