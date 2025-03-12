@@ -181,7 +181,7 @@
    ((mtimes) -1 ((%expintegral_e) ((mplus) -1 n) z)))
   grad)
 
-(defgrad %expintegral_e (n z)
+(defgrad %expintegral_e ($n $z)
   ;; The derivative wrt the parameter n is expressed in terms of the
   ;; Regularized Hypergeometric function 2F2 (see functions.wolfram.com)
   #$$gamma(1-n)*z^(n-1)*(log(z)-psi[0](1-n))-hypergeometric_regularized(

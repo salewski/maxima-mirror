@@ -648,7 +648,7 @@
     ((mexpt) ((mplus) 1 ((%lambert_w) x)) -1)))
   grad)
 
-(defgrad %lambert_w (x)
+(defgrad %lambert_w ($x)
   #$$%e^-lambert_w(x)/(lambert_w(x)+1)$)
 
 ;;; Integral of lambert_w

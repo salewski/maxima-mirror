@@ -390,7 +390,7 @@
           ((mqapply) (($psi array) 0) ((mplus) a b))))))
   grad)
 
-(defgrad %beta (a b)
+(defgrad %beta ($a $b)
   ;; derivative wrt a
   #$$-(beta(a,b)*(psi[0](b+a)-psi[0](a)))$
   ;; derivative wrt b

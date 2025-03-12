@@ -83,7 +83,7 @@
       ((rat) 1 2)))
   grad)
 
-(defgrad %bessel_j (n x)
+(defgrad %bessel_j ($n $x)
   ;; Derivative wrt to order n.  A&S 9.1.64.  Do we really want to
   ;; do this?  It's quite messy.
   ;;

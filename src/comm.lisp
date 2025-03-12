@@ -660,7 +660,7 @@
 		 ((mtimes) -1 x ((mexpt) ((mplus) ((mexpt) x 2) ((mexpt) y 2)) -1)))
   grad)
 
-(defgrad %atan2 (x y)
+(defgrad %atan2 ($x $y)
   #$$y/(y^2+x^2)$
   #$$-(x/(y^2+x^2))$)
 

@@ -29,7 +29,7 @@
 #+nil
 (defprop %airy_ai ((z) ((%airy_dai) z)) grad)
 
-(defgrad %airy_ai (z)
+(defgrad %airy_ai ($z)
   #$$airy_dai(z)$)
 
 ;; airy_ai distributes over lists, matrices, and equations
@@ -118,7 +118,7 @@
 #+nil
 (defprop %airy_dai ((z) ((mtimes) z ((%airy_ai) z))) grad)
 
-(defgrad %airy_dai (z)
+(defgrad %airy_dai ($z)
   #$$z*airy_ai(z)$)
 
 (defprop %airy_dai ((z) ((%airy_ai) z)) integral)
@@ -186,7 +186,7 @@
 (defprop %airy_bi simplim%airy_bi simplim%function)
 #+nil
 (defprop %airy_bi ((z) ((%airy_dbi) z)) grad)
-(defgrad %airy_bi (z)
+(defgrad %airy_bi ($z)
   #$$ airy_dbi(z)$)
 
 ;; airy_bi distributes over lists, matrices, and equations
@@ -275,7 +275,7 @@
 (defprop %airy_dbi simplim%airy_dbi simplim%function)
 #+nil
 (defprop %airy_dbi ((z) ((mtimes) z ((%airy_bi) z))) grad)
-(defgrad %airy_dbi (z)
+(defgrad %airy_dbi ($z)
   #$$z*airy_bi(z)$)
 (defprop %airy_dbi ((z) ((%airy_bi) z)) integral)
 

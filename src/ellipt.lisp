@@ -801,7 +801,7 @@
 	 ((%elliptic_e simp) ((%asin simp) ((%jacobi_sn simp) u m)) m))))))
   grad)
 
-(defgrad %jacobi_sn (u m)
+(defgrad %jacobi_sn ($u $m)
   #$$jacobi_cn(u,m)*jacobi_dn(u,m)$
   #$$(jacobi_cn(u,m)*jacobi_dn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
   /(2*m)
@@ -823,7 +823,7 @@
 	 ((%elliptic_e simp) ((%asin simp) ((%jacobi_sn simp) u m)) m))))))
 grad)
 
-(defgrad %jacobi_cn (u m)
+(defgrad %jacobi_cn ($u $m)
   #$$ -(jacobi_dn(u,m)*jacobi_sn(u,m))$
   #$$ -((jacobi_dn(u,m)*jacobi_sn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
  /(2*m))
@@ -845,7 +845,7 @@ grad)
 	 ((%elliptic_e simp) ((%asin simp) ((%jacobi_sn simp) u m)) m))))))
   grad)
 
-(defgrad %jacobi_dn (u m)
+(defgrad %jacobi_dn ($u $m)
   #$$ -(m*jacobi_cn(u,m)*jacobi_sn(u,m))$
   #$$ -((jacobi_cn(u,m)*jacobi_sn(u,m)*(u-elliptic_e(asin(jacobi_sn(u,m)),m)/(1-m)))
  /2)
@@ -881,7 +881,7 @@ grad)
 	  ((%elliptic_f simp) ((%asin simp) x) m)))))))
   grad)
 
-(defgrad %inverse_jacobi_sn (x m)
+(defgrad %inverse_jacobi_sn ($x $m)
   #$$ 1/(sqrt(1-x^2)*sqrt(1-m*x^2))$
   #$$ ((elliptic_e(asin(x),m)-(1-m)*elliptic_f(asin(x),m))/m
  -(x*sqrt(1-x^2))/sqrt(1-m*x^2))
@@ -929,7 +929,7 @@ grad)
 	   m)))))))
   grad)
 
-(defgrad %inverse_jacobi_cn (x m)
+(defgrad %inverse_jacobi_cn ($x $m)
      ;; Whittaker and Watson, 22.121
      ;; inverse_jacobi_cn(u,m) = integrate(1/sqrt(1-t^2)/sqrt(1-m+m*t^2), t, u, 1)
      ;; -> -1/sqrt(1-x^2)/sqrt(1-m+m*x^2)
@@ -997,7 +997,7 @@ grad)
 	    m))))))))
   grad)
 
-(defgrad %inverse_jacobi_dn (x m)
+(defgrad %inverse_jacobi_dn ($x $m)
   ;; Whittaker and Watson, 22.121
   ;; inverse_jacobi_dn(u,m) = integrate(1/sqrt(1-t^2)/sqrt(t^2-(1-m)), t, u, 1)
   ;; -> -1/sqrt(1-x^2)/sqrt(x^2+m-1)
@@ -1902,7 +1902,7 @@ first kind:
 	 ((rat simp) -1 2))))))
   grad)
 
-(defgrad %elliptic_f (phi m)
+(defgrad %elliptic_f ($phi $m)
   ;; diff wrt phi
   ;; 1/sqrt(1-m*sin(phi)^2)
   #$$1/sqrt(1-m*sin(phi)^2)$
@@ -1955,7 +1955,7 @@ first kind:
        ((mtimes simp) -1 ((%elliptic_f simp) phi m)))))
   grad)
 
-(defgrad %elliptic_e (phi m)
+(defgrad %elliptic_e ($phi $m)
   ;; sqrt(1-m*sin(phi)^2)
   #$$sqrt(1-m*sin(phi)^2)$   
   ;; diff wrt m
@@ -2203,7 +2203,7 @@ first kind:
       ((mexpt) m -1)))
   grad)
 
-(defgrad %elliptic_kc (m)
+(defgrad %elliptic_kc ($m)
   ;; diff wrt m
   #$$(elliptic_ec(m)-(1-m)*elliptic_kc(m))/(2*(1-m)*m)$)
 
@@ -2283,7 +2283,7 @@ first kind:
       ((mexpt) m -1)))
   grad)
 
-(defgrad %elliptic_ec (m)
+(defgrad %elliptic_ec ($m)
   #$$(elliptic_ec(m)-elliptic_kc(m))/(2*m)$)
 
 ;;
@@ -2474,7 +2474,7 @@ first kind:
       ((%sin) ((mtimes) 2 z))))))
   grad)
 
-(defgrad %elliptic_pi (n z m)
+(defgrad %elliptic_pi ($n $z $m)
   ;; Derivative wrt first argument
   #$$(-((n*sqrt(1-m*sin(z)^2)*sin(2*z))/(2*(1-n*sin(z)^2)))
  +((m-n)*elliptic_f(z,m))/n+elliptic_e(z,m)+((n^2-m)*elliptic_pi(n,z,m))/n)
@@ -2853,7 +2853,7 @@ first kind:
 	   m)))))))
   grad)
 
-(defgrad %jacobi_ns (u m)
+(defgrad %jacobi_ns ($u $m)
   ;; diff wrt u
   #$$ -((jacobi_cn(u,m)*jacobi_dn(u,m))/jacobi_sn(u,m)^2)$
   ;; diff wrt m

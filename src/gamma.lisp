@@ -1472,7 +1472,7 @@
       ((mexpt) z2 ((mplus) -1 a))))
   grad)
 
-(defgrad %gamma_incomplete_generalized (a z1 z2)
+(defgrad %gamma_incomplete_generalized ($a $z1 $z2)
   ;; The derivative wrt a in terms of hypergeometric_regularized 2F2 function
   ;; and the Generalized Incomplete Gamma function (functions.wolfram.com)
   #$$gamma_incomplete_generalized(a,0,z2)*log(z2)
