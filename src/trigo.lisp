@@ -398,7 +398,7 @@
   (cond ((atom e) e)
 	((specrepp e) ($trigexpand (specdisrep e)))
 	((trigexpand (caar e) (cadr e)))
-	(t (recur-apply #'$trigexpand e))))
+	(t (recur-apply-self e))))
 
 (defun trigexpand (op arg)
   (cond ((atom arg) nil)

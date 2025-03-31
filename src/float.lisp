@@ -736,7 +736,7 @@
 	  ((eq (caar x) 'rat)
 	   (ratbigfloat (cdr x)))
 	  ((setq y (safe-get (caar x) 'floatprog))
-	   (funcall y (mapcar #'$bfloat (cdr x))))
+	   (funcall y (mapcar-self (cdr x))))
 	  ((or (trigp (caar x)) (arcp (caar x)) (eq (caar x) '$entier))
 	   (setq y ($bfloat (cadr x)))
 	   (if ($bfloatp y)
@@ -764,7 +764,7 @@
 		       ($bfloat (list (ncons (safe-get (caar x) 'recip)) y))))
 		     (t ($bfloat (exponentialize (caar x) y))))
 	       (subst0 (list (ncons (caar x)) y) x)))
-	  (t (recur-apply #'$bfloat x)))))
+	  (t (recur-apply-self x)))))
 
 (defprop mplus addbigfloat floatprog)
 (defprop mtimes timesbigfloat floatprog)

@@ -956,7 +956,7 @@
 (defmfun $ratdisrep (x)
   (cond ((mbagp x)
          ;; Distribute over lists, equations, and matrices.
-         (cons (car x) (mapcar #'$ratdisrep (cdr x))))
+         (cons (car x) (mapcar-self (cdr x))))
         ((not ($ratp x)) x)
         (t
          (setq x (ratdisrepd x))

@@ -721,7 +721,7 @@
 (defmfun $trunc (e)
   (cond ((atom e) e)
 	((eq (caar e) 'mplus) (cons (append (car e) '(trunc)) (cdr e)))
-	((mbagp e) (cons (car e) (mapcar #'$trunc (cdr e))))
+	((mbagp e) (cons (car e) (mapcar-self (cdr e))))
 	((specrepp e) ($trunc (specdisrep e)))
 	(t e)))
 
@@ -1219,7 +1219,7 @@
 	((eq (caar e) 'bigfloat) (fp2flo e))
 	((member (caar e) '(mexpt mncexpt) :test #'eq)
 	 ;; avoid x^2 -> x^2.0, allow %e^%pi -> 23.14
-	 (let ((res (recur-apply #'$float e)))
+	 (let ((res (recur-apply-self e)))
 	   (if (floatp res)
 	       res
 	       (list (ncons (caar e)) ($float (cadr e)) (caddr e)))))
@@ -1284,7 +1284,7 @@
 	 (complexify (complex-erf (complex 0 1d0))))
 	((or (eq (caar e) '%derivative) (eq (caar e) '$diff))
 	 (append (list (remove 'simp (first e)) ($float (second e))) (rest (rest e))))
-	(t (recur-apply #'$float e))))
+	(t (recur-apply-self e))))
 
 (defmfun $coeff (e x &optional (n 1))
   (if (equal n 0)

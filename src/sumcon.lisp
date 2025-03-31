@@ -30,7 +30,7 @@
 					 (cddr car-x))
 				   sums)))
 		 (t (setq notsums (cons car-x notsums))))))
-	(t (recur-apply #'$sumcontract e))))
+	(t (recur-apply-self e))))
 
 (defmfun $intosum (e)		       ; e is assumed to be simplified
   (let (($sumexpand t))
@@ -59,7 +59,7 @@
 				  (muln (list sum (car x)) t))))
 		   (t (setq notsum (cons ($sumcontract (car x))
 					 notsum))))))
-	  (t (recur-apply #'$intosum e)))))
+	  (t (recur-apply-self e)))))
 
 (defun sumcontract1 (sums)
   (addn (sumcontract2 nil sums) t))
@@ -131,7 +131,7 @@
   (if (atom e)
     e
     (let (($genindex '$j)
-	  (e (recur-apply #'$bashindices e)))
+	  (e (recur-apply-self e)))
       (cond ((atom e) e)
 	    ((member (caar e) '(%sum %product) :test #'eq)
 	     (sumconsimp (subst (gensumindex) (caddr e) e)))
@@ -140,7 +140,7 @@
 (defmfun $niceindices (e)
   (if (atom e)
       e
-      (let ((e (recur-apply #'$niceindices e)))
+      (let ((e (recur-apply-self e)))
 	(cond ((atom e) e)
 	      ((member (caar e) '(%sum %product) :test #'eq)
 	       (sumconsimp (subst (get-free-index e (caddr e)) (caddr e) e)))

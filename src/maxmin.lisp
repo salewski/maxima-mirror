@@ -355,6 +355,6 @@
   (($subvarp (mop e)) ;subscripted function
 		     (subfunmake 
 		      (subfunname e) 
-			  (mapcar #'$rationalize (subfunsubs e)) 
-			  (mapcar #'$rationalize (subfunargs e))))
-	(t (recur-apply #'$rationalize e))))
+			  (mapcar-self (subfunsubs e)) 
+			  (mapcar-self (subfunargs e))))
+	(t (recur-apply-self e))))

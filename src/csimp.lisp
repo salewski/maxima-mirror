@@ -32,7 +32,7 @@
 	  ((and (eq (caar exp) 'mexpt) (eq (cadr exp) '$%e)
 		(setq nexp (demoivre (caddr exp))))
 	   nexp)
-	  (t (recur-apply #'$demoivre exp)))))
+	  (t (recur-apply-self exp)))))
 
 (defun demoivre (l)
   (cond ($exponentialize

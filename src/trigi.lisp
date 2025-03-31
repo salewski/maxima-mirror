@@ -852,7 +852,7 @@
     (cond ((atom exp) exp)
 	  ((trigp (caar exp))
 	   (exponentialize (caar exp) ($exponentialize (cadr exp))))
-	  (t (recur-apply #'$exponentialize exp)))))
+	  (t (recur-apply-self exp)))))
 
 (defun exponentialize (op arg)
   (cond ((eq '%sin op)

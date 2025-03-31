@@ -18,7 +18,7 @@
 	((arcp (caar exp)) (logarc (caar exp) ($logarc (cadr exp))))
 	((eq (caar exp) '%atan2)
 	 (logarc '%atan2 (list ($logarc (second exp)) ($logarc (third exp)))))
-	(t (recur-apply #'$logarc exp))))
+	(t (recur-apply-self exp))))
 
 (defun logarc (f x)
   ;; Gives the logarithmic form of arc trig and hyperbolic functions

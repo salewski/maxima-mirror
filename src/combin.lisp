@@ -1383,7 +1383,7 @@
 	     (maybe-simplifya (cadr (cdddr x)) z)))
 
 (defmfun $taytorat (e)
-  (cond ((mbagp e) (cons (car e) (mapcar #'$taytorat (cdr e))))
+  (cond ((mbagp e) (cons (car e) (mapcar-self (cdr e))))
 	((or (atom e) (not (member 'trunc (cdar e) :test #'eq))) (ratf e))
 	((catch 'srrat (srrat e)))
 	(t (ratf ($ratdisrep e)))))

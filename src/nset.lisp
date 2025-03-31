@@ -111,8 +111,8 @@
 (defmfun $full_listify (a)
   (setq a ($ratdisrep a))
   (cond (($mapatom a) a)
-	(($setp a) (simplify (cons (list 'mlist) (mapcar #'$full_listify (cdr a)))))
-	(t (simplify (cons (car a) (mapcar #'$full_listify (cdr a)))))))
+	(($setp a) (simplify (cons (list 'mlist) (mapcar-self (cdr a)))))
+	(t (simplify (cons (car a) (mapcar-self (cdr a)))))))
 
 (defprop $set simp-set operators)
 

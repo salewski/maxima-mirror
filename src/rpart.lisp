@@ -90,7 +90,7 @@
 
 (defmfun ($polarform :properties ((evfun t))) (xx)
   (cond ((mbagp xx)
-	 (cons (car xx) (mapcar #'$polarform (cdr xx))))
+	 (cons (car xx) (mapcar-self (cdr xx))))
 	(t
 	 (let ((aas (absarg xx)) ($%emode nil))
 	   (mul (car aas) (powers '$%e (mul '$%i (cdr aas))))))))
@@ -127,7 +127,7 @@
 
 (defmfun $carg (xx)
   (cond ((mbagp xx)
-	 (cons (car xx) (mapcar #'$carg (cdr xx))))
+	 (cons (car xx) (mapcar-self (cdr xx))))
 	(t (cdr (absarg xx)))))
 
 (defprop $carg %carg verb)

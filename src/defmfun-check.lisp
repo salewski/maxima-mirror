@@ -379,7 +379,10 @@
 	     (block ,name
 	       (let ((%%pretty-fname ',pretty-fname))
 		 (declare (ignorable %%pretty-fname))
-		 ,@forms)))
+         (macrolet
+           ((mapcar-self (&rest lists) `(mapcar #',',impl-name ,@lists))
+            (recur-apply-self (expr) `(recur-apply #',',impl-name ,expr)))
+		   ,@forms))))
 
 	   (let ,(when deprecated-p `((,warning-done-var nil)))
 	     (defun ,name (&rest ,args)

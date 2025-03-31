@@ -80,7 +80,7 @@
 
 (defmfun $poissimp (x)
   (if (mbagp x)
-      (cons (car x) (mapcar #'$poissimp (cdr x)))
+      (cons (car x) (mapcar-self (cdr x)))
       ($outofpois x)))
 
 ;;;********

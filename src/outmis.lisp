@@ -515,7 +515,7 @@
 (defmfun $combine (e)
   (cond ((or (atom e) (eq (caar e) 'rat)) e)
 	((eq (caar e) 'mplus) (combine (cdr e)))
-	(t (recur-apply #'$combine e))))
+	(t (recur-apply-self e))))
 
 (defun combine (e)
   (prog (term r ld sw nnu d ln xl)
