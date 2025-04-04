@@ -2105,18 +2105,18 @@ ignoring dummy variables and array indices."
 	 (or (equal 1. bl) (equal bl -1.)))
 	(t (equal (getsignl (m1- `((mabs) ,bl))) 0))))
 
-(defun simplimit (exp var val &aux op)
+(defun simplimit (exp limit-var val &aux op)
   (cond
-    ((eq var exp) val)
+    ((eq limit-var exp) val)
     ((or (atom exp) (mnump exp)) exp)
     ;; Lookup and dispatch a simplim%function from the property list  
     ((setq op (safe-get (mop exp) 'simplim%function))
-     (funcall op exp var val))
+     (funcall op exp limit-var val))
 
     ;; And do the same for subscripted:
     ((and (consp exp) (consp (car exp)) (eq (caar exp) 'mqapply)
 	  (setq op (safe-get (subfunname exp) 'simplim%function)))
-     (funcall op exp var val))	  
+     (funcall op exp limit-var val))	  
 
     ;; Without the call to rootscontract, 
     ;;   limit(((-4)*x^2-10*x+24)/((4*x+8)^(1/3)+2),x,-4)
@@ -2127,40 +2127,40 @@ ignoring dummy variables and array indices."
     ((mplusp exp) (let (($rootsconmode nil)) ($rootscontract (simplimplus exp))))
     ((mtimesp exp)  (simplimtimes (cdr exp)))
     ((mexptp exp)  (simplimexpt (cadr exp) (caddr exp)
-				(limit (cadr exp) var val 'think)
-				(limit (caddr exp) var val 'think)))
+				(limit (cadr exp) limit-var val 'think)
+				(limit (caddr exp) limit-var val 'think)))
     ((member (caar exp) '(%sin %cos) :test #'eq)
-     (simplimsc exp (caar exp) (limit (cadr exp) var val 'think)))
+     (simplimsc exp (caar exp) (limit (cadr exp) limit-var val 'think)))
     ((eq (caar exp) '%tan) (simplim%tan (cadr exp)))
     ((member (caar exp) '(%sinh %cosh) :test #'eq)
-     (simplimsch (caar exp) (limit (cadr exp) var val 'think)))
+     (simplimsch (caar exp) (limit (cadr exp) limit-var val 'think)))
     ((member (caar exp) '(%erf %tanh) :test #'eq)
      (simplim%erf-%tanh (caar exp) (cadr exp)))
     ((eq (caar exp) '%atanh)
-     (simplim%atanh (limit (cadr exp) var val 'think) val))
+     (simplim%atanh (limit (cadr exp) limit-var val 'think) val))
     ((eq (caar exp) '%acosh)
-     (simplim%acosh (limit (cadr exp) var val 'think)))
+     (simplim%acosh (limit (cadr exp) limit-var val 'think)))
     ((eq (caar exp) '%asinh)
-     (simplim%asinh (limit (cadr exp) var val 'think)))
+     (simplim%asinh (limit (cadr exp) limit-var val 'think)))
     ((eq (caar exp) '%inverse_jacobi_ns)
-     (simplim%inverse_jacobi_ns (limit (cadr exp) var val 'think) (third exp)))
+     (simplim%inverse_jacobi_ns (limit (cadr exp) limit-var val 'think) (third exp)))
     ((eq (caar exp) '%inverse_jacobi_nc)
-     (simplim%inverse_jacobi_nc (limit (cadr exp) var val 'think) (third exp)))
+     (simplim%inverse_jacobi_nc (limit (cadr exp) limit-var val 'think) (third exp)))
     ((eq (caar exp) '%inverse_jacobi_sc)
-     (simplim%inverse_jacobi_sc (limit (cadr exp) var val 'think) (third exp)))
+     (simplim%inverse_jacobi_sc (limit (cadr exp) limit-var val 'think) (third exp)))
     ((eq (caar exp) '%inverse_jacobi_cs)
-     (simplim%inverse_jacobi_cs (limit (cadr exp) var val 'think) (third exp)))
+     (simplim%inverse_jacobi_cs (limit (cadr exp) limit-var val 'think) (third exp)))
     ((eq (caar exp) '%inverse_jacobi_dc)
-     (simplim%inverse_jacobi_dc (limit (cadr exp) var val 'think) (third exp)))
+     (simplim%inverse_jacobi_dc (limit (cadr exp) limit-var val 'think) (third exp)))
     ((eq (caar exp) '%inverse_jacobi_ds)
-     (simplim%inverse_jacobi_ds (limit (cadr exp) var val 'think) (third exp)))
+     (simplim%inverse_jacobi_ds (limit (cadr exp) limit-var val 'think) (third exp)))
     ((and (eq (caar exp) 'mqapply)
 	  (eq (subfunname exp) '$psi))
      (simplim$psi (subfunsubs exp) (subfunargs exp) val))
-    ((and (eq (caar exp) var)
+    ((and (eq (caar exp) limit-var)
 	  (member 'array (car exp) :test #'eq)
 	  (every #'(lambda (sub-exp)
-		     (free sub-exp var))
+		     (free sub-exp limit-var))
 		 (cdr exp)))
      exp)				;LIMIT(B[I],B,INF); -> B[I]
     ;; When limsubst is true, limit(f(n+1)/f(n),n,inf) = 1. The user documentation
@@ -2168,7 +2168,7 @@ ignoring dummy variables and array indices."
     (t (if $limsubst
 	   (simplify (cons (operator-with-array-flag exp)
 			   (mapcar #'(lambda (a)
-				       (limit a var val 'think))
+				       (limit a limit-var val 'think))
 				   (cdr exp))))
 	   (throw 'limit t))))) 
   
@@ -3134,8 +3134,8 @@ ignoring dummy variables and array indices."
 
 ;;; Limit(log(XXX), var, 0, val), where val is either zerob (limit from below)
 ;;; or zeroa (limit from above).
-(defun simplimln (expr var val)
-  (let ((arglim (limit (cadr expr) var val 'think)) (dir)) 
+(defun simplimln (expr limit-var val)
+  (let ((arglim (limit (cadr expr) limit-var val 'think)) (dir)) 
     (cond ((eq arglim '$inf) '$inf)     ;log(inf) = inf
           ;;log(minf,infinity,zerob) = infinity & log(0) = infinity
 	  ((or (member arglim '($minf $infinity $zerob)))
@@ -3149,10 +3149,10 @@ ignoring dummy variables and array indices."
 	  ((member arglim '($ind $und)) '$und)
           ;; log(1^(-)) = zerob, log(1^(+)) = zeroa & log(1)=0
 	  ((eql arglim 1)
-	   (if (or (eq val '$zerob) (eq var '$zeroa)) val 0))
+	   (if (or (eq val '$zerob) (eq limit-var '$zeroa)) val 0))
 	  ;; Special case of arglim = 0
 	  ((eql arglim 0)
-	   (setq dir (behavior (cadr expr) var val))
+	   (setq dir (behavior (cadr expr) limit-var val))
 	   (cond ((eql dir -1) '$infinity)
 		 ((eql dir 0) '$infinity)
 		 ((eql dir 1) '$minf)))
@@ -3161,14 +3161,14 @@ ignoring dummy variables and array indices."
            (ftake '%log arglim))
 	  (t
 	   ;; We know that arglim is a negative real number, say xx.
-	   ;; When the imaginary part of (cadr expr) near var is negative,
+	   ;; When the imaginary part of (cadr expr) near limit-var is negative,
 	   ;; return log(-x) - %i*pi; when the imaginary part of (cadr expr) 
-	   ;; near var is positive return log(-x) + %i*pi; and when
+	   ;; near limit-var is positive return log(-x) + %i*pi; and when
 	   ;; we cannot determine the behavior of the imaginary part,
 	   ;; return a nounform. The value of val (either zeroa or zerob)
-	   ;; determines what is meant by "near" (smaller than var when 
-	   ;; val is zerob and larger than var when val is zeroa).
-	   (setq dir (behavior ($imagpart (cadr expr)) var val))
+	   ;; determines what is meant by "near" (smaller than limit-var when 
+	   ;; val is zerob and larger than limit-var when val is zeroa).
+	   (setq dir (behavior ($imagpart (cadr expr)) limit-var val))
            (cond  ((or (eql dir 1) (eql dir -1))
 	           (add (ftake '%log (mul -1 arglim)) (mul dir '$%i '$%pi)))
 	          (t (throw 'limit nil))))))) ;do a nounform return
@@ -3180,8 +3180,8 @@ ignoring dummy variables and array indices."
   (throw 'limit t))
 (setf (get '%limit 'simplim%function) 'simplim%limit)
 
-(defun simplim%unit_step (e var val)
-	(let ((lim (limit (cadr e) var val 'think)))
+(defun simplim%unit_step (e limit-var val)
+	(let ((lim (limit (cadr e) limit-var val 'think)))
 		(cond ((eq lim '$und) '$und)
 			  ((eq lim '$ind) '$ind)
 			  ((eq lim '$zerob) 0)
@@ -3193,15 +3193,15 @@ ignoring dummy variables and array indices."
 			  (t '$ind))))
 (setf (get '$unit_step 'simplim%function) 'simplim%unit_step)
 
-(defun simplim%conjugate (e var val)
-	(let ((lim (limit (cadr e) var val 'think)))
+(defun simplim%conjugate (e limit-var val)
+	(let ((lim (limit (cadr e) limit-var val 'think)))
 		(cond ((off-negative-real-axisp lim)
 				(ftake '$conjugate lim))
               (t (throw 'limit nil)))))
 (setf (get '$conjugate 'simplim%function)  'simplim%conjugate)
 
-(defun simplim%imagpart (e var val)
-  (let ((lim (limit (cadr e) var val 'think)))
+(defun simplim%imagpart (e limit-var val)
+  (let ((lim (limit (cadr e) limit-var val 'think)))
     (cond ((eq lim '$und) '$und)
 	  ((eq lim '$ind) 0)
 	  ((eq lim '$infinity) (throw 'limit nil))
@@ -3209,8 +3209,8 @@ ignoring dummy variables and array indices."
 (setf (get '$imagpart 'simplim%function) 'simplim%imagpart)
 (setf (get '%imagpart 'simplim%function) 'simplim%imagpart)
 
-(defun simplim%realpart (e var val)
-  (let ((lim (limit (cadr e) var val 'think)))
+(defun simplim%realpart (e limit-var val)
+  (let ((lim (limit (cadr e) limit-var val 'think)))
     (cond ((eq lim '$und) '$und)
 	  ((eq lim '$ind) '$ind)
 	  ((eq lim '$infinity) (throw 'limit nil))
@@ -3219,8 +3219,8 @@ ignoring dummy variables and array indices."
 (setf (get '%realpart 'simplim%function) 'simplim%realpart)
 ;;; Limit of the Factorial function
 
-(defun simplimfact (expr var val)
-  (let* ((arglim (limit (cadr expr) var val 'think)) ; Limit of the argument.
+(defun simplimfact (expr limit-var val)
+  (let* ((arglim (limit (cadr expr) limit-var val 'think)) ; Limit of the argument.
          (arg2 arglim))
     (cond ((eq arglim '$inf) '$inf)
           ((member arglim '($minf $infinity $und $ind) :test #'eq) '$und)
@@ -3229,7 +3229,7 @@ ignoring dummy variables and array indices."
                     (setq arg2 (integer-representation-p arglim)))
                 (eq ($sign arg2) '$neg))
            ;; A negative integer or float or bigfloat representation.
-           (let ((dir (limit (add (cadr expr) (mul -1 arg2)) var val 'think))
+           (let ((dir (limit (add (cadr expr) (mul -1 arg2)) limit-var val 'think))
                  (even (mevenp arg2)))
              (cond ((or (and even
                              (eq dir '$zeroa))
