@@ -421,11 +421,11 @@
 
 (defprop %gamma_incomplete simplim%gamma_incomplete simplim%function)
 
-(defun simplim%gamma_incomplete (expr var val)
+(defun simplim%gamma_incomplete (expr limit-var val)
   ;; Set preserve-direction to true and find the limit of each argument.
   (let* ((preserve-direction t) 
-         (a (limit (cadr expr) var val 'think))
-         (z (limit (caddr expr) var val 'think)))
+         (a (limit (cadr expr) limit-var val 'think))
+         (z (limit (caddr expr) limit-var val 'think)))
   (cond
    ;; when either a or z is und, return und
    ((or (eql a '$und) (eql z '$und)) '$und)
@@ -441,12 +441,12 @@
     ;; And that makes limit(gamma_incomplete(2, -%i*x), x, inf) = und, not
     ;; infinity (this is a test in rtest_limit) But this bug needs to be fixed 
     ;; elsewhere. When a isn't fixed, give up.
-    (if (freeof var a)
-       (limit (div (ftake 'mexpt z (sub a 1)) (ftake 'mexpt '$%e z)) var val 'think)
+    (if (freeof limit-var a)
+       (limit (div (ftake 'mexpt z (sub a 1)) (ftake 'mexpt '$%e z)) limit-var val 'think)
        (throw 'limit t)))
 
      ((and (eql a 0) (eq t (mgrp 0 z)))
-      (let ((im (behavior (cdr (risplit (caddr expr))) var val)))
+      (let ((im (behavior (cdr (risplit (caddr expr))) limit-var val)))
       (cond ((eql im -1)
               (sub (mul '$%i '$%pi) (ftake '%expintegral_ei (mul -1 z))))
             ((eql im 1)
@@ -454,7 +454,7 @@
             (t (throw 'limit nil)))))      
    
     ;; z in {zerob, 0, zeroa}.
-    ((and (freeof var a) (or (eql z 0) (eq z '$zeroa) (eq z '$zerob)))
+    ((and (freeof limit-var a) (or (eql z 0) (eq z '$zeroa) (eq z '$zerob)))
         ;; Two cases: (i) a <= 0 & integer (ii) a not a negative integer.
         ;; Revert a & z to the arguments of gamma_incomplete.
         (setq a (cadr expr))
@@ -463,15 +463,15 @@
               ;; gamma_incomplete(a,n) = - (-1)^(-a) log(z)/(-a)! + ...
               (setq a (sub 0 a))
               (limit (div (mul -1 (ftake 'mexpt -1 a) (ftake '%log z))
-                          (ftake 'mfactorial a)) var val 'think))
+                          (ftake 'mfactorial a)) limit-var val 'think))
               (t 
-              (limit (sub (ftake '%gamma a) (div (ftake 'mexpt z a) a)) var val 'think))))
+              (limit (sub (ftake '%gamma a) (div (ftake 'mexpt z a) a)) limit-var val 'think))))
     ;; z is on the branch cut. We need to know if the imaginary part of
     ;; (caddr exp) approaches zero from above or below. The incomplete
     ;; gamma function is continuous from above its branch cut. The check for
     ;; $ind is needed to avoid calling sign on $ind.
     ((and (not (eq z '$ind)) (eq t (mgrp 0 z)))
-      (let ((im (behavior (cdr (risplit (caddr expr))) var val)))
+      (let ((im (behavior (cdr (risplit (caddr expr))) limit-var val)))
           (cond ((eql im 1) ; use direct substitution
                    (ftake '%gamma_incomplete a z))
                 ((eql im -1)
@@ -2389,10 +2389,10 @@
 
 (defprop %erf_generalized simplim%erf_generalized simplim%function)
 
-(defun simplim%erf_generalized (expr var val)
+(defun simplim%erf_generalized (expr limit-var val)
   ;; Look for the limit of the arguments.
-  (let ((z1 (limit (cadr expr) var val 'think))
-        (z2 (limit (caddr expr) var val 'think)))
+  (let ((z1 (limit (cadr expr) limit-var val 'think))
+        (z2 (limit (caddr expr) limit-var val 'think)))
     (cond
       ;; Handle infinities at this place.
       ((or (eq z2 '$inf)
@@ -2511,9 +2511,9 @@
 
 (defprop %erfc simplim%erfc simplim%function)
 
-(defun simplim%erfc (expr var val)
+(defun simplim%erfc (expr limit-var val)
   ;; Look for the limit of the arguments.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
     (cond
       ;; Handle infinities at this place.
       ((eq z '$inf) 0)
@@ -2521,9 +2521,9 @@
       ((eq z '$infinity)	;; parallel to code in simplim%erf-%tanh
        (destructuring-let (((rpart . ipart) (trisplit (cadr expr)))
 			   (ans ()) (rlim ()))
-			  (setq rlim (limit rpart var val 'think))
+			  (setq rlim (limit rpart limit-var val 'think))
 			  (setq ans
-				(limit (m* rpart (m^t ipart -1)) var val 'think))
+				(limit (m* rpart (m^t ipart -1)) limit-var val 'think))
 			  (setq ans ($asksign (m+ `((mabs) ,ans) -1)))
 			  (cond ((or (eq ans '$pos) (eq ans '$zero))
 				 (cond ((eq rlim '$inf) 0)
@@ -2619,9 +2619,9 @@
 
 (defprop %erfi simplim%erfi simplim%function)
 
-(defun simplim%erfi (expr var val)
+(defun simplim%erfi (expr limit-var val)
   ;; Look for the limit of the arguments.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
     (cond
       ;; Handle extended reals
       ((eq z '$inf) '$inf)
@@ -2739,9 +2739,9 @@
 
 (defprop %inverse_erf simplim%inverse_erf simplim%function)
 
-(defun simplim%inverse_erf (expr var val)
+(defun simplim%inverse_erf (expr limit-var val)
   ;; Look for the limit of the argument.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 1 at this place
     ((onep1 z) '$inf)
@@ -2812,9 +2812,9 @@
 
 (defprop %inverse_erfc simplim%inverse_erfc simplim%function)
 
-(defun simplim%inverse_erfc (expr var val)
+(defun simplim%inverse_erfc (expr limit-var val)
   ;; Look for the limit of the argument.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 0 at this place
     ((or (zerop1 z) 
@@ -3064,8 +3064,8 @@
 ;;; Limits of the Fresnel Integral S
 
 (defprop %fresnel_s simplim%fresnel_s simplim%function)
-(defun simplim%fresnel_s (exp var val)
-  (let ((arg (limit (cadr exp) var val 'think)))
+(defun simplim%fresnel_s (exp limit-var val)
+  (let ((arg (limit (cadr exp) limit-var val 'think)))
     (cond ((eq arg '$inf)
            '((rat simp) 1 2))
           ((eq arg '$minf)
@@ -3254,8 +3254,8 @@
 ;;; Limits of the Fresnel Integral C
 
 (defprop %fresnel_c simplim%fresnel_c simplim%function)
-(defun simplim%fresnel_c (exp var val)
-  (let ((arg (limit (cadr exp) var val 'think)))
+(defun simplim%fresnel_c (exp limit-var val)
+  (let ((arg (limit (cadr exp) limit-var val 'think)))
     (cond ((eq arg '$inf)
            '((rat simp) 1 2))
           ((eq arg '$minf)

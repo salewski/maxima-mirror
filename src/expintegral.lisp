@@ -195,10 +195,10 @@
 
 (defprop %expintegral_e simplim%expintegral_e simplim%function)
 
-(defun simplim%expintegral_e (expr var val)
+(defun simplim%expintegral_e (expr limit-var val)
   ;; Look for the limit of the arguments.
-  (let ((a (limit (cadr expr) var val 'think))
-        (z (limit (caddr expr) var val 'think)))
+  (let ((a (limit (cadr expr) limit-var val 'think))
+        (z (limit (caddr expr) limit-var val 'think)))
   (cond ((and (onep1 a)
               (or (eq z '$zeroa)
                   (eq z '$zerob)
@@ -896,9 +896,9 @@
 
 (defprop %expintegral_e1 simplim%expintegral_e1 simplim%function)
 
-(defun simplim%expintegral_e1 (expr var val)
+(defun simplim%expintegral_e1 (expr limit-var val)
   ;; Look for the limit of the argument.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 0 at this place
     ((or (zerop1 z)
@@ -1010,9 +1010,9 @@
 
 (defprop %expintegral_ei simplim%expintegral_ei simplim%function)
 
-(defun simplim%expintegral_ei (expr var val)
+(defun simplim%expintegral_ei (expr limit-var val)
   ;; Look for the limit of the arguments.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 0 at this place
     ((or (zerop1 z)
@@ -1209,9 +1209,9 @@
 
 (defprop %expintegral_li simplim%expintegral_li simplim%function)
 
-(defun simplim%expintegral_li (expr var val)
+(defun simplim%expintegral_li (expr limit-var val)
   ;; Look for the limit of the argument.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 1 at this place
     ((onep1 z) '$minf)
@@ -1356,9 +1356,9 @@
 
 (defprop %expintegral_si simplim%expintegral_si simplim%function)
 
-(defun simplim%expintegral_si (expr var val)
+(defun simplim%expintegral_si (expr limit-var val)
   ;; Look for the limit of the argument.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
     ;; All cases are handled by the simplifier of the function.
     (take '(%expintegral_si) z)))
 
@@ -1515,9 +1515,9 @@
 
 (defprop %expintegral_shi simplim%expintegral_shi simplim%function)
 
-(defun simplim%expintegral_shi (expr var val)
+(defun simplim%expintegral_shi (expr limit-var val)
   ;; Look for the limit of the argument.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
     (cond
       ;; Handle infinities at this place
       ((eq z '$inf)
@@ -1685,9 +1685,9 @@
 
 (defprop %expintegral_ci simplim%expintegral_ci simplim%function)
 
-(defun simplim%expintegral_ci (expr var val)
+(defun simplim%expintegral_ci (expr limit-var val)
   ;; Look for the limit of the argument.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 0 at this place
     ((or (zerop1 z)
@@ -1868,9 +1868,9 @@
 
 (defprop %expintegral_chi simplim%expintegral_chi simplim%function)
 
-(defun simplim%expintegral_chi (expr var val)
+(defun simplim%expintegral_chi (expr limit-var val)
   ;; Look for the limit of the argument.
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 0 at this place
     ((or (zerop1 z)

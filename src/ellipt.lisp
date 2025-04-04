@@ -2008,9 +2008,9 @@ first kind:
 
 (defprop %elliptic_kc simplim%elliptic_kc simplim%function)
 
-(defun simplim%elliptic_kc (expr var val)
+(defun simplim%elliptic_kc (expr limit-var val)
   ;; Look for the limit of the argument
-  (let ((m (limit (cadr expr) var val 'think)))
+  (let ((m (limit (cadr expr) limit-var val 'think)))
     (cond ((onep1 m)
            ;; For an argument 1 return $infinity.
            '$infinity)
