@@ -64,9 +64,9 @@
 
 (setf (gethash '%airy_ai *flonum-op*) 'airy-ai)
 
-(defun simplim%airy_ai (expr var val)
+(defun simplim%airy_ai (expr limit-var val)
   ; Look for the limit of the argument
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
     (cond ((or (eq z '$inf)   ; A&S 10.4.59
 	       (eq z '$minf)) ; A&S 10.4.60
 	   0)
@@ -126,9 +126,9 @@
 
 (setf (gethash '%airy_dai *flonum-op*) 'airy-dai)
 
-(defun simplim%airy_dai (expr var val)
+(defun simplim%airy_dai (expr limit-var val)
   ; Look for the limit of the argument
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
     (cond ((eq z '$inf) ; A&S 10.4.61
 	   0)
 	  ((eq z '$minf) ; A&S 10.4.62
@@ -213,9 +213,9 @@
 
 (setf (gethash '%airy_bi *flonum-op*) 'airy-bi)
 
-(defun simplim%airy_bi (expr var val)
+(defun simplim%airy_bi (expr limit-var val)
   ; Look for the limit of the argument
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
     (cond ((eq z '$inf) ; A&S 10.4.63
 	   '$inf)
 	  ((eq z '$minf) ; A&S 10.4.64
@@ -276,9 +276,9 @@
 
 (setf (gethash '%airy_dbi *flonum-op*) 'airy-dbi)
 
-(defun simplim%airy_dbi (expr var val)
+(defun simplim%airy_dbi (expr limit-var val)
   ; Look for the limit of the argument
-  (let ((z (limit (cadr expr) var val 'think)))
+  (let ((z (limit (cadr expr) limit-var val 'think)))
     (cond ((eq z '$inf) ; A&S 10.4.66
 	   '$inf)
 	  ((eq z '$minf) ; A&S 10.4.67

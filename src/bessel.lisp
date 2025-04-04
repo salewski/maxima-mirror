@@ -125,10 +125,10 @@
 
 (defprop %bessel_j simplim%bessel_j simplim%function)
 
-(defun simplim%bessel_j (expr var val)
+(defun simplim%bessel_j (expr limit-var val)
   ;; Look for the limit of the arguments.
-  (let ((v (limit (cadr expr) var val 'think))
-        (z (limit (caddr expr) var val 'think)))
+  (let ((v (limit (cadr expr) limit-var val 'think))
+        (z (limit (caddr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 0 at this place.
     ((or (zerop1 z)
@@ -460,10 +460,10 @@
 
 (defprop %bessel_y simplim%bessel_y simplim%function)
 
-(defun simplim%bessel_y (expr var val)
+(defun simplim%bessel_y (expr limit-var val)
   ;; Look for the limit of the arguments.
-  (let ((v (limit (cadr expr) var val 'think))
-        (z (limit (caddr expr) var val 'think)))
+  (let ((v (limit (cadr expr) limit-var val 'think))
+        (z (limit (caddr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 0 at this place.
     ((or (zerop1 z)
@@ -793,10 +793,10 @@
 
 (defprop %bessel_i simplim%bessel_i simplim%function)
 
-(defun simplim%bessel_i (expr var val)
+(defun simplim%bessel_i (expr limit-var val)
   ;; Look for the limit of the arguments.
-  (let ((v (limit (cadr expr) var val 'think))
-        (z (limit (caddr expr) var val 'think)))
+  (let ((v (limit (cadr expr) limit-var val 'think))
+        (z (limit (caddr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 0 at this place.
     ((or (zerop1 z)
@@ -1151,10 +1151,10 @@
 
 (defprop %bessel_k simplim%bessel_k simplim%function)
 
-(defun simplim%bessel_k (expr var val)
+(defun simplim%bessel_k (expr limit-var val)
   ;; Look for the limit of the arguments.
-  (let ((v (limit (cadr expr) var val 'think))
-        (z (limit (caddr expr) var val 'think)))
+  (let ((v (limit (cadr expr) limit-var val 'think))
+        (z (limit (caddr expr) limit-var val 'think)))
   (cond
     ;; Handle an argument 0 at this place.
     ((or (zerop1 z)
