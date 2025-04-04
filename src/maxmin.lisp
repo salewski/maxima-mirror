@@ -84,8 +84,8 @@
 ;; Define a simplim%function to handle a limit of $max.
 (defprop $max simplim$max simplim%function)
 
-(defun simplim$max (expr var val)
-  (simplifya (cons '($max) (mapcar #'(lambda (e) (limit e var val 'think)) (cdr expr))) t))
+(defun simplim$max (expr limit-var val)
+  (simplifya (cons '($max) (mapcar #'(lambda (e) (limit e limit-var val 'think)) (cdr expr))) t))
 
 (defprop $max simp-max operators)
 
@@ -221,8 +221,8 @@
 
 (defprop $min simplim$min simplim%function)
 
-(defun simplim$min (expr var val)
- (simplifya (cons '($min) (mapcar #'(lambda (e) (limit e var val 'think)) 
+(defun simplim$min (expr limit-var val)
+ (simplifya (cons '($min) (mapcar #'(lambda (e) (limit e limit-var val 'think)) 
     (cdr expr))) t))
 
 (defprop $min simp-min operators)

@@ -248,10 +248,10 @@
 
 (defprop $floor simplim%floor simplim%function)
 
-(defun simplim%floor (expr var val)
+(defun simplim%floor (expr limit-var val)
   (let* ((arg (cadr expr))
-	 (b (behavior arg var val))
-	 (arglimab (let ((preserve-direction t)) (limit arg var val 'think))) ; with $zeroa $zerob
+	 (b (behavior arg limit-var val))
+	 (arglimab (let ((preserve-direction t)) (limit arg limit-var val 'think))) ; with $zeroa $zerob
 	 (arglim (ridofab arglimab)))
     (cond 
 	  ((eq arglim '$ind) (throw 'limit nil))
@@ -320,10 +320,10 @@
 
 (defprop $ceiling simplim%ceiling simplim%function)
 
-(defun simplim%ceiling (expr var val)
+(defun simplim%ceiling (expr limit-var val)
   (let* ((arg (cadr expr))
-	 (b (behavior arg var val))
-	 (arglimab (let ((preserve-direction t)) (limit arg var val 'think))) ; with $zeroa $zerob
+	 (b (behavior arg limit-var val))
+	 (arglimab (let ((preserve-direction t)) (limit arg limit-var val 'think))) ; with $zeroa $zerob
 	 (arglim (ridofab arglimab)))
     (cond 
 	  ((eq arglim '$ind) (throw 'limit nil))
@@ -410,10 +410,10 @@
 
 (defprop %round simplim%round simplim%function)
 
-(defun simplim%round (expr var val)
+(defun simplim%round (expr limit-var val)
   (let* ((arg (cadr expr))
-	 (b (behavior arg var val))
-	 (arglimab (let ((preserve-direction t)) (limit arg var val 'think))) ; with $zeroa $zerob
+	 (b (behavior arg limit-var val))
+	 (arglimab (let ((preserve-direction t)) (limit arg limit-var val 'think))) ; with $zeroa $zerob
 	 (arglim (ridofab arglimab)))
     (cond
 	  ((eq arglim '$ind) (throw 'limit nil))
