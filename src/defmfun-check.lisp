@@ -832,3 +832,22 @@
         (merror (intl:gettext "~M: expected exactly ~M arguments but got ~M: ~M")
          pretty-name
          required-arg-count arg-count `((mlist) ,@args))))))
+
+(defmacro def-limit (base-name lambda-list &body body)
+  (let* ((noun-name (intern (concatenate 'string "%" (string base-name))))
+	 (simp-name (intern (concatenate 'string "SIMPLIM%" (string base-name))))
+         (expr-arg (intern "EXPR"))
+         (limit-var (intern "LIMIT-VAR"))
+         (val-arg (intern "VAL"))
+         (arg-forms (loop for arg in lambda-list
+                          and count from 1
+                          collect (list arg `(limit (nth ,count ,expr-arg)
+                                                    ,limit-var ,val-arg 'think)))))
+    `(progn
+       (defun ,simp-name (,expr-arg ,limit-var ,val-arg)
+         (let (,@arg-forms)
+           (flet ((simplifier ()
+                    (simplify (list '(,noun-name) ,@lambda-list))))
+             (declare (ignorable simplifier))
+             ,@body)))
+       (defprop ,noun-name ,simp-name simplim%function))))
