@@ -847,7 +847,8 @@
        (defun ,simp-name (,expr-arg ,limit-var ,val-arg)
          (let (,@arg-forms)
            (flet ((simplifier ()
-                    (simplify (list '(,noun-name) ,@lambda-list))))
-             (declare (ignorable simplifier))
+                    ;; Simplifier is used to take the limit
+                    (ftake ',noun-name ,@lambda-list)))
+             (declare (ignorable #'simplifier))
              ,@body)))
        (defprop ,noun-name ,simp-name simplim%function))))
