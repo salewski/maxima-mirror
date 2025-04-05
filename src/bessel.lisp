@@ -524,7 +524,7 @@
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%bessel_y) v z))))))
 
-(def-limit bessel_y (v z)
+(def-simplimit bessel_y (v z)
   ;; Look for the limit of the arguments.
   (let ((v (limit (cadr expr) var val 'think))
         (z (limit (caddr expr) var val 'think)))
@@ -892,7 +892,7 @@
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%bessel_i) v z))))))
 
-(def-limit bessel_i (v z)
+(def-simplimit bessel_i (v z)
   (cond
     ;; Handle an argument 0 at this place.
     ((or (zerop1 z)
@@ -1286,7 +1286,7 @@
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%bessel_k) v z))))))
 
-(def-limit bessel_k (v z)
+(def-simplimit bessel_k (v z)
   (cond
     ;; Handle an argument 0 at this place.
     ((or (zerop1 z)

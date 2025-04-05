@@ -833,7 +833,7 @@
          pretty-name
          required-arg-count arg-count `((mlist) ,@args))))))
 
-(defmacro def-limit (base-name lambda-list &body body)
+(defmacro def-simplimit (base-name lambda-list &body body)
   (let* ((noun-name (intern (concatenate 'string "%" (string base-name))))
 	 (simp-name (intern (concatenate 'string "SIMPLIM%" (string base-name))))
          (expr-arg (intern "EXPR"))

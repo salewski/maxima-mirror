@@ -149,7 +149,7 @@
 	   ; Handle other cases with the function simplifier
 	   (simplify (list '(%airy_dai) z))))))
 
-(def-limit airy_dai (z)
+(def-simplimit airy_dai (z)
   (cond ((eq z '$inf)                   ; A&S 10.4.61
 	 0)
 	((eq z '$minf)                  ; A&S 10.4.62
@@ -247,7 +247,7 @@
 	   ; Handle other cases with the function simplifier
 	   (simplify (list '(%airy_bi) z))))))
 
-(def-limit airy_bi (z)
+(def-simplimit airy_bi (z)
   (cond ((eq z '$inf)                   ; A&S 10.4.63
 	 '$inf)
 	((eq z '$minf)                  ; A&S 10.4.64
@@ -309,7 +309,7 @@
 
 (setf (gethash '%airy_dbi *flonum-op*) 'airy-dbi)
 
-(def-limit airy_dbi (z)
+(def-simplimit airy_dbi (z)
   (cond ((eq z '$inf)                   ; A&S 10.4.66
 	 '$inf)
 	((eq z '$minf)                  ; A&S 10.4.67
