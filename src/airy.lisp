@@ -76,7 +76,7 @@
 	   ; Handle other cases with the function simplifier
 	   (simplify (list '(%airy_ai) z))))))
 
-(def-limit airy_ai (z)
+(def-simplimit airy_ai (z)
   (cond ((or (eq z '$inf)               ; A&S 10.4.59
 	     (eq z '$minf))             ; A&S 10.4.60
 	 0)
