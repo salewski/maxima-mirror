@@ -155,7 +155,7 @@
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%bessel_j) v z))))))
 
-(def-limit bessel_j (v z)
+(def-simplimit bessel_j (v z)
   (cond
     ;; Handle an argument 0 at this place.
     ((or (zerop1 z)
@@ -526,39 +526,37 @@
 
 (def-simplimit bessel_y (v z)
   ;; Look for the limit of the arguments.
-  (let ((v (limit (cadr expr) var val 'think))
-        (z (limit (caddr expr) var val 'think)))
-    (cond
-      ;; Handle an argument 0 at this place.
-      ((or (zerop1 z)
-           (eq z '$zeroa)
-           (eq z '$zerob))
-       (cond ((zerop1 v)
-              ;; bessel_y(0,0)
-              '$minf)
-             ((integerp v)
-              ;; bessel_y(n,0), n an integer
-              (cond ((evenp v) '$minf)
-                    (t (cond ((eq z '$zeroa) '$minf)
-                             ((eq z '$zerob) '$inf)
-                             (t '$infinity)))))
-             ((not (zerop1 ($realpart v)))
-              ;; bessel_y(v,0), Re(v)#0
-              '$infinity)
-             ((and (zerop1 ($realpart v))
-                   (not (zerop1 v)))
-              ;; bessel_y(v,0), Re(v)=0 and v#0
-              '$und)
-             ;; Call the simplifier of the function.
-             (t
-              (simplifier))))
-      ((or (eq z '$inf)
-           (eq z '$minf))
-       ;; bessel_y(v,inf) or bessel_y(v,minf)
-       0)
-      (t
-       ;; All other cases are handled by the simplifier of the function.
-       (simplifier)))))
+  (cond
+    ;; Handle an argument 0 at this place.
+    ((or (zerop1 z)
+         (eq z '$zeroa)
+         (eq z '$zerob))
+     (cond ((zerop1 v)
+            ;; bessel_y(0,0)
+            '$minf)
+           ((integerp v)
+            ;; bessel_y(n,0), n an integer
+            (cond ((evenp v) '$minf)
+                  (t (cond ((eq z '$zeroa) '$minf)
+                           ((eq z '$zerob) '$inf)
+                           (t '$infinity)))))
+           ((not (zerop1 ($realpart v)))
+            ;; bessel_y(v,0), Re(v)#0
+            '$infinity)
+           ((and (zerop1 ($realpart v))
+                 (not (zerop1 v)))
+            ;; bessel_y(v,0), Re(v)=0 and v#0
+            '$und)
+           ;; Call the simplifier of the function.
+           (t
+            (simplifier))))
+    ((or (eq z '$inf)
+         (eq z '$minf))
+     ;; bessel_y(v,inf) or bessel_y(v,minf)
+     0)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 
 
