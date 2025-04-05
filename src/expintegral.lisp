@@ -193,8 +193,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %expintegral_e simplim%expintegral_e simplim%function)
 
+#+nil
 (defun simplim%expintegral_e (expr var val)
   ;; Look for the limit of the arguments.
   (let ((a (limit (cadr expr) var val 'think))
@@ -222,6 +224,31 @@
         (t
          ;; All other cases are handled by the simplifier of the function.
          (ftake '%expintegral_e a z)))))
+
+(def-simplimit expintegral_e (a z)
+  (cond ((and (onep1 a)
+              (or (eq z '$zeroa)
+                  (eq z '$zerob)
+                  (zerop1 z)))
+         ;; Special case order a=1
+         '$inf)
+         
+        ((member ($sign (add ($realpart a) -1)) '($neg $nz $zero))
+                                        ; realpart of order < 1
+         (cond ((eq z '$zeroa)
+                ;; from above, always inf
+                '$inf)
+               ((eq z '$zerob)
+                ;; this can be further improved to give a directed infinity
+                '$infinity)
+               ((zerop1 z)
+                ;; no direction, return infinity
+                '$infinity)
+               (t
+                (simplifier))))
+        (t
+         ;; All other cases are handled by the simplifier of the function.
+         (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -894,8 +921,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %expintegral_e1 simplim%expintegral_e1 simplim%function)
 
+#+nil
 (defun simplim%expintegral_e1 (expr var val)
   ;; Look for the limit of the argument.
   (let ((z (limit (cadr expr) var val 'think)))
@@ -909,6 +938,18 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (take '(%expintegral_e1) z)))))
+
+(def-simplimit expintegral_e1 (z)
+  (cond
+    ;; Handle an argument 0 at this place
+    ((or (zerop1 z)
+         (eq z '$zeroa)
+         (eq z '$zerob))
+     ;; limit is inf from both sides
+     '$inf)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1008,8 +1049,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %expintegral_ei simplim%expintegral_ei simplim%function)
 
+#+nil
 (defun simplim%expintegral_ei (expr var val)
   ;; Look for the limit of the arguments.
   (let ((z (limit (cadr expr) var val 'think)))
@@ -1022,6 +1065,17 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (take '(%expintegral_ei) z)))))
+
+(def-simplimit expintegral_ei (z)
+  (cond
+    ;; Handle an argument 0 at this place
+    ((or (zerop1 z)
+         (eq z '$zeroa)
+         (eq z '$zerob))
+     '$minf)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simpiflier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1207,8 +1261,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %expintegral_li simplim%expintegral_li simplim%function)
 
+#+nil
 (defun simplim%expintegral_li (expr var val)
   ;; Look for the limit of the argument.
   (let ((z (limit (cadr expr) var val 'think)))
@@ -1218,6 +1274,14 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (take '(%expintegral_li) z)))))
+
+(def-simplimit expintegral_li (z)
+  (cond
+    ;; Handle an argument 1 at this place
+    ((onep1 z) '$minf)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1354,13 +1418,19 @@
 
 ;;; We support a simplim%function.
 
+#+nil
 (defprop %expintegral_si simplim%expintegral_si simplim%function)
 
+#+nil
 (defun simplim%expintegral_si (expr var val)
   ;; Look for the limit of the argument.
   (let ((z (limit (cadr expr) var val 'think)))
     ;; All cases are handled by the simplifier of the function.
     (take '(%expintegral_si) z)))
+
+(def-simplimit expintegral_si (z)
+  ;; All cases are handled by the simplifier of the function.
+  (simplifier))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1513,8 +1583,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %expintegral_shi simplim%expintegral_shi simplim%function)
 
+#+nil
 (defun simplim%expintegral_shi (expr var val)
   ;; Look for the limit of the argument.
   (let ((z (limit (cadr expr) var val 'think)))
@@ -1527,6 +1599,17 @@
       (t
        ;; All other cases are handled by the simplifier of the function.
        (take '(%expintegral_shi) z)))))
+
+(def-simplimit expintegral_shi (z)
+  (cond
+    ;; Handle infinities at this place
+    ((eq z '$inf)
+     '$inf)
+    ((eq z '$minf)
+     '$minf)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1683,8 +1766,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %expintegral_ci simplim%expintegral_ci simplim%function)
 
+#+nil
 (defun simplim%expintegral_ci (expr var val)
   ;; Look for the limit of the argument.
   (let ((z (limit (cadr expr) var val 'think)))
@@ -1697,6 +1782,17 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (take '(%expintegral_ci) z)))))
+
+(def-simplimit expintegral_ci (z)
+  (cond
+    ;; Handle an argument 0 at this place
+    ((or (zerop1 z)
+         (eq z '$zeroa)
+         (eq z '$zerob))
+     '$minf)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1866,8 +1962,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %expintegral_chi simplim%expintegral_chi simplim%function)
 
+#+nil
 (defun simplim%expintegral_chi (expr var val)
   ;; Look for the limit of the argument.
   (let ((z (limit (cadr expr) var val 'think)))
@@ -1883,6 +1981,20 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (take '(%expintegral_chi) z)))))
+
+(def-simplimit expintegral_chi (z)
+  (cond
+    ;; Handle an argument 0 at this place
+    ((or (zerop1 z)
+         (eq z '$zeroa)
+         (eq z '$zerob))
+     '$minf)
+    ((or (eq z '$inf)
+         (eq z '$minf))
+     '$inf)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

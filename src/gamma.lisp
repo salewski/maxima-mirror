@@ -2387,8 +2387,10 @@
 
 ;;; ----------------------------------------------------------------------------
 
+#+nil
 (defprop %erf_generalized simplim%erf_generalized simplim%function)
 
+#+nil
 (defun simplim%erf_generalized (expr var val)
   ;; Look for the limit of the arguments.
   (let ((z1 (limit (cadr expr) var val 'think))
@@ -2410,6 +2412,25 @@
       (t
        ;; All other cases are handled by the simplifier of the function.
        (simplify (list '(%erf_generalized) z1 z2))))))
+
+(def-simplimit erf_generalized (z1 z2)
+  (cond
+    ;; Handle infinities at this place.
+    ((or (eq z2 '$inf)
+         (alike1 z2 '((mtimes) -1 $minf)))
+     (sub 1 (take '(%erf) z1)))
+    ((or (eq z2 '$minf)
+         (alike1 z2 '((mtimes) -1 $inf)))
+     (sub (mul -1 (take '(%erf) z1)) 1))
+    ((or (eq z1 '$inf)
+         (alike1 z1 '((mtimes) -1 $minf)))
+     (sub (take '(%erf) z2) 1))
+    ((or (eq z1 '$minf)
+         (alike1 z1 '((mtimes) -1 $inf)))
+     (add (take '(%erf) z2) 1))
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 ;;; ----------------------------------------------------------------------------
 
@@ -2509,8 +2530,10 @@
 
 ;;; ----------------------------------------------------------------------------
 
+#+nil
 (defprop %erfc simplim%erfc simplim%function)
 
+#+nil
 (defun simplim%erfc (expr var val)
   ;; Look for the limit of the arguments.
   (let ((z (limit (cadr expr) var val 'think)))
@@ -2534,6 +2557,28 @@
       (t
        ;; All other cases are handled by the simplifier of the function.
        (simplify (list '(%erfc) z))))))
+
+(def-simplimit erfc (z)
+  (cond
+    ;; Handle infinities at this place.
+    ((eq z '$inf) 0)
+    ((eq z '$minf) 2)
+    ((eq z '$infinity) ;; parallel to code in simplim%erf-%tanh
+     (destructuring-let (((rpart . ipart) (trisplit (cadr expr)))
+			 (ans ()) (rlim ()))
+       (setq rlim (limit rpart var val 'think))
+       (setq ans
+	     (limit (m* rpart (m^t ipart -1)) var val 'think))
+       (setq ans ($asksign (m+ `((mabs) ,ans) -1)))
+       (cond ((or (eq ans '$pos) (eq ans '$zero))
+	      (cond ((eq rlim '$inf) 0)
+		    ((eq rlim '$minf) 2)
+		    (t '$und)))
+	     (t '$und))))
+    ((eq z '$ind) '$ind)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 ;;; ----------------------------------------------------------------------------
 
@@ -2617,8 +2662,10 @@
 
 ;;; ----------------------------------------------------------------------------
 
+#+nil
 (defprop %erfi simplim%erfi simplim%function)
 
+#+nil
 (defun simplim%erfi (expr var val)
   ;; Look for the limit of the arguments.
   (let ((z (limit (cadr expr) var val 'think)))
@@ -2633,6 +2680,19 @@
       (t
        ;; All other cases are handled by the simplifier of the function.
        (ftake '%erfi z)))))
+
+(def-simplimit erfi (z)
+  (cond
+    ;; Handle extended reals
+    ((eq z '$inf) '$inf)
+    ((eq z '$minf) '$minf)
+    ((eq z '$und) '$und)
+    ((eq z '$ind) '$ind)
+    ((or (eq z '$zerob) (eq z '$zeroa)) z)
+    ((eq z '$infinity) '$und)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 ;;; ----------------------------------------------------------------------------
 
@@ -2737,8 +2797,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %inverse_erf simplim%inverse_erf simplim%function)
 
+#+nil
 (defun simplim%inverse_erf (expr var val)
   ;; Look for the limit of the argument.
   (let ((z (limit (cadr expr) var val 'think)))
@@ -2749,6 +2811,15 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%inverse_erf) z))))))
+
+(def-simplimit inverse_erf (expr var val)
+  (cond
+    ;; Handle an argument 1 at this place
+    ((onep1 z) '$inf)
+    ((onep1 (mul -1 z)) '$minf)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
           
@@ -2810,8 +2881,10 @@
 ;;; We support a simplim%function. The function is looked up in simplimit and 
 ;;; handles specific values of the function.
 
+#+nil
 (defprop %inverse_erfc simplim%inverse_erfc simplim%function)
 
+#+nil
 (defun simplim%inverse_erfc (expr var val)
   ;; Look for the limit of the argument.
   (let ((z (limit (cadr expr) var val 'think)))
@@ -2825,6 +2898,18 @@
     (t
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%inverse_erfc) z))))))
+
+(def-simplimit inverse_erfc (z)
+  (cond
+    ;; Handle an argument 0 at this place
+    ((or (zerop1 z) 
+         (eq z '$zeroa)
+         (eq z '$zerob)) 
+     '$inf)
+    ((zerop1 (add z -2)) '$minf)
+    (t
+     ;; All other cases are handled by the simplifier of the function.
+     (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
           
@@ -3063,7 +3148,9 @@
 
 ;;; Limits of the Fresnel Integral S
 
+#+nil
 (defprop %fresnel_s simplim%fresnel_s simplim%function)
+#+nil
 (defun simplim%fresnel_s (exp var val)
   (let ((arg (limit (cadr exp) var val 'think)))
     (cond ((eq arg '$inf)
@@ -3072,6 +3159,14 @@
            '((rat simp) -1 2))
           (t
            `((%fresnel_s) ,arg)))))
+
+(def-simplimit fresnel_s (arg)
+  (cond ((eq arg '$inf)
+         '((rat simp) 1 2))
+        ((eq arg '$minf)
+         '((rat simp) -1 2))
+        (t
+         (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -3253,7 +3348,9 @@
 
 ;;; Limits of the Fresnel Integral C
 
+#+nil
 (defprop %fresnel_c simplim%fresnel_c simplim%function)
+#+nil
 (defun simplim%fresnel_c (exp var val)
   (let ((arg (limit (cadr exp) var val 'think)))
     (cond ((eq arg '$inf)
@@ -3262,6 +3359,14 @@
            '((rat simp) -1 2))
           (t
            `((%fresnel_c) ,arg)))))
+
+(def-simplimit fresnel_c (arg)
+  (cond ((eq arg '$inf)
+         '((rat simp) 1 2))
+        ((eq arg '$minf)
+         '((rat simp) -1 2))
+        (t
+         (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
