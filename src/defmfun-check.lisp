@@ -833,22 +833,39 @@
          pretty-name
          required-arg-count arg-count `((mlist) ,@args))))))
 
-(defmacro def-simplimit (base-name lambda-list &body body)
-  (let* ((noun-name (intern (concatenate 'string "%" (string base-name))))
-	 (simp-name (intern (concatenate 'string "SIMPLIM%" (string base-name))))
-         (expr-arg (intern "EXPR"))
-         (limit-var (intern "LIMIT-VAR"))
-         (val-arg (intern "VAL"))
-         (arg-forms (loop for arg in lambda-list
-                          and count from 1
-                          collect (list arg `(limit (nth ,count ,expr-arg)
-                                                    ,limit-var ,val-arg 'think)))))
-    `(progn
-       (defun ,simp-name (,expr-arg ,limit-var ,val-arg)
-         (let (,@arg-forms)
-           (flet ((simplifier ()
-                    ;; Simplifier is used to take the limit
-                    (ftake ',noun-name ,@lambda-list)))
-             (declare (ignorable #'simplifier))
-             ,@body)))
-       (defprop ,noun-name ,simp-name simplim%function))))
+(defmacro def-simplimit (base-name-and-options lambda-list &body body)
+  (destructuring-bind (base-name &key
+                                   (preserve-direction nil preserve-direction-p))
+      (if (symbolp base-name-and-options)
+          (list base-name-and-options)
+          base-name-and-options)
+    
+    (let* ((noun-name (intern (concatenate 'string "%" (string base-name))))
+	   (simp-name (intern (concatenate 'string "SIMPLIM%" (string base-name))))
+           (expr-arg (intern "EXPR"))
+           (limit-var (intern "LIMIT-VAR"))
+           (val-arg (intern "VAL"))
+           (orig-arg-names (loop for arg in lambda-list
+                                 collect (intern (concatenate 'string "ORIG-ARG-" (string arg)))))
+           (orig-args (loop for arg in lambda-list
+                            for names in orig-arg-names
+                            and count from 1
+                            collect `(,names
+                                      (nth ,count ,expr-arg))))
+           (arg-forms (loop for arg in lambda-list
+                            for o-arg in orig-arg-names
+                            collect (list arg `(limit ,o-arg
+                                                      ,limit-var ,val-arg 'think))))
+           (preserve-form (when preserve-direction-p
+                            `((preserve-direction ,preserve-direction)))))
+      `(progn
+         (defun ,simp-name (,expr-arg ,limit-var ,val-arg)
+           (let (,@preserve-form
+                 ,@orig-args)
+             (let (,@arg-forms)
+               (flet ((simplifier ()
+                        ;; Simplifier is used to take the limit
+                        (ftake ',noun-name ,@lambda-list)))
+                 (declare (ignorable #'simplifier))
+                 ,@body))))
+         (defprop ,noun-name ,simp-name simplim%function)))))
