@@ -834,6 +834,51 @@
          pretty-name
          required-arg-count arg-count `((mlist) ,@args))))))
 
+
+;; DEF-SIMPLIMIT
+;;   Defines a limit function for a Maxima function whose name is
+;;   BASE-NAME that can be used as a `simplim%fun`
+;;
+;; The base name can be a symbol or a lambda-list of the form (name
+;; &key preserve-direction).  The NAME is the BASE-NAME of the limit
+;; function.  The keyword arg :PRESERVE-DIRECTION allows the limit
+;; function to set the variable PRESERVE-DIRECTION to the given value
+;; before the limit of the arguments of the function is taken.  This
+;; option is needed by the limit function for gamma_incomplete.
+;;
+;; The lambda-list of the macro is the list of arguments to the Maxima
+;; function.
+;;
+;; Here is how to define the limit function for the bessel_j(v, z)
+;; simplifying function:
+;;
+;;   (def-simplimit bessel (v z)
+;;     ;; v and z are defined and set appropriately.
+;;     <body>
+;;   )
+;;
+;; This expands to
+;;
+;;   (progn
+;;     (defun simplim%bessel_j (expr limit-var val)
+;;       (let ((orig-arg-v (nth 1 expr)) (orig-arg-z (nth 2 expr)))
+;;         (let ((v (limit orig-arg-v limit-var val 'think))
+;;               (z (limit orig-arg-z limit-var val 'think)))
+;;           (flet ((simplifier ()
+;;                    (ftake '%bessel_j v z)))
+;;             (declare (ignorable #'simplifier))
+;;             <body>))))
+;;     (defprop %bessel_j simplim%bessel_j simplim%function))
+;;
+;; The macro defines the variables ORIG-ARG-V and ORIG-ARG-Z as the
+;; original values of the variables in the call to the simplifier.
+;; Some simplim functions (such as for gamma_incomplete) needs these
+;; variables.
+;;
+;; The local function SIMPLIFIER that takes no arguments is also
+;; defined.  It is for the case where the simplim function wants to
+;; evaluate the limit by calling the simplifier to evaluate the
+;; function with the given arguments.
 (defmacro def-simplimit (base-name-and-options lambda-list &body body)
   (destructuring-bind (base-name &key
                                    (preserve-direction nil preserve-direction-p))
