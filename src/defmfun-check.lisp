@@ -391,10 +391,11 @@
                       (not keywords-present-p)
                       (not allow-other-keys-p))
                `((flet ((,name ,required-args
-                          ,(format nil "Proxy function to forward ~S calls to ~S" name impl-name)
                           (declare (notinline ,impl-name))
+                          ,(format nil "Proxy function to forward ~S calls to ~S" name impl-name)
                           (,impl-name ,@required-args)))
-                   (declare (ignorable #',name) (inline ,name))
+                   ;; GCL doesn't like the IGNORABLE declaration.
+                   (declare #-gcl (ignorable #',name) (inline ,name))
 		           ,@forms))
                forms))))
 
