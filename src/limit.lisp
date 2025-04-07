@@ -3187,7 +3187,7 @@ ignoring dummy variables and array indices."
 	((eq arglim '$zeroa) '$minf)    ;log(zeroa) = minf
         ;; log(ind) = ind when ind > 0 else und
 	((eq arglim '$ind)
-	 (if (eq t (mgrp (cadr expr) 0)) '$ind '$und))
+	 (if (eq t (mgrp orig-arg-arglim 0)) '$ind '$und))
 	;; log(und) = und
 	((eq arglim '$und) '$und)
 	((member arglim '($ind $und)) '$und)
@@ -3196,7 +3196,7 @@ ignoring dummy variables and array indices."
 	 (if (or (eq val '$zerob) (eq var '$zeroa)) val 0))
 	;; Special case of arglim = 0
 	((eql arglim 0)
-	 (setq dir (behavior (cadr expr) var val))
+	 (setq dir (behavior orig-arg-arglim var val))
 	 (cond ((eql dir -1) '$infinity)
 	       ((eql dir 0) '$infinity)
 	       ((eql dir 1) '$minf)))
@@ -3205,14 +3205,14 @@ ignoring dummy variables and array indices."
          (simplifier))
 	(t
 	 ;; We know that arglim is a negative real number, say xx.
-	 ;; When the imaginary part of (cadr expr) near var is negative,
-	 ;; return log(-x) - %i*pi; when the imaginary part of (cadr expr) 
+	 ;; When the imaginary part of orig-arg-arglim near var is negative,
+	 ;; return log(-x) - %i*pi; when the imaginary part of orig-arg-arglim 
 	 ;; near var is positive return log(-x) + %i*pi; and when
 	 ;; we cannot determine the behavior of the imaginary part,
 	 ;; return a nounform. The value of val (either zeroa or zerob)
 	 ;; determines what is meant by "near" (smaller than var when 
 	 ;; val is zerob and larger than var when val is zeroa).
-	 (setq dir (behavior ($imagpart (cadr expr)) var val))
+	 (setq dir (behavior ($imagpart orig-arg-arglim) var val))
          (cond  ((or (eql dir 1) (eql dir -1))
 	         (add (ftake '%log (mul -1 arglim)) (mul dir '$%i '$%pi)))
 	        (t (throw 'limit nil)))))) ;do a nounform return

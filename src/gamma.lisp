@@ -526,7 +526,7 @@
          (throw 'limit t)))
 
     ((and (eql a 0) (eq t (mgrp 0 z)))
-     (let ((im (behavior (cdr (risplit (caddr expr))) var val)))
+     (let ((im (behavior (cdr (risplit orig-arg-z)) var val)))
        (cond ((eql im -1)
               (sub (mul '$%i '$%pi) (ftake '%expintegral_ei (mul -1 z))))
              ((eql im 1)
@@ -551,7 +551,7 @@
     ;; gamma function is continuous from above its branch cut. The check for
     ;; $ind is needed to avoid calling sign on $ind.
     ((and (not (eq z '$ind)) (eq t (mgrp 0 z)))
-     (let ((im (behavior (cdr (risplit (caddr expr))) var val)))
+     (let ((im (behavior (cdr (risplit orig-arg-z)) var val)))
        (cond ((eql im 1)                ; use direct substitution
               (ftake '%gamma_incomplete a z))
              ((eql im -1)
@@ -2644,7 +2644,7 @@
     ((eq z '$inf) 0)
     ((eq z '$minf) 2)
     ((eq z '$infinity) ;; parallel to code in simplim%erf-%tanh
-     (destructuring-let (((rpart . ipart) (trisplit (cadr expr)))
+     (destructuring-let (((rpart . ipart) (trisplit orig-arg-z))
 			 (ans ()) (rlim ()))
        (setq rlim (limit rpart var val 'think))
        (setq ans
@@ -2892,7 +2892,7 @@
      ;; All other cases are handled by the simplifier of the function.
      (simplify (list '(%inverse_erf) z))))))
 
-(def-simplimit inverse_erf (expr var val)
+(def-simplimit inverse_erf (z)
   (cond
     ;; Handle an argument 1 at this place
     ((onep1 z) '$inf)
