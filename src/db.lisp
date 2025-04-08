@@ -85,6 +85,62 @@
 (defvar conunmrk (make-array (1+ *connumber*) :initial-element nil))
 (defvar conmark  (make-array (1+ *connumber*) :initial-element nil))
 
+
+(defvar *kindp-cache* nil
+  "Least-recently-used cache for the KINDP function")
+
+(defvar *kindp-cache-last-context* nil
+  "Variable to track context changes and invalidate the KINDP cache in response")
+
+(defun kindp-cache-get (key)
+  "Searches the cache for the first entry with key KEY.
+  If one is found, it is moved to the front of the cache, unless it's already there.
+  The function returns multiple values: VALUE and FOUND.
+  VALUE is the value that was retrieved from the cache, or NIL, if none was found.
+  FOUND is T or NIL, indicating whether an entry was found in the cache, allowing to
+  distinguish between a cached value of NIL and no entry being found."
+  (multiple-value-bind
+    (cursor prev)
+    (do
+      ((cursor *kindp-cache* (cdr cursor))
+       (prev nil cursor))
+      ((or (null cursor) (equal (caar cursor) key))
+        (values cursor prev)))
+    (cond
+      (cursor
+        ;; Found! Move the entry to the front of the cache,
+        ;; if it's not already there.
+        (when prev
+          (setf (cdr prev) (cddr prev))
+          (push (car cursor) *kindp-cache*))
+        (values (cdar cursor) t))
+      (t
+        ;; Not found!
+        (values nil nil)))))
+
+(defun kindp-cache-put (key value)
+  "Stores a (KEY . VALUE) pair at the front of the KINDP cache,
+  removing excess entries. Returns VALUE."
+  (let* ((new-cache (cons (cons key value) *kindp-cache*))
+         (tail (nthcdr 7 new-cache)))
+    ;; Remove excess entries, if necessary.
+    (when tail
+      (setf (cdr tail) nil))
+    (setq *kindp-cache* new-cache))
+  value)
+
+(defun kindp-cache-clear ()
+  "Clears the KINDP cache"
+  (setq *kindp-cache* nil))
+
+(defun kindp-cache-handle-fact (fact)
+  "This function gets called whenever a fact is added to or removed from the
+  facts database. It clears the KINDP cache if the fact is of type KIND."
+  ;; When adding or removing a fact of type KIND, invalidate the KINDP cache.
+  (when (eq (car fact) 'kind)
+    (kindp-cache-clear)))
+
+
 (defun mark (x)
   (putprop x t 'mark))
 
@@ -401,15 +457,29 @@
     isp))
 
 ;; Return NIL for all non-symbols.
+(defun kindp1 (x y)
+  (clear)
+  (beg x 1)
+  (do ((p (dq+) (dq+)))
+      ((null p))
+      (if (eq y p)
+        (return t)
+        (mark+ p (+labs p)))))
+
 (defun kindp (x y)
   (when (and (symbolp x) (get x 'data))
-    (clear)
-    (beg x 1)
-    (do ((p (dq+) (dq+)))
-        ((null p))
-        (if (eq y p)
-          (return t)
-          (mark+ p (+labs p))))))
+    ;; When the context changes, the cache must be cleared, since cached data
+    ;; may no longer be correct.
+    (unless (eq *kindp-cache-last-context* context)
+      (setq *kindp-cache-last-context* context)
+      (kindp-cache-clear))
+    ;; If the answer is cached, return it.
+    ;; If not, get the answer by calling KINDP1 and store it in the cache.
+    (let ((key (cons x y)))
+      (multiple-value-bind (value found) (kindp-cache-get key)
+        (if found
+          value
+          (kindp-cache-put key (kindp1 x y)))))))
 
 (defun true* (pat)
   (let ((dum (semant pat)))
@@ -450,9 +520,11 @@
       (mapc #'ind2 nd)))
 
 (defun addf (dat nd)
+  (kindp-cache-handle-fact (car dat)) ; Maybe invalidate KINDP cache.
   (push+sto (sel nd data) (cons dat (sel nd data))))
 
 (defun maxima-remf (dat nd)
+  (kindp-cache-handle-fact dat) ; Maybe invalidate KINDP cache.
   (push+sto (sel nd data) (fdel dat (sel nd data))))
 
 (defun fdel (fact data)
@@ -639,6 +711,7 @@
 	   (incf *conindex*)))))
 
 (defun cntxt (dat con)
+  (kindp-cache-handle-fact (car dat)) ; Maybe invalidate KINDP cache.
   (unless (atom con)
     (setq con (cdr con)))
   (putprop con (cons dat (zl-get con 'data)) 'data)
@@ -647,6 +720,7 @@
   dat)
 
 (defun kcntxt (fact con)
+  (kindp-cache-handle-fact fact) ; Maybe invalidate KINDP cache.
   (unless (atom con)
     (setq con (cdr con)))
   (putprop con (fdel fact (zl-get con 'data)) 'data)
@@ -667,6 +741,7 @@
       (cmark con))))
 
 (defun cmark (con)
+  (kindp-cache-clear) ; Activating a context - invalidate the KINDP cache.
   (unless (atom con)
     (setq con (cdr con)))
   (let ((cm (zl-get con 'cmark)))
@@ -674,6 +749,7 @@
     (mapc #'cmark (zl-get con 'subc))))
 
 (defun cunmrk (con)
+  (kindp-cache-clear) ; Deactivating a context - invalidate the KINDP cache.
   (if (not (atom con))
       (setq con (cdr con)))
   (let ((cm (zl-get con 'cmark)))
