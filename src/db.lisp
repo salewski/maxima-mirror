@@ -110,26 +110,28 @@
   VALUE is the value that was retrieved from the cache, or NIL, if none was found.
   FOUND is T or NIL, indicating whether an entry was found in the cache, allowing to
   distinguish between a cached value of NIL and no entry being found."
-  (multiple-value-bind
-    (cursor prev)
-    (do
-      ((cursor *kindp-cache* (cdr cursor))
-       (prev nil cursor))
-      ((or (null cursor) (and (eq (caaar cursor) (car key))
-                              (eq (cdaar cursor) (cdr key))))
-        ;; Key found, or end of list reached.
-        (values cursor prev)))
-    (cond
-      (cursor
-        ;; Key found! Move the entry to the front of the cache,
-        ;; if it's not already there.
-        (when prev
-          (setf (cdr prev) (cddr prev))
-          (push (car cursor) *kindp-cache*))
-        (values (cdar cursor) t))
-      (t
-        ;; Not found!
-        (values nil nil)))))
+  (let ((cache *kindp-cache*))
+    (multiple-value-bind
+      (cursor prev)
+      (do
+        ((cursor cache (cdr cursor))
+         (prev nil cursor))
+        ((or (null cursor) (and (eq (caaar cursor) (car key))
+                                (eq (cdaar cursor) (cdr key))))
+          ;; Key found, or end of list reached.
+          (values cursor prev)))
+      (cond
+        (cursor
+          ;; Key found! Move the entry to the front of the cache,
+          ;; if it's not already there. "Re-wire" the list without any allocations.
+          (when prev
+            (setf (cdr prev) (cddr prev)
+                  (cdr cursor) cache)
+            (setq *kindp-cache* cursor))
+          (values (cdar cursor) t))
+        (t
+          ;; Not found!
+          (values nil nil))))))
 
 (defun kindp-cache-put (key value)
   "Stores a (KEY . VALUE) pair at the front of the KINDP cache,
@@ -179,26 +181,28 @@
   VALUE is the value that was retrieved from the cache, or NIL, if none was found.
   FOUND is T or NIL, indicating whether an entry was found in the cache, allowing to
   distinguish between a cached value of NIL and no entry being found."
-  (multiple-value-bind
-    (cursor prev)
-    (do
-      ((cursor *dcomp-cache* (cdr cursor))
-       (prev nil cursor))
-      ((or (null cursor) (and (alike1 (caaar cursor) (car key))
-                              (alike1 (cdaar cursor) (cdr key))))
-        ;; Key found, or end of list reached.
-        (values cursor prev)))
-    (cond
-      (cursor
-        ;; Key found! Move the entry to the front of the cache,
-        ;; if it's not already there.
-        (when prev
-          (setf (cdr prev) (cddr prev))
-          (push (car cursor) *dcomp-cache*))
-        (values (cdar cursor) t))
-      (t
-        ;; Not found!
-        (values nil nil)))))
+  (let ((cache *dcomp-cache*))
+    (multiple-value-bind
+      (cursor prev)
+      (do
+        ((cursor cache (cdr cursor))
+         (prev nil cursor))
+        ((or (null cursor) (and (alike1 (caaar cursor) (car key))
+                                (alike1 (cdaar cursor) (cdr key))))
+          ;; Key found, or end of list reached.
+          (values cursor prev)))
+      (cond
+        (cursor
+          ;; Key found! Move the entry to the front of the cache,
+          ;; if it's not already there. "Re-wire" the list without any allocations.
+          (when prev
+            (setf (cdr prev) (cddr prev)
+                  (cdr cursor) cache)
+            (setq *dcomp-cache* cursor))
+          (values (cdar cursor) t))
+        (t
+          ;; Not found!
+          (values nil nil))))))
 
 (defun dcomp-cache-put (key value)
   "Stores a (KEY . VALUE) pair at the front of the DCOMP cache,
