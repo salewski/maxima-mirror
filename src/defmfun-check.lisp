@@ -911,7 +911,9 @@
              (let (,@arg-forms)
                (flet ((simplifier ()
                         ;; Simplifier is used to take the limit
-                        (ftake ',noun-name ,@lambda-list)))
+                        (ftake ',noun-name ,@(mapcar #'(lambda (v)
+                                                         `(ridofab ,v))
+                                                     lambda-list))))
                  (declare (ignorable #'simplifier))
                  ,@body))))
          (defprop ,noun-name ,simp-name simplim%function)))))
