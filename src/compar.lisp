@@ -2259,12 +2259,26 @@ TDNEG TDZERO TDPN) to store it, and also sets SIGN."
              '$pnz) ; fast track for symbols without database information
 		   (t (dcomp x y)))))
 
-(defun dcomp (x y)
+(defun dcomp1 (x y)
   (let (mgqp mlqp)
     (setq x (dinternp x) y (dinternp y))
     (cond ((or (null x) (null y)) '$pnz)
 	  ((progn (clear) (deq x y) (sel y +labs)))
 	  (t '$pnz))))
+
+(defun dcomp (x y)
+  ;; When the context changes, the cache must be cleared, since cached data
+  ;; may no longer be correct.
+  (unless (eq *dcomp-cache-last-context* context)
+    (setq *dcomp-cache-last-context* context)
+    (dcomp-cache-clear))
+  ;; If the answer is cached, return it.
+  ;; If not, get the answer by calling DCOMP1, and store it in the cache.
+  (let ((key (cons x y)))
+    (multiple-value-bind (value found) (dcomp-cache-get key)
+      (if found
+        value
+        (dcomp-cache-put key (dcomp1 x y))))))
 
 (defun deq (x y)
   (cond ((dmark x '$zero) nil)
