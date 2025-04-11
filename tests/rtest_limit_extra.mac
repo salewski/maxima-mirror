@@ -419,7 +419,7 @@ block([domain : 'complex],limit(2/5*((3/4)^m - 1)*(a - 10) + 1/5*(3*(3/4)^m + 2)
  -((%pi^2-6*%gamma^2)/6)$
 
  limit(e,x,1);
- %gamma^2-%pi^2/6$
+-((%pi^2-6*%gamma^2)/6)$
 
 /* #2877 Limits behave incorrectly when applied to derivatives */
 (dg: diff(g(x), x),0);
@@ -690,16 +690,16 @@ limit(X,t,1,'minus);
 log(sqrt(2)+1)-log(1-sqrt(2))-sqrt(2)$
 
 limit(X,t,1,'plus);
-log(sqrt(2)+1)-log(1-sqrt(2))-sqrt(2)$
+ log(sqrt(2)+1)+(-(2*log(sqrt(2)-1))-2*%i*%pi)/2-sqrt(2)$
 
 limit(X,t,1);
-log(sqrt(2)+1)-log(1-sqrt(2))-sqrt(2)$
+log(sqrt(2)+1)+(-(2*log(sqrt(2)-1))-2*%i*%pi)/2-sqrt(2)$
 
 tlimit(X,t,1);
 log(sqrt(2)+1)-log(1-sqrt(2))-sqrt(2)$
 
 block([algebraic : true], limit(ratsimp(X),t,1));
-log(sqrt(2)+1)-log(1-sqrt(2))-sqrt(2)$
+log(sqrt(2)+1)+(-(2*log(sqrt(2)-1))-2*%i*%pi)/2-sqrt(2)$
 
 (remvalue(X),0);
 0$
@@ -1083,11 +1083,11 @@ block([xxx : integrate((x-%i)/((x-2*%i)*(x^2+1)),x)],
 0$ 
 
 limit(ratsimp(X),t,1);
-log(sqrt(2)+1)-log(1-sqrt(2))-sqrt(2)$
+ log(sqrt(2)+1)-log(sqrt(2)-1)-%i*%pi-sqrt(2)$
 
 /* doesn't finish! */
 limit(X,t,1);
-log(sqrt(2)+1)-log(1-sqrt(2))-sqrt(2)$
+log(sqrt(2)+1)+(-(2*log(sqrt(2)-1))-2*%i*%pi)/2-sqrt(2)$
 
 (remvalue(X),0);
 0$
@@ -1281,6 +1281,62 @@ ind$
 
 limit(round(1/2 + cos(1/x)/10), x, 0);
 ind$
+
+/* #4529 atan2 limit with radexpand : false */
+block([radexpand : false], limit(atan2(x^2-2, x^3-3*x),x,sqrt(2),minus));
+-%pi$
+
+block([radexpand : true], limit(atan2(x^2-2, x^3-3*x),x,sqrt(2),minus));
+-%pi$
+
+/* tests for atan2(zeroa/b, zeroa/b) */
+
+limit(atan2(exp(x)-1, sin(x)),x,0,plus);
+%pi/4$
+
+is(subst(x=1.0e-8, float(abs(atan2(exp(x)-1, sin(x)) - %pi/4) < 1.0e-8)));
+true$
+
+limit(atan2(exp(x)-1, 8*sin(x)),x,0,plus);
+atan(1/8)$
+
+is(subst(x=1.0e-8, float(abs(atan2(exp(x)-1,8*sin(x)) - atan(1/8))) < 1.0e-8));
+true$
+
+limit(atan2(exp(x)-1, -sin(x)),x,0,minus);
+-%pi/4$
+
+is(subst(x=-1.0e-8, float(abs(atan2(exp(x)-1,-sin(x)) + %pi/4)) < 1.0e-8));
+true$
+
+limit(atan2(exp(x)-1, -sin(x)),x,0,plus);
+3*%pi/4$
+
+is(subst(x=1.0e-8, float(abs(atan2(exp(x)-1,-sin(x)) - 3*%pi/4)) < 1.0e-8));
+true$
+
+limit(atan2(exp(x)-1, -107*sin(x)),x,0,plus);
+%pi - atan(1/107)$
+
+is(subst(x=1.0e-8, float(abs(atan2(exp(x)-1, -107*sin(x)) - (%pi - atan(1/107)))) < 1.0e-8));
+true$
+
+limit(atan2(exp(x)-1, sin(x)),x,0,minus);
+-3*%pi/4$
+
+is(subst(x=-1.0e-8, float(abs(atan2(exp(x)-1, sin(x)) + 3*%pi/4)) < 1.0e-8));
+true$
+
+limit(atan2(exp(x)-1, 5*sin(x)),x,0,minus);
+atan(1/5)-%pi$
+
+is(subst(x=-1.0e-8, float(abs(atan2(exp(x)-1, 5*sin(x)) - atan(1/5)+%pi))) < 1.0e-8);
+true$
+
+/* #4536 atan2(0,0) undefined error while evaluating a limit 
+   This is fix for *just one* of two bugs mentioned in ticket 4536. */
+limit(atan2(exp(x)-cos(x), -x*sin(x)),x,0,minus);
+-%pi/2$   
 
 /* clean up*/
 (kill(values),0);

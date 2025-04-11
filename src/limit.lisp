@@ -2105,7 +2105,8 @@ ignoring dummy variables and array indices."
 	 (or (equal 1. bl) (equal bl -1.)))
 	(t (equal (getsignl (m1- `((mabs) ,bl))) 0))))
 
-(defun simplimit (exp var val &aux op)
+(defun simplimit (exp var val)
+ (let ((preserve-direction t) (op nil))
   (cond
     ((eq var exp) val)
     ((or (atom exp) (mnump exp)) exp)
@@ -2170,7 +2171,7 @@ ignoring dummy variables and array indices."
 			   (mapcar #'(lambda (a)
 				       (limit a var val 'think))
 				   (cdr exp))))
-	   (throw 'limit t))))) 
+	   (throw 'limit t)))))) 
   
 (defun liminv (e)
   (setq e (resimplify (subst (m// 1 var) var e)))
@@ -2311,17 +2312,21 @@ ignoring dummy variables and array indices."
 	;; the rectangular form of their sum. When gruntz1 is able to find the
 	;; limit, we modify the lists infinityl, minfl, ... accordingly.
     (when (and infinityl (cdr infinityl) (not (among '$li (cons '(mlist) infinityl))))
-      (let ((infinityl-sum (fapply 'mplus infinityl)))
+      (let (($radexpand nil) (infinityl-sum (fapply 'mplus infinityl)))
 	   (setq ans (risplit infinityl-sum))
 	  
 	   (let ((re (car ans)) (im (cdr ans)))
-	   	 (setq re (car (errcatch (gruntz1 re var val))))
-		 (setq im (car (errcatch (gruntz1 im var val))))
+	        (setq re (catch 'taylor-catch
+                  (let ((silent-taylor-flag t)) (gruntz1 re var val))))
+        
+             (setq im (catch 'taylor-catch
+                  (let ((silent-taylor-flag t)) (gruntz1 im var val))))
 		 (setq r
 		     (cond ((or (null re) (null im)) nil)
 			       ((infinityp im) '$infinity)
 				   ((infinityp re) re)
 				   (t (add re (mul '$%i im))))))
+
 	   (cond ((eq r '$infinity) (list (fapply 'mplus infinityl)))
 			 ((eq r nil) (throw 'limit t))
 			 (t 
@@ -3134,7 +3139,7 @@ ignoring dummy variables and array indices."
 
 ;;; Limit(log(XXX), var, 0, val), where val is either zerob (limit from below)
 ;;; or zeroa (limit from above).
-#+ni
+#+nil
 (defun simplimln (expr var val)
   (let ((arglim (limit (cadr expr) var val 'think)) (dir)) 
     (cond ((eq arglim '$inf) '$inf)     ;log(inf) = inf
@@ -3143,41 +3148,47 @@ ignoring dummy variables and array indices."
 	   '$infinity)
 	  ((eq arglim '$zeroa) '$minf)  ;log(zeroa) = minf
       ;; log(ind) = ind when ind > 0 else und
+	  ((eq arglim '$zerob) '$infinity)
+      ;; If expr doesn't vanish, log(ind) = ind; otherwise log(ind) = und.
 	  ((eq arglim '$ind)
 	      (if (eq t (mgrp (cadr expr) 0)) '$ind '$und))
 	  ;; log(und) = und
 	  ((eq arglim '$und) '$und)
 	  ((member arglim '($ind $und)) '$und)
           ;; log(1^(-)) = zerob, log(1^(+)) = zeroa & log(1)=0
-	  ((eql arglim 1)
-	   (if (or (eq val '$zerob) (eq var '$zeroa)) val 0))
+	  ((eql (ridofab arglim) 1)
+	    (cond (preserve-direction
+                 (setq dir (behavior (cadr expr) var val))
+		         (cond ((eql dir -1) '$zerob)
+		               ((eql dir 1) '$zeroa)
+			           (t 0)))
+			  (t 0)))
 	  ;; Special case of arglim = 0
 	  ((eql arglim 0)
 	   (setq dir (behavior (cadr expr) var val))
 	   (cond ((eql dir -1) '$infinity)
 		 ((eql dir 0) '$infinity)
 		 ((eql dir 1) '$minf)))
-          ;; When arglim is off the negative real axis, use direct substitution
-	  ((off-negative-real-axisp arglim) 
-           (ftake '%log arglim))
-	  (t
-	   ;; We know that arglim is a negative real number, say xx.
-	   ;; When the imaginary part of (cadr expr) near var is negative,
-	   ;; return log(-x) - %i*pi; when the imaginary part of (cadr expr) 
-	   ;; near var is positive return log(-x) + %i*pi; and when
-	   ;; we cannot determine the behavior of the imaginary part,
-	   ;; return a nounform. The value of val (either zeroa or zerob)
-	   ;; determines what is meant by "near" (smaller than var when 
-	   ;; val is zerob and larger than var when val is zeroa).
-	   (setq dir (behavior ($imagpart (cadr expr)) var val))
-           (cond  ((or (eql dir 1) (eql dir -1))
-	           (add (ftake '%log (mul -1 arglim)) (mul dir '$%i '$%pi)))
-	          (t (throw 'limit nil))))))) ;do a nounform return
+
+	    (t
+	       (let* ((z (trisplit arglim)) (xx (car z)) (yy (cdr z)))
+	        (cond 
+		    ;; When arglim is off the negative real axis, use direct substitution
+		    ((or (eq t (mnqp yy 0)) (eq t (mgrp xx 0)))
+		  		(ftake '%log arglim))
+			(t
+			  ;; For arglim on the negative real axis, we need to examine the imaginary
+			  ;; part of 'expr' to see if the imaginary part of 'expr' vanishes, or if it
+			  ;; approaches zero from above or below.
+			  (let ((yy (cdr (trisplit (cadr expr)))))
+					 (setq dir (if (eq t (meqp yy 0)) 1 (behavior yy var val)))
+					 (cond ((eql dir 0) (throw 'limit t))
+				           (t
+	                        (add (ftake '%log (mul -1 arglim)) (mul dir '$%i '$%pi))))))))))))
 #+nil
 (setf (get '%log 'simplim%function) 'simplimln)
 #+nil
 (setf (get '%plog 'simplim%function) 'simplimln)
-(setf (get '%plog 'simplim%function) 'simplim%log)
 
 (def-simplimit log (arglim)
   (cond ((eq arglim '$inf) '$inf)       ;log(inf) = inf
@@ -3216,6 +3227,7 @@ ignoring dummy variables and array indices."
          (cond  ((or (eql dir 1) (eql dir -1))
 	         (add (ftake '%log (mul -1 arglim)) (mul dir '$%i '$%pi)))
 	        (t (throw 'limit nil)))))) ;do a nounform return
+(setf (get '%plog 'simplim%function) 'simplimln)
 
 (defun simplim%limit (e x pt)
   (declare (ignore e x pt))
@@ -3359,38 +3371,55 @@ ignoring dummy variables and array indices."
         (ylim)
         (xlim-z)
         (ylim-z)
+		(dir)
         (q))
-    (setq xlim (limit x v pt 'think))
-    (setq ylim (limit y v pt 'think))
+    (setq xlim (let ((preserve-direction t)) (limit x v pt 'think)))
+    (setq ylim (let ((preserve-direction t)) (limit y v pt 'think)))
+
+	(when (eql 0 xlim)
+		(setq dir (behavior x v pt))
+		;(mtell "x = ~M ; dir = ~M ~%" x dir)
+		(cond ((eql dir 1) (setq xlim '$zeroa))
+		      ((eql dir -1) (setq xlim '$zerob))))
+
+	(when (eql 0 ylim)
+		(setq dir (behavior y v pt))
+		;(mtell "dir  = ~M ~%" dir)
+		(cond ((eql dir 1) (setq ylim '$zeroa))
+		      ((eql dir -1) (setq ylim '$zerob))))
+
     (setq xlim-z (ridofab xlim)
-	  ylim-z (ridofab ylim))
+	      ylim-z (ridofab ylim))
     ;; For cases for which direct substitution fails, normalize 
     ;; x & y and try again.
     (setq q (cond ((eq xlim '$inf) x)
-		  ((eq xlim '$minf)
-                   (mul -1 x))
-		  ((eq ylim '$inf) y)
-		  ((eq ylim '$minf)
-                   (mul -1 y))
-                  ((and (eq xlim '$zerob) (zerop2 ylim))
-                   (mul -1 x))
-		  ((and (eq xlim '$zeroa) (zerop2 ylim))
-                   x)
-		  ((and (eq ylim '$zerob) (zerop2 xlim))
-                   (mul -1 y))
-		  ((and (eq ylim '$zeroa) (zerop2 xlim))
-                   y) 
-		  (t 1)))
+		          ((eq xlim '$minf) (mul -1 x))
+		          ((eq ylim '$inf) y)
+		          ((eq ylim '$minf) (mul -1 y))
+		          (t 1)))
 
-    (when (not (eql q 1))
-      (setq x (div x q))
+    (when (not (eql q 1)) 
+	  (setq x (div x q))
       (setq y (div y q))
       (setq xlim (limit x v pt 'think))
       (setq ylim (limit y v pt 'think))
       (setq xlim-z (ridofab xlim)
-	    ylim-z (ridofab ylim)))		  	  
-				
+	        ylim-z (ridofab ylim)))
+
     (cond
+
+      ((and (eq xlim '$zeroa) (eq ylim '$zeroa)) ; in quadrant I
+	    (limit (ftake '%atan (div y x)) v pt 'think))
+    
+      ((and (eq xlim '$zerob) (eq ylim '$zeroa)) ; in quadrant II
+	    (add '$%pi (limit (ftake '%atan (div y x)) v pt 'think)))
+
+	  ((and (eq xlim '$zerob) (eq ylim '$zerob)) ; in quadrant III
+	    (sub (limit (ftake '%atan (div y x)) v pt 'think) '$%pi)) 
+
+      ((and (eq xlim '$zeroa) (eq ylim '$zerob)) ; in quadrant IV
+	    (limit (ftake '%atan (div y x)) v pt 'think))  
+
       ((and (eq '$zerob ylim) (eq t (mgrp 0 xlim)))
        (mul -1 '$%pi))
       ((and (eq '$zerob ylim) (eq t (mgrp xlim 0)))
