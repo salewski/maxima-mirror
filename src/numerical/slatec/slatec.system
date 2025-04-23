@@ -26,16 +26,16 @@
 (mk:defsystem "slatec"
   :source-extension "f"
   :binary-extension "lisp"
+  :language :f2cl
+  :compile-only t
   :components
   ((:module xermsg
-	    :source-pathname "fortran"
-	    :binary-pathname "."
-	    :language :f2cl
+            :source-pathname "fortran"
+            :binary-pathname "lisp"
 	    :compiler-options (:array-slicing nil
 			       :array-type :simple-array
 			       :float-format double-float
 			       :package :slatec)
-	    :compile-only t
 	    :components
 	    (
 	     (:file "fdump")
@@ -50,15 +50,12 @@
 	     (:file "xersve"
 		    :depends-on ("j4save"))))
    (:module fortran
-	    :source-pathname "fortran"
-	    :binary-pathname "."
-	    :language :f2cl
+            :binary-pathname "lisp"
 	    :compiler-options (:array-slicing nil
 			       :array-type :simple-array
 			       :float-format double-float
 			       :package :slatec)
 	    :depends-on ("xermsg")
-	    :compile-only t
 	    :components
 	    (
 	     (:file "initds")
@@ -246,9 +243,8 @@
 	     (:file "d9upak")
 	     ))
    (:module quadpack
-	    :source-pathname "fortran"
-	    :binary-pathname "."
-	    :language :f2cl
+            :source-pathname "fortran"
+            :binary-pathname "lisp"
 	    ;; These are appropriate defaults for quadpack because
 	    ;; some of the routines slice an array and pass it as an
 	    ;; argument to other routines.
@@ -260,7 +256,6 @@
 			       :array-type :array
 			       :float-format double-float
 			       :package :slatec)
-	    :compile-only t
 	    :depends-on ("xermsg")
 	    :components
 	      (
