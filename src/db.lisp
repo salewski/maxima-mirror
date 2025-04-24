@@ -103,8 +103,8 @@
 (defvar *kindp-cache-last-context* nil
   "Variable to track context changes and invalidate the KINDP cache in response")
 
-(defun kindp-cache-get (key)
-  "Searches the cache for the first entry with key KEY.
+(defun kindp-cache-get (x y)
+  "Searches the cache for the first entry with key (X . Y).
   If one is found, it is moved to the front of the cache, unless it's already there.
   The function returns multiple values: VALUE and FOUND.
   VALUE is the value that was retrieved from the cache, or NIL, if none was found.
@@ -116,8 +116,8 @@
       (do
         ((cursor cache (cdr cursor))
          (prev nil cursor))
-        ((or (null cursor) (and (eq (caaar cursor) (car key))
-                                (eq (cdaar cursor) (cdr key))))
+        ((or (null cursor) (and (eq (caaar cursor) x)
+                                (eq (cdaar cursor) y)))
           ;; Key found, or end of list reached.
           (values cursor prev)))
       (cond
@@ -133,11 +133,11 @@
           ;; Not found!
           (values nil nil))))))
 
-(defun kindp-cache-put (key value)
-  "Stores a (KEY . VALUE) pair at the front of the KINDP cache,
+(defun kindp-cache-put (x y value)
+  "Stores a ((X . Y) . VALUE) pair at the front of the KINDP cache,
   removing excess entries. It does not check whether the key is already present
   in the cache. Returns VALUE."
-  (let* ((new-cache (cons (cons key value) *kindp-cache*))
+  (let* ((new-cache (cons (cons (cons x y) value) *kindp-cache*))
          (tail (nthcdr (1- *kindp-cache-capacity*) new-cache)))
     ;; Remove excess entries, if necessary.
     (when tail
@@ -174,8 +174,8 @@
 (defvar *dcomp-cache-last-context* nil
   "Variable to track context changes and invalidate the DCOMP cache in response")
 
-(defun dcomp-cache-get (key)
-  "Searches the cache for the first entry with key KEY.
+(defun dcomp-cache-get (x y)
+  "Searches the cache for the first entry with key (X . Y).
   If one is found, it is moved to the front of the cache, unless it's already there.
   The function returns multiple values: VALUE and FOUND.
   VALUE is the value that was retrieved from the cache, or NIL, if none was found.
@@ -187,8 +187,8 @@
       (do
         ((cursor cache (cdr cursor))
          (prev nil cursor))
-        ((or (null cursor) (and (alike1 (caaar cursor) (car key))
-                                (alike1 (cdaar cursor) (cdr key))))
+        ((or (null cursor) (and (alike1 (caaar cursor) x)
+                                (alike1 (cdaar cursor) y)))
           ;; Key found, or end of list reached.
           (values cursor prev)))
       (cond
@@ -204,11 +204,11 @@
           ;; Not found!
           (values nil nil))))))
 
-(defun dcomp-cache-put (key value)
-  "Stores a (KEY . VALUE) pair at the front of the DCOMP cache,
+(defun dcomp-cache-put (x y value)
+  "Stores a ((X . Y) . VALUE) pair at the front of the DCOMP cache,
   removing excess entries. It does not check whether the key is already present
   in the cache. Returns VALUE."
-  (let* ((new-cache (cons (cons key value) *dcomp-cache*))
+  (let* ((new-cache (cons (cons (cons x y) value) *dcomp-cache*))
          (tail (nthcdr (1- *dcomp-cache-capacity*) new-cache)))
     ;; Remove excess entries, if necessary.
     (when tail
@@ -567,11 +567,10 @@
       (kindp-cache-clear))
     ;; If the answer is cached, return it.
     ;; If not, get the answer by calling KINDP1, and store it in the cache.
-    (let ((key (cons x y)))
-      (multiple-value-bind (value found) (kindp-cache-get key)
-        (if found
-          value
-          (kindp-cache-put key (kindp1 x y)))))))
+    (multiple-value-bind (value found) (kindp-cache-get x y)
+      (if found
+        value
+        (kindp-cache-put x y (kindp1 x y))))))
 
 (defun true* (pat)
   (let ((dum (semant pat)))

@@ -2274,11 +2274,10 @@ TDNEG TDZERO TDPN) to store it, and also sets SIGN."
     (dcomp-cache-clear))
   ;; If the answer is cached, return it.
   ;; If not, get the answer by calling DCOMP1, and store it in the cache.
-  (let ((key (cons x y)))
-    (multiple-value-bind (value found) (dcomp-cache-get key)
-      (if found
-        value
-        (dcomp-cache-put key (dcomp1 x y))))))
+  (multiple-value-bind (value found) (dcomp-cache-get x y)
+    (if found
+      value
+      (dcomp-cache-put x y (dcomp1 x y)))))
 
 (defun deq (x y)
   (cond ((dmark x '$zero) nil)
