@@ -8,12 +8,21 @@ fortran directory.  (Some of the code may have been slightly modified
 from the original code obtained from www.netlib.org, but the original
 versions are stored in CVS.)
 
-Here is a simple script used to convert the Fortran code from the
-SLATEC library to Lisp.
+Here's how to regenerate the Lisp files from the Fortran files.  Do
+this if f2cl has been updated in a relevant way or if the Fortran
+files have been updated.  These instruction mostly assume that you
+start at the root of the Maxima source tree.
 
-To build the Lisp files, use numerical/slatec/slatec.system to do
-that.  It contains the necessary options and rules to convert the
-SLATEC Fortran files to Lisp.
+1. Load defsystem.lisp.
+2. Get f2cl from https://gitlab.common-lisp.net/f2cl/f2cl.
+   1.  `(load "path/f2cl.system")`
+   2.  `(mk:oos "f2cl" :compile)`
+3. `(load "src/numerical/slatec/slatec.system")`
+4. `(mk:oos "slatec" :compile)`
 
-Also, the converted files were done using CMUCL.  If some other Lisp
-is used, the formatting of the files may be totally different.
+This should generate all the Lisp files and place them in
+src/numerical/slatec/lisp.
+
+Also, as of this writing, the converted files were done using CMUCL.
+If some other Lisp is used, the formatting of the files may be totally
+different.
