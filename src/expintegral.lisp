@@ -234,7 +234,7 @@
          '$inf)
          
         ((member ($sign (add ($realpart a) -1)) '($neg $nz $zero))
-                                        ; realpart of order < 1
+         ; realpart of order < 1
          (cond ((eq z '$zeroa)
                 ;; from above, always inf
                 '$inf)
@@ -245,10 +245,10 @@
                 ;; no direction, return infinity
                 '$infinity)
                (t
-                (simplifier))))
+                (ftake '%expintegral_e a z))))
         (t
          ;; All other cases are handled by the simplifier of the function.
-         (simplifier))))
+         (ftake '%expintegral_e a z))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1433,8 +1433,13 @@
         (t (ftake '%expintegral_si lim)))))
 
 (def-simplimit expintegral_si (z)
-  ;; All cases are handled by the simplifier of the function.
-  (simplifier))
+  (cond ((eq z '$infinity) (throw 'zit t))
+	((eq z '$ind) '$ind)
+	((eq z '$zerob) '$zerob)
+	((eq z '$zeroa) '$zeroa)
+	((eq z '$und) (throw 'limit nil))
+        ;;The expintegral_si simplifier handles expintegral_si(minf & inf)
+        (t (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1792,15 +1797,20 @@
 		    (t (ftake '%expintegral_ci lim)))))
 
 (def-simplimit expintegral_ci (z)
-  (cond
-    ;; Handle an argument 0 at this place
-    ((or (zerop1 z)
-         (eq z '$zeroa)
-         (eq z '$zerob))
-     '$minf)
-    (t
-     ;; All other cases are handled by the simplifier of the function.
-     (simplifier))))
+  (cond ((eq z '$infinity) 
+	 ;; Is the limit +/- %i x inf?
+         (setq z (limit (div (cadr limit-expr) '$%i) limit-var limit-val 'think))
+	 (cond ((eq z '$inf) '$inf)
+	       ((eq z '$minf) '$inf)
+	       (t (throw 'limit nil))))
+	((eq z '$ind)
+	 (if (eq t (mgrp (cadr limit-expr) 0)) '$ind (throw 'limit nil)))
+	((eq z '$zerob) '$minf)
+	((eq z '$zeroa) '$minf)
+	((eql z 0) '$minf)
+	((eq z '$und) (throw 'limit nil))
+        ;; The general simplifier for expintegral_ci handles inputs minf & inf
+	(t (simplifier)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

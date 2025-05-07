@@ -888,9 +888,9 @@
     
     (let* ((noun-name (intern (concatenate 'string "%" (string base-name))))
 	   (simp-name (intern (concatenate 'string "SIMPLIM%" (string base-name))))
-           (expr-arg (gensym "EXPR-"))
-           (limit-var (gensym "LIMIT-VAR-"))
-           (val-arg (gensym "VAL-"))
+           (expr-arg (intern "LIMIT-EXPR"))
+           (limit-var (intern "LIMIT-VAR"))
+           (val-arg (intern "LIMIT-VAL"))
            (orig-arg-names (loop for arg in lambda-list
                                  collect (intern (concatenate 'string "ORIG-ARG-" (string arg)))))
            (orig-args (loop for arg in lambda-list
