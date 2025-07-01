@@ -166,7 +166,7 @@ m4_math(<<<{\rm nsizei} = 3 + {\rm kdm}>>>, <<<@math{nsizei = 3 + kdm}>>>)
 m4_displaymath(<<<\eqalign{
     {\rm kdm} &= {\rm kd} + m^* \cr
     {\rm kd} &= k + {\rm ncomp} \cr
-    {\rm nrec} &= {\it number of right end boundary conditions} \cr
+    {\rm nrec} &= {\it number\, of\, right\, end\, boundary\, conditions} \cr
   }>>>,<<<
     @math{kdm = kd + mstar}@*
     @math{kd = k * ncomp}@*
