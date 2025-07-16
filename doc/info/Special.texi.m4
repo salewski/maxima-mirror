@@ -2386,29 +2386,71 @@ For @code{expintrep} set to @code{expintegral_hyp}:
 @defvr {Option variable} expintexpand 
 Default value: false
 
-Expand @code{expintegral_e(n,z)} for half
+When @code{true}, expand @code{expintegral_e(n,z)} for half
 integral values in terms of @code{erfc} or @code{erf} and
 for positive integers in terms of @code{expintegral_ei}.
 
+When @code{erf}, expand @code{expintegral_e(n,z)} for half
+integral values in terms of @code{erf} and
+for positive integers in terms of @code{expintegral_ei}.
+
+@c ===beg===
+@c expintegral_e(1/2,z);
+@c expintegral_e(1,z);
+@c expintexpand:true;
+@c expintegral_e(1/2,z);
+@c expintegral_e(1,z);
+@c expintexpand:erf;
+@c expintegral_e(1/2,z);
+@c expintegral_e(1,z);
+@c ===end===
 @example
+@group
 (%i1) expintegral_e(1/2,z);
-                                            1
-(%o1)                         expintegral_e(-, z)
-                                            2
+                                     1
+(%o1)                  expintegral_e(-, z)
+                                     2
+@end group
+@group
 (%i2) expintegral_e(1,z);
-(%o2)                         expintegral_e(1, z)
+(%o2)                  expintegral_e(1, z)
+@end group
+@group
 (%i3) expintexpand:true;
-(%o3)                                true
+(%o3)                         true
+@end group
+@group
 (%i4) expintegral_e(1/2,z);
-                            sqrt(%pi) erfc(sqrt(z))
-(%o4)                       -----------------------
-                                    sqrt(z)
+                     sqrt(%pi) erfc(sqrt(z))
+(%o4)                -----------------------
+                             sqrt(z)
+@end group
+@group
 (%i5) expintegral_e(1,z);
-                               1
-                         log(- -) - log(- z)
-                               z
-(%o5)       (- log(z)) - ------------------- - expintegral_ei(- z)
-                                  2
+                       1
+                 log(- -) - log(- z)
+                       z
+(%o5) - log(z) - ------------------- - expintegral_ei(- z)
+                          2
+@end group
+@group
+(%i6) expintexpand:erf;
+(%o6)                          erf
+@end group
+@group
+(%i7) expintegral_e(1/2,z);
+                  sqrt(%pi) (1 - erf(sqrt(z)))
+(%o7)             ----------------------------
+                            sqrt(z)
+@end group
+@group
+(%i8) expintegral_e(1,z);
+                       1
+                 log(- -) - log(- z)
+                       z
+(%o8) - log(z) - ------------------- - expintegral_ei(- z)
+                          2
+@end group
 @end example
 
 @opencatbox{Categories:}
