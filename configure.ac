@@ -1544,6 +1544,10 @@ if test x"${xmaxima_exe}" = xtrue ; then
    fi
 fi
 
+if test -n "x$MAKEINFO"; then
+  echo "Using makeinfo ${MAKEINFO} to generate docs"
+fi
+
 if test "x${syntax_highlighting}" = "xfalse"; then
   echo "HTML syntax highlighting disabled"
 else
