@@ -1542,3 +1542,7 @@ if test x"${xmaxima_exe}" = xtrue ; then
      AC_MSG_WARN([A prerequisite for xmaxima.exe not found.  The missing components can be defined on the make command line.])
    fi
 fi
+
+if test -n "syntax_highlight"; then
+  echo "HTML syntax highlighting enabled using ${syntax_highlight}"
+fi  
