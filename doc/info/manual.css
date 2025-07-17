@@ -27,8 +27,23 @@ div.spacerbox {border: none; padding-top: 2em; padding-bottom: 2em}
 div.image {margin: 0; padding: 1em; text-align: center}
 div.categorybox {border: 1px solid gray; padding-top: 1em; padding-bottom: 1em;
     padding-left: 1em; padding-right: 1em; background: rgb(247,242,220)}
+div.highlight {
+    background-color: rgb(238,238,255) !important; 
+}    
 img {max-width:80%; max-height: 80%; display: block; margin-left: auto; margin-right: auto}
 
 .nav-panel {
     background-color: #DDDDFF;
+}
+
+/* CSS for pygment highlighting */
+.example.user-maxima {
+    overflow-x: auto
+}
+
+.highlight.pre {
+    /* Lines for highlighted examples are too close by default with
+     *  pygments.  Make it larger.
+     */
+    line-height: 150% !important;
 }
