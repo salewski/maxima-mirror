@@ -3621,9 +3621,9 @@ Examples:
 @end group
 @group
 (%i3) hypergeometric_simp (foo);
-                 log(1 - z)              z    z/2
-(%o3)         [- ----------, bessel_i(0, -) %e   ]
-                     z                   2
+                 log(1 - z)    z/2             z
+(%o3)         [- ----------, %e    bessel_i(0, -)]
+                     z                         2
 @end group
 @group
 (%i4) bar : hypergeometric([n], [m], z + 1);
