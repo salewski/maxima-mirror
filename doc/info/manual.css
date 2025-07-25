@@ -57,8 +57,11 @@ img {
     margin-right: auto
 }
 
-/* Put background color on the navigation bar */
-div.header {
+/*
+ * Put background color on the navigation bar.  .nav-panel for texinfo
+ * 7.2. div.header for 6.8.
+ */
+.nav-panel, div.header {
     background-color: #F2F1F0;
     padding: 3px 10px;
 }
