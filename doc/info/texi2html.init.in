@@ -1,5 +1,5 @@
-@TEXI_EXTRA_HEAD@ q{<link rel="icon" href="figures/favicon.ico">
-<link rel="stylesheet" type="text/css" href="manual.css">
+@TEXI_EXTRA_HEAD@ q{<link rel="icon" type="image/svg+xml" href="figures/maxima.svg">
+<link rel="alternate icon" href="figures/favicon.ico">
 @HIGHLIGHT1@
 @HIGHLIGHT2@
 @NEED_MATHJAX@}

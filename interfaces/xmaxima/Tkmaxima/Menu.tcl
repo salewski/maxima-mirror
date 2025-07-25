@@ -7,15 +7,14 @@
 ############################################################
 
 proc zoomConsole {f} {
-    global maxima_default maxima_priv
-    set ffamily [lindex $maxima_default(ConsoleFont) 0]
-    set fsize [lindex $maxima_default(ConsoleFont) 1]
+    set ffamily [lindex $::xmaxima_default(ConsoleFont) 0]
+    set fsize [lindex $::xmaxima_default(ConsoleFont) 1]
     set fsize [expr round($fsize*pow(1.2,$f))]
     font configure ConsoleFont -family $ffamily -size $fsize
-    set text $maxima_priv(cConsoleText)
+    set text $::xmaxima_priv(cConsoleText)
     resizeSubPlotWindows $text [winfo width $text] [winfo height $text]
     resizeMaxima $text [winfo width $text] [winfo height $text]
-    set maxima_default(ConsoleFont) [list $ffamily $fsize]
+    set ::xmaxima_default(ConsoleFont) [list $ffamily $fsize]
 }
 
 proc fileType {type} {
@@ -29,9 +28,8 @@ proc fileType {type} {
         return [list {"All Files" *}]}}
 
 proc getOpenFile {title {type "all"}} {
-    global maxima_default
     set types [fileType $type]
-    set file $maxima_default(OpenFile)
+    set file $::xmaxima_default(OpenFile)
     if {$file ne ""} {set dir [file dir $file]} {set dir ""}
     set proc tk_getOpenFile
     set list [list $proc -title $title -filetypes $types]
@@ -41,13 +39,12 @@ proc getOpenFile {title {type "all"}} {
 	tk_messageBox -title Error -icon error -message \
             [mc "Error opening file:\n%s" $errorInfo]
 	return ""}
-    if {$retval ne ""} { set maxima_default(OpenFile) $retval }
+    if {$retval ne ""} { set ::xmaxima_default(OpenFile) $retval }
     return $retval}
 
 proc getSaveFile {title {type "all"}} {
-    global maxima_default
     set types [fileType $type]
-    set file $maxima_default(SaveFile)
+    set file $::xmaxima_default(SaveFile)
     if {$file ne ""} {set dir [file dir $file]} {set dir ""}
     set proc tk_getSaveFile
     set list [list $proc -title $title -filetypes $types]
@@ -57,7 +54,7 @@ proc getSaveFile {title {type "all"}} {
 	tk_messageBox -title Error -icon error -message \
             [mc "Error saving file:\n%s" $errorInfo]
 	return ""}
-    if {$retval ne ""} { set maxima_default(SaveFile) $retval }
+    if {$retval ne ""} { set ::xmaxima_default(SaveFile) $retval }
     return $retval}
 
 proc cIDECreateEvent {text label code} {
@@ -81,9 +78,6 @@ proc pMAXSaveTexToFile {text} {
 }
 
 proc vMAXAddBrowserMenu {win} {
-    global maxima_priv maxima_default
-    global tcl_platform env
-
     if {[winfo exists .browser.menu]} {destroy .browser.menu}
     set bm .browser.menu
     menu $bm
@@ -113,15 +107,11 @@ proc vMAXAddBrowserMenu {win} {
 }
 
 proc vMAXAddSystemMenu {fr text} {
-    global maxima_priv maxima_default
-    global tcl_platform env
     set win $fr.textcommands
-
     # Build a menubar
     if {[winfo exists .menu]} {destroy .menu}
     menu .menu
     . configure -menu .menu
-
     # Add a File menu
     set m [menu .menu.file -tearoff 0]
     .menu add cascade -label [mc "File"] -menu $m -underline 0
@@ -131,7 +121,7 @@ proc vMAXAddSystemMenu {fr text} {
 	-command [set command [cIDECreateEvent $text $label {
 	    set file [getOpenFile [mc "Open a file to Batch"] maxima]
 	    if {$file != ""} {
-		sendMaxima $maxima_priv(cConsoleText) "batch(\"$file\")\$\n"
+		sendMaxima $::xmaxima_priv(cConsoleText) "batch(\"$file\")\$\n"
 		maxStatus [concat [mc "Batched File "] "$file"]
 	    }
 	}]]
@@ -142,7 +132,7 @@ proc vMAXAddSystemMenu {fr text} {
 	-command [set command [cIDECreateEvent $text $label {
 	    set file [getOpenFile [mc "Open a file to Batch Silently"] maxima]
 	    if {$file != ""} {
-		sendMaxima $maxima_priv(cConsoleText) "batchload(\"$file\")\$\n"
+		sendMaxima $::xmaxima_priv(cConsoleText) "batchload(\"$file\")\$\n"
 		maxStatus [concat [mc "Batched File "] "$file"]
 	    }
 	}]]
@@ -154,7 +144,7 @@ proc vMAXAddSystemMenu {fr text} {
 	-command [set command [cIDECreateEvent $text $label {
 	    set file [getOpenFile [mc "Open a file to Restore State"] lisp]
 	    if {$file != ""} {
-		sendMaxima $maxima_priv(cConsoleText) ":lisp-quiet (prog2 (mfuncall '\$load \"$file\") nil)\n"
+		sendMaxima $::xmaxima_priv(cConsoleText) ":lisp-quiet (prog2 (mfuncall '\$load \"$file\") nil)\n"
 		maxStatus [concat [mc "Maxima State Restored from "] "$file"]
 	    }
 	}]]
@@ -167,7 +157,7 @@ proc vMAXAddSystemMenu {fr text} {
 	-command [set command [cIDECreateEvent $text $label {
 	    set file [getSaveFile [mc "Save to a file"] lisp]
 	    if {$file != ""} {
-		sendMaxima $maxima_priv(cConsoleText) ":lisp-quiet (prog2 (mfuncall '\$save \"$file\" '\$all) nil)\n"
+		sendMaxima $::xmaxima_priv(cConsoleText) ":lisp-quiet (prog2 (mfuncall '\$save \"$file\" '\$all) nil)\n"
 		maxStatus [concat [mc "Maxima State Saved to "] "$file"]
 	    }
 	}]]
@@ -179,7 +169,7 @@ proc vMAXAddSystemMenu {fr text} {
 	-command [set command [cIDECreateEvent $text $label {
 	    set file [getSaveFile [mc "Save to a file"] maxima]
 	    if {$file != ""} {
-		sendMaxima $maxima_priv(cConsoleText) ":lisp-quiet (prog2 (mfuncall '\$stringout \"$file\" '\$input) nil)\n"
+		sendMaxima $::xmaxima_priv(cConsoleText) ":lisp-quiet (prog2 (mfuncall '\$stringout \"$file\" '\$input) nil)\n"
 		maxStatus [concat [mc "Maxima Input Saved to "] "$file"]
 	    }
 	}]]
@@ -241,7 +231,7 @@ proc vMAXAddSystemMenu {fr text} {
 	-command [list CNclearinput $text]
     $m add separator
     $m add command -underline 0 -label [mc "Save Console to File"] \
-	-command [list pMAXSaveTexToFile $maxima_priv(cConsoleText)]
+	-command [list pMAXSaveTexToFile $::xmaxima_priv(cConsoleText)]
 
     # Add an Options menubutton
     set m [menu .menu.options -tearoff 0]
@@ -253,7 +243,7 @@ proc vMAXAddSystemMenu {fr text} {
     $m add cascade -label [mc "Plot Windows"] -menu $pm
     foreach elt { embedded separate multiple } {
 	$pm add radio -label [mc [string totit $elt]] \
-	    -variable maxima_default(plotwindow) \
+	    -variable ::xmaxima_default(plotwindow) \
 	    -value $elt -command [list SetPlotFormat $text ]
     }
     # $m add separator
@@ -281,7 +271,7 @@ proc vMAXAddSystemMenu {fr text} {
 	    -command [list sendMaxima $text "kill($elt)\$\n"]
     }
     $m add separator  
-    set dir $maxima_priv(pTestsDir)  
+    set dir $::xmaxima_priv(pTestsDir)  
     if {[file isdir $dir]} {
 	set state normal
     } else {
@@ -301,7 +291,7 @@ proc vMAXAddSystemMenu {fr text} {
     .menu add cascade -label [mc "Help"] -menu $m -underline 0
 
     # Xmaxima manual
-    set xmaximahelpfile [file join $maxima_priv(maxima_verpkgdatadir) xmaxima html index.html]
+    set xmaximahelpfile [file join $::xmaxima_priv(maxima_verpkgdatadir) xmaxima html index.html]
     set xmaximahelpfile [file normalize $xmaximahelpfile]
     set xstate normal
     # if {[file isfile $xmaximahelpfile]} {
@@ -310,8 +300,8 @@ proc vMAXAddSystemMenu {fr text} {
     #     set xstate disabled
     # }
     # Maxima manual
-    set file $maxima_priv(pReferenceToc)
-    if {$tcl_platform(platform) == "windows"} {
+    set file $::xmaxima_priv(pReferenceToc)
+    if {$::tcl_platform(platform) == "windows"} {
         # decodeURL is broken and needs fixing
         # This is a workaround
         set file [file attrib $file -shortname]
@@ -322,7 +312,7 @@ proc vMAXAddSystemMenu {fr text} {
     # } else {
     #     set state disabled
     # }
-    if {$tcl_platform(platform) == "windows"} {
+    if {$::tcl_platform(platform) == "windows"} {
         if {[string match *maxima.chm* $file]} {
             $m add command -underline 1 -label [mc "Maxima Manual"] \
          	    -state $state \
@@ -346,8 +336,8 @@ proc vMAXAddSystemMenu {fr text} {
     set browse {exec}
 
     # FIXME: get a browser object
-    if {$tcl_platform(platform) == "windows"} {
-	if {$tcl_platform(os) == "Windows 95"} {
+    if {$::tcl_platform(platform) == "windows"} {
+	if {$::tcl_platform(os) == "Windows 95"} {
 	    # Windows 95/98/ME
 	    lappend browse start
 	} else {
@@ -365,7 +355,7 @@ proc vMAXAddSystemMenu {fr text} {
 	lappend browse $selectedbrowser
     }
     $m add separator
-    if {$tcl_platform(platform) != "windows"} {
+    if {$::tcl_platform(platform) != "windows"} {
 	$m add command -underline 0 -label [mc "Maxima Manual (web browser)"] \
 	    -command [list eval $browse "file://$file" &]
     }
@@ -395,8 +385,7 @@ proc vMAXAddSystemBar {} {
 }
 
 proc SetPlotFormat { text } {
-    global maxima_default
-    if { $maxima_default(plotwindow) == "embedded" } {
+    if { $::xmaxima_default(plotwindow) == "embedded" } {
 	sendMaxima $text ":lisp-quiet (prog2 (\$set_plot_option '((mlist simp) \$plot_format \$xmaxima)) nil) \n"
     }
 }

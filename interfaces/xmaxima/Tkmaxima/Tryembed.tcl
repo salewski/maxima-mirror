@@ -12,7 +12,7 @@
 # jack
 # %     safe::interpInit $slave
 # jack
-# %     interp eval $slave set env(DISPLAY) $env(DISPLAY)
+# %     interp eval $slave set ::env(DISPLAY) $::env(DISPLAY)
 # :0.0
 # %     load {} Tk $slave
 # % interp eval jack {entry .ja ; pack .ja}
@@ -23,10 +23,10 @@
 # % interp eval jack plot2d -xfun {sin(x)}
 
 proc makeEmbedWin { parent width height } {
-    global maxima_priv env auto_index
-    set win $parent.embed[incr maxima_priv(counter)]
+    global auto_index
+    set win $parent.embed[incr ::xmaxima_priv(counter)]
     set fr [frame $win -width $width -height $height -container 1]
-    set slave tclet$maxima_priv(counter)
+    set slave tclet$::xmaxima_priv(counter)
     safe::interpCreate $slave
     # make it exist somehow the autoload stuff doesn't make it a command
     if { [info exists auto_index(::safe::allowTk) ]  } {
@@ -39,8 +39,8 @@ proc makeEmbedWin { parent width height } {
 	interp eval $slave [list set argv [list -use [winfo id $fr]]]	
     }
 
-    if { [info exists env(DISPLAY)] } {
-	interp eval $slave set env(DISPLAY) $env(DISPLAY)
+    if { [info exists ::env(DISPLAY)] } {
+	interp eval $slave set ::env(DISPLAY) $::env(DISPLAY)
     }
     interp eval $slave { proc policy {args } {} }
     #    $slave alias bgerror bgerror
@@ -82,10 +82,10 @@ proc auto_load1 { slave name {namespace ""} } {
 proc setupPrintVariables { slave } {
     global printOption fontSize show_balloons getOp parse_table Parser \
         axisGray plot2dOptions plot3dOptions paperSizes printOptions \
-        doExit fontCourier8 plotdfOptions maxima_priv
+        doExit fontCourier8 plotdfOptions
     foreach v {printOption fontSize show_balloons getOp parse_table Parser
 	axisGray plot2dOptions plot3dOptions paperSizes printOptions
-	doExit  fontCourier8   plotdfOptions maxima_priv} {
+	doExit  fontCourier8   plotdfOptions ::xmaxima_priv} {
 	if { [array exists  $v] } {
 	    interp eval $slave [list array set $v [array get $v *] ]
 	} else {interp eval $slave [list set $v [set $v ]]}}}
@@ -151,9 +151,9 @@ proc Safesock_PolicyInit {slave {version 1.0}} {
     set browser_state($slave,safesock,homebase) $server
 
     # Tell the slave about itself:
-    interp eval $slave [list set env(SERVER) $server]
-    interp eval $slave [list set env(PORT) $port]
-    interp eval $slave [list set env(URL) $url]
+    interp eval $slave [list set ::env(SERVER) $server]
+    interp eval $slave [list set ::env(PORT) $port]
+    interp eval $slave [list set ::env(URL) $url]
 
     browser_log $slave security installed policy Safesock
 }
