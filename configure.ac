@@ -732,6 +732,7 @@ if test x"${enable_build_docs}" = xtrue ; then
            TEXI_EXTRA_HEAD='texinfo_set_from_init_file("EXTRA_HEAD", '
            HLJS_CSS_SELECTOR="'.example-preformatted'"
            TEXI_EXTRA_TAIL=')'
+           TEXI_NO_TOP_NODE='-c NO_TOP_NODE_OUTPUT=1'
         fi
         if test x${syntax_highlight} = xtrue; then
 	   HIGHLIGHT1='<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github.min.css"> <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script> <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/maxima.min.js"> </script>
@@ -744,6 +745,7 @@ if test x"${enable_build_docs}" = xtrue ; then
         AC_SUBST(TEXI_EXTRA_TAIL)
 	AC_SUBST(HIGHLIGHT1)
         AC_SUBST(HIGHLIGHT2)
+        AC_SUBST(TEXI_NO_TOP_NODE)
         TEXI2HTML=texi2html.init
         AC_SUBST(TEXI2HTML)
 
