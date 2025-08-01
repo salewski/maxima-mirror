@@ -213,8 +213,8 @@ LANG_DIR="-I . -I $languagedir"
 CSS_REF="--css-ref=manual.css"
 INCLUDES="-I ../.. -I @abs_srcdir@/figures"
 TEXI_INIT="--init-file $texiinitfile"
-NO_TOP_NODE="@TEXI_NO_TOP_NODE@"
-TEXIOPT="$FORCE --html $OUTPUT_ENCODING $DOC_LANG $LANG_DIR $CSS_REF $INCLUDES $TEXI_INIT  ${SET_HTML_MATH} $NO_TOP_NODE"
+SHOW_TITLEPAGE="@SHOW_TITLEPAGE@"
+TEXIOPT="$FORCE --html $OUTPUT_ENCODING $DOC_LANG $LANG_DIR $CSS_REF $INCLUDES $TEXI_INIT  ${SET_HTML_MATH} $SHOW_TITLEPAGE"
 # Show the commands. 
 set -x
 @MAKEINFO@ --split=chapter --no-node-files --output="$languagedestdir" $TEXIOPT maxima.texi
