@@ -160,7 +160,7 @@
     (when found-it
       (destructuring-bind (base-name . id)
 	  found-it
-	(let ((url (concatenate 'string
+	  (let ((url (concatenate 'string
                                 ;; If BASE-NAME is an absolute path,
                                 ;; use "FILE://" as the protocol.
                                 ;; Otherwise use $URL_BASE.
@@ -170,18 +170,12 @@
 				"/"
 				(namestring base-name)
 				"#"
-				id))
-	      command)
-	  (when *debug-display-html-help*
-	    (format *debug-io* "URL: ~S~%" url))
-	  (setf command (ignore-errors (format nil $browser url)))
-	  (cond (command
-		 (when *debug-display-html-help*
-		   (format *debug-io* "Command: ~S~%" command))
-		 ($system command))
-		(t
-		 (merror "Browser command must contain exactly one ~~A:  ~S" $browser))))))
-    topic))
+				id)))
+	    (when *debug-display-html-help*
+	      (format *debug-io* "URL: ~S~%" url))
+	    (when *debug-display-html-help*
+	      (format *debug-io* "Command: ~{~a ~}~%" (list $browser url)))
+	    (apply '$system (list $browser url)))))))
 
 (defun display-html-topics (wanted)
   (when maxima::*debug-display-html-help*
