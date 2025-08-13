@@ -3164,7 +3164,7 @@ represented.  It must be set to one of @code{false}, @code{erf},
 @code{erfc}, or @code{erfi}.  When set to @code{false}, the error functions are not
 modified.  When set to @code{erf}, all error functions (@mref{erfc},
 @mref{erfi}, @mref{erf_generalized}, @mref{fresnel_s} and
-@mref{fresnel_c}) are converted to @mref{erf} functions.  Similary,
+@mref{fresnel_c}) are converted to @mref{erf} functions.  Similarly,
 @code{erfc} converts error functions to @mref{erfc}.  Finally
 @code{erfi} converts the functions to @mref{erfi}.
 
@@ -3489,6 +3489,7 @@ m4_displaymath(
 @closecatbox
 @end deffn
 
+@anchor{%w}
 @deffn {Function} %w [@var{k},@var{u}] (@var{z}) 
 Whittaker W function (@urlaands{eqn 13.1.33, 505}):
 m4_displaymath(
@@ -3790,12 +3791,119 @@ The Bateman k function
 
 m4_displaymath(
 <<<k_v(x)
- = \frac{2}{\pi} \int_0^{\frac{\pi}{2}} \cos(x \tan\theta-v\theta)d\theta>>>,
+ = \frac{2}{\pi} \int_0^{\pi/2} \cos(x \tan\theta-v\theta)d\theta>>>,
 <<<@math{kbateman[v](x) = (2/%pi) integrate(cos(x*tan(t)-v*t),t,0,%pi/2)}>>>)
 
-It is a special case of the confluent hypergeometric function. Maxima can
+It is one solution of a differential equation which appears in the
+theory of turbulence:
+
+m4_displaymath(
+<<<x {d^2u\over dx^2} = (x-\nu)u>>>,
+<<<
+@example
+                     2
+                    d u
+                    ─── x = u (x - v)
+                      2
+                    dx
+@end example
+>>>)
+
+It is a special case of the confluent hypergeometric function for
+@math{x > 0}:
+
+m4_displaymath(
+<<<k_v(x)
+ = {e^{-x}\over{\Gamma\left(1+{1\over 2}\nu\right)}} U\left(-{1\over 2}
+ \nu, 0, 2x\right)>>>,
+<<<
+@example
+                    - x     v
+                  %e    U(- ─, 0, 2 x)
+                            2
+                  ────────────────────
+                            v
+                      gamma(─ + 1)
+                            2
+@end example
+>>>)
+where @math{U} is the confluent hypergeometric function.  Also, we
+have
+m4_displaymath(
+<<<k_{2\nu}(z) = {1\over\Gamma(\nu+1)} W_{\nu,1/2}(2z)>>>,
+<<<
+@example
+                      %w      (2 z)
+                        v, 1/2
+            k   (z) = ─────────────
+             2 v      gamma(v + 1)
+@end example
+>>>)
+where
+m4_math(
+<<<W>>>,<<<%w>>>)
+is the @ref{%w, Whittaker W function}.
+
+Some examples:
+@c ===beg===
+@c assume(x > 0)$
+@c makelist(kbateman[n](0),n,0,5);
+@c kbateman[0](x);
+@c kbateman[2](x);
+@c kbateman[4](x);
+@c kbateman[3](x);
+@c ===end===
+@example
+(%i1) assume(x > 0)$
+@group
+(%i2) makelist(kbateman[n](0),n,0,5);
+                      2          2         2
+(%o2)            [0, ---, 0, - -----, 0, -----]
+                     %pi       3 %pi     5 %pi
+@end group
+@group
+(%i3) kbateman[0](x);
+                                - x
+(%o3)                         %e
+@end group
+@group
+(%i4) kbateman[2](x);
+                                - x
+(%o4)                       2 %e    x
+@end group
+@group
+(%i5) kbateman[4](x);
+                            - x
+(%o5)                   2 %e    (x - 1) x
+@end group
+@group
+(%i6) kbateman[3](x);
+(%o6)                     kbateman (x)
+                                  3
+@end group
+@end example
+
+Maxima can
 calculate the Laplace transform of @code{kbateman} using @mref{laplace}
-or @mrefcomma{specint} but has no other knowledge of this function.
+or @mrefcomma{specint} as shown below:
+
+@c ===beg===
+@c assume(s>0)$
+@c specint(kbateman[v](z)*exp(-s*z),z);
+@c ===end===
+@example
+(%i1) assume(s>0)$
+@group
+(%i2) specint(kbateman[v](z)*exp(-s*z),z);
+                               v        v   s - 1
+              2 %f    ([2, 1 - -], [2 - -], -----)
+                  2, 1         2        2   s + 1
+(%o2)         ------------------------------------
+                      2           v        v
+               (s + 1)  gamma(2 - -) gamma(- + 1)
+                                  2        2
+@end group
+@end example
 
 @opencatbox{Categories:}
 @category{Special functions}
