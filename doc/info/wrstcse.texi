@@ -119,7 +119,7 @@ Systematically introduces @var{num} values per parameter into @var{expression}
 and returns a list of the result. If no @var{num} is given, @var{num} defaults
 to 3.
 
-See also @mrefdot{wc_montecarlo}
+See also @mref{wc_ewc_simplify} and @mrefdot{wc_montecarlo}
 
 Example:
 @c ===beg===
@@ -151,11 +151,116 @@ Example:
 @end group
 @group
 (%i4) wc_systematic(subst(vals,rhs(divider)));
-(%o4) [0.3333333333333334 U_In, 0.3311036789297659 U_In, 
+(%o4) [0.33333333333333337 U_In, 0.3311036789297659 U_In, 
 0.3289036544850498 U_In, 0.3355704697986577 U_In, 
-0.3333333333333333 U_In, 0.3311258278145696 U_In, 
+0.3333333333333333 U_In, 0.33112582781456956 U_In, 
 0.3377926421404682 U_In, 0.3355481727574751 U_In, 
 0.3333333333333333 U_In]
+@end group
+@end example
+@end deffn
+
+
+@anchor{wc_ewc_simplify}
+@deffn {Function} wc_ewc_simplify (@var{expression})
+
+Brute-forcing through all combinations of @var{tol[n]} in order to find the
+worst-case combination is O(m^n)-complete and therefore computationally intensive
+for high numbers of tol[n].
+
+@code{wc_ewc_simplify} uses the sign of the derivatives of @var{expression} to combine
+as many @code{tol[n]}, as possible. The result is an expression that might run much
+faster through @code{wc_mintypmax} and @code{wc_systematic}, but that, if the derivate
+of @var{expression} doesn't change sign in the @var{tol[n]} space, still yields the
+same results for the brute-force approaches to worst-case analysis.
+
+Note that changing the number of @var{tol[n]} will change the statistical distribution
+of the results over the @var{tol[n]} space and therefore will change the statistical
+distribution of the montecarlo method and the results of the root sum square functions.
+
+See also @mref{wc_mintypmax} and @mrefdot{wc_montecarlo}
+
+Example:
+@c ===beg===
+@c load("wrstcse")$
+@c vals: [
+@c    R_1= 1000.0*(1+tol[1]*.01),
+@c    R_2= 2000.0*(1+tol[2]*.01)
+@c  ];
+@c ratprint:false;
+@c assume(U_In>0);
+@c divider: U_Out=U_In*(R_1)/(R_1+R_2);
+@c divider_vals:subst(vals,divider);
+@c divider_vals_simplified:lhs(divider_vals)=wc_ewc_simplify(rhs(divider_vals));
+@c wc_systematic(rhs(divider_vals));
+@c wc_systematic(rhs(divider_vals_simplified));
+@c lhs(divider_vals)=wc_mintypmax(rhs(divider_vals));
+@c lhs(divider_vals_simplified)=wc_mintypmax(rhs(divider_vals_simplified));
+@c ===end===
+@example
+(%i1) load("wrstcse")$
+@group
+(%i2) vals: [
+   R_1= 1000.0*(1+tol[1]*.01),
+   R_2= 2000.0*(1+tol[2]*.01)
+ ];
+(%o2) [R_1 = 1000.0 (0.01 tol  + 1), 
+                             1
+                                    R_2 = 2000.0 (0.01 tol  + 1)]
+                                                          2
+@end group
+@group
+(%i3) ratprint:false;
+(%o3)                         false
+@end group
+@group
+(%i4) assume(U_In>0);
+(%o4)                      [U_In > 0]
+@end group
+@group
+(%i5) divider: U_Out=U_In*(R_1)/(R_1+R_2);
+                                R_1 U_In
+(%o5)                   U_Out = ---------
+                                R_2 + R_1
+@end group
+@group
+(%i6) divider_vals:subst(vals,divider);
+                        1000.0 (0.01 tol  + 1) U_In
+                                        1
+(%o6) U_Out = -----------------------------------------------
+              2000.0 (0.01 tol  + 1) + 1000.0 (0.01 tol  + 1)
+                              2                        1
+@end group
+@group
+(%i7) divider_vals_simplified:lhs(divider_vals)=wc_ewc_simplify(rhs(divider_vals));
+                        1000.0 (1 - 0.01 tol ) U_In
+                                            2
+(%o7) U_Out = -----------------------------------------------
+              2000.0 (0.01 tol  + 1) + 1000.0 (1 - 0.01 tol )
+                              2                            2
+@end group
+@group
+(%i8) wc_systematic(rhs(divider_vals));
+(%o8) [0.33333333333333337 U_In, 0.3311036789297659 U_In, 
+0.3289036544850498 U_In, 0.3355704697986577 U_In, 
+0.3333333333333333 U_In, 0.33112582781456956 U_In, 
+0.3377926421404682 U_In, 0.3355481727574751 U_In, 
+0.3333333333333333 U_In]
+@end group
+@group
+(%i9) wc_systematic(rhs(divider_vals_simplified));
+(%o9) [0.3377926421404682 U_In, 0.3333333333333333 U_In, 
+                                         0.3289036544850498 U_In]
+@end group
+@group
+(%i10) lhs(divider_vals)=wc_mintypmax(rhs(divider_vals));
+(%o10) U_Out = [min = 0.3289036544850498 U_In, 
+    typ = 0.3333333333333333 U_In, max = 0.3377926421404682 U_In]
+@end group
+@group
+(%i11) lhs(divider_vals_simplified)=wc_mintypmax(rhs(divider_vals_simplified));
+(%o11) U_Out = [min = 0.3289036544850498 U_In, 
+    typ = 0.3333333333333333 U_In, max = 0.3377926421404682 U_In]
 @end group
 @end example
 @end deffn
@@ -198,11 +303,11 @@ Example:
 @end group
 @group
 (%i4) wc_montecarlo(subst(vals,rhs(divider)),10);
-(%o4) [0.3365488313167528 U_In, 0.3339089445851889 U_In, 
-0.314651402884122 U_In, 0.3447359711624277 U_In, 
-0.3294005710066001 U_In, 0.3330897542463686 U_In, 
-0.3397591863729343 U_In, 0.3227030530673181 U_In, 
-0.3385512773502185 U_In, 0.314764470912582 U_In]
+(%o4) [0.3301505377099377 U_In, 0.33276843198354916 U_In, 
+0.33406203454153227 U_In, 0.33434833585190965 U_In, 
+0.3341006856369802 U_In, 0.3359647531928058 U_In, 
+0.32911646313213117 U_In, 0.333158315034511 U_In, 
+0.3325173140803672 U_In, 0.3331108406798784 U_In]
 @end group
 @end example
 @end deffn
@@ -214,6 +319,8 @@ Prints the minimum, maximum and typical value of @var{expr}. If @var{n}
 is positive, @var{n} values for each parameter will be tried systematically.
 If @var{n} is negative, @var{-n} random values are used instead.
 If no @var{n} is given, 3 is assumed.
+
+See also @mref{wc_ewc_simplify} and @mrefdot{wc_systematic}
 
 Example:
 @c ===beg===
@@ -327,9 +434,11 @@ Example:
 (%i1) load("wrstcse")$
 @group
 (%i2) V_F: U_Diode=wc_mintypmax2tol(tol[1],.5,.75,.82);
-                                          2
-(%o2) U_Diode = (- 0.09000000000000002 tol ) + 0.16 tol  + 0.75
-                                          1            1
+                                         2
+(%o2) U_Diode = - 0.09000000000000002 tol
+                                         1
+                                + 0.15999999999999998 tol  + 0.75
+                                                         1
 @end group
 @group
 (%i3) lhs(V_F)=wc_mintypmax(rhs(V_F));
