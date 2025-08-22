@@ -561,7 +561,7 @@ Example:
 @c assume(U_In>0);
 @c divider:U_Out=U_In*R_1/(R_1+R_2);
 @c lhs(divider)=wc_mintypmax_rss(subst(vals,rhs(divider)),6);
-@c lhs(divider)=wc_mintypmax_rss_percent(subst(vals,rhs(divider)),6);
+@c lhs(divider)=float(wc_mintypmax_rss_percent(subst(vals,rhs(divider)),6));
 @c ===end===
 @example maxima
 (%i1) load("wrstcse")$
@@ -593,20 +593,9 @@ Example:
  max = 0.5035355339059328 U_In, Fail = 0.0019731752898266564 ppm]
 @end group
 @group
-(%i8) lhs(divider)=wc_mintypmax_rss_percent(subst(vals,rhs(divider)),6);
-                                             U_In
-                            2.0 (0.5 U_In - -------)
-                                                7/2
-                                            25 2
-(%o8) U_Out = [min = 100 % (------------------------ - 1), 
-                                      U_In
-                   U_In
-             2.0 (------- + 0.5 U_In)
-                      7/2
-                  25 2
-max = 100 % (------------------------ - 1), 
-                       U_In
-Fail = 0.0019731752898266564 ppm]
+(%i8) lhs(divider)=float(wc_mintypmax_rss_percent(subst(vals,rhs(divider)),6));
+(%o8) U_Out = [min = - 0.7071067811865506 %, typ = 0.5 U_In, 
+    max = 0.7071067811865506 %, Fail = 0.0019731752898266564 ppm]
 @end group
 @end example
 @end deffn
