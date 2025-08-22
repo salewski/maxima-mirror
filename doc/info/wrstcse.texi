@@ -320,7 +320,7 @@ is positive, @var{n} values for each parameter will be tried systematically.
 If @var{n} is negative, @var{-n} random values are used instead.
 If no @var{n} is given, 3 is assumed.
 
-See also @mref{wc_ewc_simplify} and @mrefdot{wc_systematic}
+See also @mrefcomma{wc_mintypmax_rss} @mref{wc_ewc_simplify} and @mrefdot{wc_systematic}
 
 Example:
 @c ===beg===
@@ -364,6 +364,140 @@ Example:
 @end group
 @end example
 @end deffn
+
+
+@anchor{wc_mintypmax_rss}
+@deffn {Function} wc_mintypmax_rss (@var{expr}, @var{sigmas})
+
+Prints the minimum and maximum of @var{expr}, as well as how high the
+probability is that @var{expr} will lie out of that range based on a root
+sum square calculation and assuming all input ranges will be gauss-shaped.
+
+@var{wc_defaultsigma} defines how many sigma of an input value's tolerance
+distribution the range of @var{tol[n]}=[-1...1] corresponds to.
+
+The RSS methods has a few advantages a brute-force worst-case calculation:
+It is fast even witput @mref{wc_ewc_simplify}. It prevents overengineering
+resulting from assuming all tolerances to add up in a catastrophical way if
+this only happens in a neglectible number of cases. But it will yield only
+the correct results if the gaussian distribution of the input data is known.
+
+See also @mref{wc_defaultsigma} and @mrefdot{wc_mintypmax}
+
+Example:
+@c ===beg===
+@c load("wrstcse")$
+@c ratprint:false$
+@c wc_defaultsigma:6$
+@c vals: [
+@c    R_1= 1000.0*(1+tol[1]*.01),
+@c    R_2= 1000.0*(1+tol[2]*.01)
+@c  ];
+@c assume(U_In>0);
+@c divider:U_Out=U_In*R_1/(R_1+R_2);
+@c lhs(divider)=wc_mintypmax_rss(subst(vals,rhs(divider)),6);
+@c ===end===
+@example
+(%i1) load("wrstcse")$
+(%i2) ratprint:false$
+(%i3) wc_defaultsigma:6$
+@group
+(%i4) vals: [
+   R_1= 1000.0*(1+tol[1]*.01),
+   R_2= 1000.0*(1+tol[2]*.01)
+ ];
+(%o4) [R_1 = 1000.0 (0.01 tol  + 1), 
+                             1
+                                    R_2 = 1000.0 (0.01 tol  + 1)]
+                                                          2
+@end group
+@group
+(%i5) assume(U_In>0);
+(%o5)                      [U_In > 0]
+@end group
+@group
+(%i6) divider:U_Out=U_In*R_1/(R_1+R_2);
+                                R_1 U_In
+(%o6)                   U_Out = ---------
+                                R_2 + R_1
+@end group
+@group
+(%i7) lhs(divider)=wc_mintypmax_rss(subst(vals,rhs(divider)),6);
+(%o7) U_Out = [min = 0.49646446609406725 U_In, typ = 0.5 U_In, 
+ max = 0.5035355339059328 U_In, Fail = 0.0019731752898266564 ppm]
+@end group
+@end example
+@end deffn
+
+@anchor{wc_defaultsigma}
+@defvr {Option variable} wc_defaultsigma
+Default value: @code{6}
+
+Defines how many sigmas of the gauss distribution that represents the
+tolerances of a parameter correspond to a @var{tol[n]} value of -1...1.
+
+See also @mrefdot{wc_mintypmax_rss}
+
+Example:
+@c ===beg===
+@c load("wrstcse")$
+@c ratprint:false$
+@c vals: [
+@c    R_1= 1000.0*(1+tol[1]*.01),
+@c    R_2= 1000.0*(1+tol[2]*.01)
+@c  ];
+@c assume(U_In>0);
+@c divider:U_Out=U_In*R_1/(R_1+R_2);
+@c wc_defaultsigma:1$
+@c lhs(divider)=wc_mintypmax_rss(subst(vals,rhs(divider)),6);
+@c wc_defaultsigma:3$
+@c lhs(divider)=wc_mintypmax_rss(subst(vals,rhs(divider)),6);
+@c wc_defaultsigma:6$
+@c lhs(divider)=wc_mintypmax_rss(subst(vals,rhs(divider)),6);
+@c ===end===
+@example
+(%i1) load("wrstcse")$
+(%i2) ratprint:false$
+@group
+(%i3) vals: [
+   R_1= 1000.0*(1+tol[1]*.01),
+   R_2= 1000.0*(1+tol[2]*.01)
+ ];
+(%o3) [R_1 = 1000.0 (0.01 tol  + 1), 
+                             1
+                                    R_2 = 1000.0 (0.01 tol  + 1)]
+                                                          2
+@end group
+@group
+(%i4) assume(U_In>0);
+(%o4)                      [U_In > 0]
+@end group
+@group
+(%i5) divider:U_Out=U_In*R_1/(R_1+R_2);
+                                R_1 U_In
+(%o5)                   U_Out = ---------
+                                R_2 + R_1
+@end group
+(%i6) wc_defaultsigma:1$
+@group
+(%i7) lhs(divider)=wc_mintypmax_rss(subst(vals,rhs(divider)),6);
+(%o7) U_Out = [min = 0.4787867965644036 U_In, typ = 0.5 U_In, 
+ max = 0.5212132034355964 U_In, Fail = 0.0019731752898266564 ppm]
+@end group
+(%i8) wc_defaultsigma:3$
+@group
+(%i9) lhs(divider)=wc_mintypmax_rss(subst(vals,rhs(divider)),6);
+(%o9) U_Out = [min = 0.49292893218813455 U_In, typ = 0.5 U_In, 
+ max = 0.5070710678118655 U_In, Fail = 0.0019731752898266564 ppm]
+@end group
+(%i10) wc_defaultsigma:6$
+@group
+(%i11) lhs(divider)=wc_mintypmax_rss(subst(vals,rhs(divider)),6);
+(%o11) U_Out = [min = 0.49646446609406725 U_In, typ = 0.5 U_In, 
+ max = 0.5035355339059328 U_In, Fail = 0.0019731752898266564 ppm]
+@end group
+@end example
+@end defvr
 
 @anchor{wc_tolappend}
 @deffn {Function} wc_tolappend (@var{list})
