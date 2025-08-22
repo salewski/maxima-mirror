@@ -187,7 +187,7 @@ wc_mintypmax_rss_percent(x,sigmas):=block([rssparams:wc_getrssparams(x)],
 );
 
 /* Like wc_mintypmax, but output the tolerances in percent, not in abs values. */
-wc_mintypmax_percent(x):=block([mintypmax:wc_mintypmax(x)],
+wc_mintypmax_percent([x]):=block([mintypmax:apply('wc_mintypmax,x*/)],
     [
         'min=(subst(mintypmax,'min)/subst(mintypmax,'typ)-1)*100*"%",
         'typ=subst(mintypmax,'typ),
