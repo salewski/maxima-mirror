@@ -185,6 +185,15 @@ wc_mintypmax_rss_percent(x,sigmas):=block([rssparams:wc_getrssparams(x)],
     ]
 );
 
+/* Like wc_mintypmax, but output the tolerances in percent, not in abs values. */
+wc_mintypmax_percent(x,sigmas):=block([mintypmax:wc_mintypmax(x)],
+    [
+        'min=(subst(mintypmax,'min)/subst(mintypmax,'typ)-1)*100*"%",
+        'typ=subst(mintypmax,'typ),
+        'max=(subst(mintypmax,'max)/subst(mintypmax,'typ)-1)*100*"%"
+    ]
+);
+
 /* Finding the extreme Worst Case is O(n^2) complete and therefore slow
 for a high number of tol[n]. This function now merges all tol[n] we can
 determine for in which direction they will affect the tolerances,
