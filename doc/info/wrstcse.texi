@@ -33,7 +33,7 @@ will make both parameters tolerate in the same way.
 @anchor{wc_typicalvalues}
 @deffn {Function} wc_typicalvalues (@var{expression}, [@var{num}])
 
-Returns what happens if all tolerances (that are represented by tol [n] that can
+Returns what happens if all tolerances (that are represented by @var{tol[n]} that can
 vary from 0 to 1) happen to be 0.
 
 Example:
