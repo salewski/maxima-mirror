@@ -72,6 +72,61 @@ For example two 1% resistors that both will change over the temperature range by
                                        max = 2.020202020202033 %]
 @end group
 @end example
+
+@code{load ("wrstcse")} loads this package.
+
+@opencatbox{Categories:}
+@category{Share packages}
+@category{Package wrstcse}
+@closecatbox
+
+@node Functions and Variables for wrstcse, , Introduction to wrstcse, Package wrstcse
+@section Functions and Variables for wrstcse
+
+@anchor{wc_typicalvalues}
+@deffn {Function} wc_typicalvalues (@var{expression}, [@var{num}])
+
+Returns what happens if all tolerances (that are represented by @var{tol[n]} that can
+vary from 0 to 1) happen to be 0.
+
+Example:
+@c ===beg===
+@c load("wrstcse")$
+@c vals: [
+@c    R_1= 1000.0*(1+tol[1]*.01),
+@c    R_2= 2000.0*(1+tol[2]*.01)
+@c  ];
+@c divider:U_Out=U_In*R_1/(R_1+R_2);
+@c wc_typicalvalues(vals);
+@c wc_typicalvalues(subst(vals,divider));
+@c ===end===
+@example
+(%i1) load("wrstcse")$
+@group
+(%i2) vals: [
+   R_1= 1000.0*(1+tol[1]*.01),
+   R_2= 2000.0*(1+tol[2]*.01)
+ ];
+(%o2) [R_1 = 1000.0 (0.01 tol  + 1), 
+                             1
+                                    R_2 = 2000.0 (0.01 tol  + 1)]
+                                                          2
+@end group
+@group
+(%i3) divider:U_Out=U_In*R_1/(R_1+R_2);
+                                R_1 U_In
+(%o3)                   U_Out = ---------
+                                R_2 + R_1
+@end group
+@group
+(%i4) wc_typicalvalues(vals);
+(%o4)             [R_1 = 1000.0, R_2 = 2000.0]
+@end group
+@group
+(%i5) wc_typicalvalues(subst(vals,divider));
+(%o5)            U_Out = 0.3333333333333333 U_In
+@end group
+@end example
 @end deffn
 
 @anchor{wc_inputvalueranges}
