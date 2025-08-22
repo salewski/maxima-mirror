@@ -20,7 +20,7 @@ endif
 
 genericdir = $(xmaximadir)
 
-genericdirDATA = demos.html examples.html intro.html plotmaxima.html net.sourceforge.maxima.png net.sourceforge.maxima.svg net.sourceforge.maxima.gif net.sourceforge.maxima.ico
+genericdirDATA = demos.html examples.html primer.html intro.html plotmaxima.html net.sourceforge.maxima.png net.sourceforge.maxima.svg net.sourceforge.maxima.gif net.sourceforge.maxima.ico
 
 appicondir = $(datarootdir)/icons
 dist_appicon_DATA = xmaxima.png xmaxima.svg
@@ -69,7 +69,6 @@ TKSOURCES = \
 	Tkmaxima/OpenMath.tcl \
 	Tkmaxima/NConsole.tcl \
 	Tkmaxima/String.tcl \
-	Tkmaxima/Prefs.tcl \
 	Tkmaxima/RunMaxima.tcl \
 	Tkmaxima/Menu.tcl \
 	Tkmaxima/Paths.tcl \
@@ -88,7 +87,7 @@ xmaxima: $(XMAXIMASOURCES)
 	cat "$(abs_top_srcdir)/interfaces/xmaxima/xmaxima-trailer.tcl" >> xmaxima && \
 	chmod +x xmaxima
 
-EXTRA_DIST = $(genericdirDATA) $(XMAXIMA_FILES) Tkmaxima/Header.tcl.in xmaxima-trailer.tcl maxima-icon.png
+EXTRA_DIST = $(genericdirDATA) $(XMAXIMA_FILES) Tkmaxima/Header.tcl.in xmaxima-trailer.tcl
 
 
 # Developer convenience target

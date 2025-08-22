@@ -8,7 +8,7 @@ dnl Note: during Lisp-based builds (see INSTALL.lisp) the version
 dnl number is read from the following AC_INIT line.  It's sensitive to
 dnl whitespace so when updating the version number only make changes
 dnl within the second pair of square brackets.
-AC_INIT([maxima], [5.47post])
+AC_INIT([maxima], [5.48post])
 AC_CONFIG_SRCDIR([src/macsys.lisp])
 AM_INIT_AUTOMAKE([-Wno-portability tar-ustar])
 
@@ -535,7 +535,7 @@ dnl       Are these checks (especially Windows, Linux PPC64) okay?
 dnl Probably at the end we could check if another - CCL64 unsupported - OS was used.
 dnl
 dnl of course the ccl directory needs to be in the path.
-dnl another possibilty would be to default to "ccl64", which is - MAYBE - a platform independent
+dnl another possibility would be to default to "ccl64", which is - MAYBE - a platform independent
 dnl startscript in /usr/local/bin.
 case "${host_os}" in
     *linux-powerpc64*)
@@ -655,6 +655,25 @@ AC_ARG_ENABLE(build-docs,
 	 esac],
 	 [enable_build_docs=true])
 
+AC_ARG_ENABLE(syntax-highlighting,
+  [AS_HELP_STRING([--enable-syntax-highlighting],
+    [Enable syntax highlighting for the HTML manual (default = no).
+       Set to "highlightjs" to use highlightjs or "pygments" to use pygments.  No value implies highlightjs])],
+  [case "${enableval}" in
+          yes|highlightjs) syntax_highlighting=highlightjs ;;
+          pygments) syntax_highlighting=pygments ;;
+          no)  syntax_highlighting=false ;;
+          *) AC_MSG_ERROR(bad value ${enableval} for --enable-syntax-highlighting) ;;
+   esac],
+  [syntax_highlighting=false])
+
+AS_IF([test "x$syntax_highlighting" = "xpygments"],
+  [AC_CHECK_PROG([pygmentize_found], [pygmentize],
+    true,
+    false)
+    AS_IF([test "x$pygmetize_found" = "xfalse"],
+      AC_MSG_FAILURE(
+        [--enable-syntax-highlighting set to "pygments" but pygmentize not found]))])
 
 AM_CONDITIONAL(ENABLE_BUILD_DOCS, test x$enable_build_docs = xtrue)
 
@@ -668,7 +687,7 @@ if test x"${enable_build_docs}" = xtrue ; then
 [makeinfo not found; Maxima needs makeinfo to build docs.
 If you have makeinfo installed somewhere not in PATH,
 specify where it is by using
-  ./configure MAKEINFO=/path/to/makinfo
+  ./configure MAKEINFO=/path/to/makeinfo
 Or disable building of the docs using
   ./configure --disable-build-docs
 ])
@@ -722,12 +741,28 @@ if test x"${enable_build_docs}" = xtrue ; then
            TEXI_EXTRA_TAIL=''
         else
            TEXI_EXTRA_HEAD='texinfo_set_from_init_file("EXTRA_HEAD", '
-           HLJS_CSS_SELECTOR="'.example-preformatted'"
+           HLJS_CSS_SELECTOR="'.example.user-maxima .example-preformatted'"
            TEXI_EXTRA_TAIL=')'
         fi
+        if test x${syntax_highlighting} = xhighlightjs; then
+	   HIGHLIGHT1='<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github.min.css"> <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script> <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/maxima.min.js"> </script>
+'
+	   HIGHLIGHT2="<script> hljs.configure({languages: [['Maxima']], cssSelector: ${HLJS_CSS_SELECTOR}}); hljs.highlightAll(); </script>
+"
+        fi
+        if test x${syntax_highlighting} = xpygments; then
+           if test ${makeinfo_version} -ge 702; then
+             USE_PYGMENTS=true
+           else
+             AC_MSG_ERROR([Makeinfo version (${makeinfo_version_string}) too old to use pygments for syntax highlighting.  Disable or use highlightjs])
+           fi
+        fi
         AC_SUBST(TEXI_EXTRA_HEAD)
-        AC_SUBST(HLJS_CSS_SELECTOR)
+        dnl AC_SUBST(HLJS_CSS_SELECTOR)
         AC_SUBST(TEXI_EXTRA_TAIL)
+	AC_SUBST(HIGHLIGHT1)
+        AC_SUBST(HIGHLIGHT2)
+        AC_SUBST(USE_PYGMENTS)
         TEXI2HTML=texi2html.init
         AC_SUBST(TEXI2HTML)
 
@@ -1313,6 +1348,7 @@ AC_ARG_WITH(emacs-prefix,
 	[EMACSDIR="${datarootdir}/emacs/site-lisp"])
 AC_SUBST(EMACSDIR)
 
+
 dnl Tell defsystem that this isn't a lisp-only build
 lisp_only_build="nil"
 AC_SUBST(lisp_only_build)
@@ -1507,3 +1543,13 @@ if test x"${xmaxima_exe}" = xtrue ; then
      AC_MSG_WARN([A prerequisite for xmaxima.exe not found.  The missing components can be defined on the make command line.])
    fi
 fi
+
+if test -n "x$MAKEINFO"; then
+  echo "Using makeinfo ${MAKEINFO} to generate docs"
+fi
+
+if test "x${syntax_highlighting}" = "xfalse"; then
+  echo "HTML syntax highlighting disabled"
+else
+  echo "HTML syntax highlighting enabled using ${syntax_highlighting}"
+fi  

@@ -75,11 +75,24 @@
     (format t "Already added entry ~S ~S: ~S~%"
 	    item (gethash item *html-index*)
 	    line))
-  (format *log-file* "~A: ~S -> ~S ~S~%"
-	  prefix item file item-id)
+  (flet ((skip-toc-entry (item)
+         ;; Returns non-nil if the item should not be included in the
+         ;; html index.  This is not currently used.
+           (let ((found
+                   (find item '( ;; "Error and warning messages"
+                                )
+                         :test #'string=)))
+             ;; Log a note that we skipped this entry.
+             (when found
+               (format *log-file* "Skip ~A: ~S -> ~S ~S~%"
+                       prefix item file item-id))
+             found)))
+    (unless (skip-toc-entry item)
+      (format *log-file* "~A: ~S -> ~S ~S~%"
+	      prefix item file item-id)
 
-  (setf (gethash item *html-index*)
-	(cons file item-id)))
+      (setf (gethash item *html-index*)
+	    (cons file item-id)))))
 
 (defun process-line (line matcher path &key replace-dash-p (prefix "Add:") truenamep)
   "Process the LINE using the function MATCHER to determine if this line
@@ -188,12 +201,17 @@
 ;; the section numbers, "Bessel Functions".  
 ;; Further subsections are ignored.
 ;; Conditional expression allows us to handle earlier versions of Texinfo.
-(defun match-toc (line)
-  (let ((regexp (cond 
-          ((>= *texinfo-version* (texinfo-version-number 6 8 )) (pregexp:pregexp "<a id=\"toc-.*\" href=\"([^#\"]+)(#([^\"]+))\">[[:digit:]]+\.[[:digit:]]+ ([^\"]+?)</a>"))
-          (t (pregexp:pregexp "<a (?:name|id)=\"toc-.*\" href=\"([^#\"]+)(#([^\"]+))\">[[:digit:]]+\\.[[:digit:]]+ ([^\"]+?)</a>(?!.*maxima_100.html)")))
-       ))
-    (let ((match (pregexp:pregexp-match regexp line)))
+(let ((regexp-texinfo>=6.8
+       (pregexp:pregexp "<a id=\"toc-.*\" href=\"([^#\"]+)(#([^\"]+))\">[[:digit:]]+\\.[[:digit:]]+ ([^\"]+?)</a>"))
+      (regexp-texinfo<6.8
+       (pregexp:pregexp "<a (?:name|id)=\"toc-.*\" href=\"([^#\"]+)(#([^\"]+))\">[[:digit:]]+\\.[[:digit:]]+ ([^\"]+?)</a>(?!.*maxima_100.html)")))
+  (defun match-toc (line)
+    (let* ((regexp (cond 
+                   ((>= *texinfo-version* (texinfo-version-number 6 8))
+                    regexp-texinfo>=6.8)
+                   (t
+                    regexp-texinfo<6.8)))
+         (match (pregexp:pregexp-match regexp line)))
       (when match
 	(destructuring-bind (whole file item# id item)
 	    match
@@ -224,7 +242,9 @@
 						     item
 						     (string (code-char char-code)))))))
 
-	  (format *log-file* "TOC: ~S -> ~S~%" item file)
+          ;; Note that we found a TOC entry.  ADD-ENTRY determines
+          ;; what actually gets added.
+	  (format *log-file* "Found TOC: ~S -> ~S~%" item file)
 
 	  (values item id file line))))))
 

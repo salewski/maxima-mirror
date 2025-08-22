@@ -187,18 +187,18 @@ x_2 &= -{1\over \sqrt{2}}
 @c fmin_cobyla(x1*x2, [x1, x2], [1,1], 
 @c             constraints = [x1^2+x2^2<=1], iprint=1);
 @c ===end===
-@example
+@example maxima
 (%i1) load("fmin_cobyla")$
 @group
-(%i2) fmin_cobyla(x1*x2, [x1, x2], [1,1], 
-                  constraints = [x1^2+x2^2<=1], iprint=1);
-@end group
+(%i2) fmin_cobyla(x1*x2, [x1, x2], [1,1],
+            constraints = [x1^2+x2^2<=1], iprint=1);
    Normal return from subroutine COBYLA
 
-   NFVALS =   66   F =-5.000000E-01    MAXCV = 1.999845E-12
-   X = 7.071058E-01  -7.071077E-01
-(%o2) [[x1 = 0.70710584934848, x2 = - 0.7071077130248], 
-       - 0.49999999999926, [[-1.999955756559757e-12],[]], 66]
+   NFVALS =   64   F =-5.000000E-01    MAXCV = 2.000122E-12
+   X = 7.071076E-01  -7.071060E-01
+(%o2) [[x1 = 0.707107555323284, x2 = - 0.7071060070503778], 
+                                     - 0.4999999999998015, 64, 0]
+@end group
 @end example
 
 Here is the same example but the constraint
@@ -230,3 +230,7 @@ is, of course, violated.
 There are additional examples in the share/cobyla/ex directory and in
 share/cobyla/rtest_cobyla.mac.
 
+@c Local Variables: 
+@c mode: texinfo
+@c TeX-master: "include-maxima"
+@c End: 

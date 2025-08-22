@@ -1,6 +1,5 @@
 ;; xmaxima.lisp: routines for Maxima's interface to xmaxima
 ;; Copyright (C) 2007-2021 J. Villate
-;; Time-stamp: "2024-03-25 08:58:31 villate"
 ;; 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -445,14 +444,7 @@
                             #+sbcl (sb-ext:native-namestring file)
                             #-sbcl file
                             :direction :output :if-exists :supersede)
-             (princ (slot-value plot 'data) fl))
-           ($system (concatenate 'string *maxima-prefix* 
-                                 (if (string= *autoconf-windows* "true")
-                                     "\\bin\\" "/bin/") 
-                                 $xmaxima_plot_command)
-                    #-(or (and sbcl win32) (and sbcl win64) (and ccl windows))
-                    (format nil " ~s &" file)
-                    #+(or (and sbcl win32) (and sbcl win64) (and ccl windows))
-                    file))
+                           (princ (slot-value plot 'data) fl))
+           ($system $xmaxima_plot_command (format nil $gnuplot_file_args file)))
           (t (princ (slot-value plot 'data)) ""))
     (cons '(mlist) (cons file output-file))))

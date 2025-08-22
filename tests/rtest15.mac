@@ -24,9 +24,11 @@ integrate(3^log(x),x);
 integrate(sqrt(x+1/x-2),x,0,1);
 4/3$
 
-/* bug reported by kevin ellwood.  fixed mar 11 2004 */
-integrate(exp(-k*t)/sqrt(k*t),t);
-sqrt(%pi)*erf(sqrt(k*t))/k$
+/* bug reported by kevin ellwood.  fixed mar 11 2004 
+Let's locally set `expintrep : gamma_incomplete` because it makes it easier to verify the answer is correct.
+*/
+block([expintrep : gamma_incomplete], integrate(exp(-k*t)/sqrt(k*t),t));
+-(gamma_incomplete(1/2,k*t)/k)$
 
 /* a bug in chebyf.  fixed 20 apr 2004. */
 
@@ -680,16 +682,13 @@ factor(integrate(1/(sin(x)^2+1),x,0,3*%pi));
  * Bug [1504505] integrate( 1/(x^8-1),x,0,1/2) => internal error
  *
  * Fixed in residu.lisp, 1.5.
- *
- * The call to factor is to get rid of some numerical factors.
  */
-ratsimp(ev(logcontract((integrate(1/(x^8-1),x,0,1/2))),algebraic) + 
-(sqrt(2)*log((2^(3/2)+5)/(2^(3/2)-5)/-1)
-      +2*sqrt(2)*atan((sqrt(2)+2)/2)
-      +2*sqrt(2)*atan((sqrt(2)-2)/2)+log(9)
-      +4*atan(1/2))
- /16);
-0;
+block([ans : integrate(1/(x^8-1),x,0,1/2)],[ans, expand(float(ans))]);
+[-(log((5*sqrt(2)+4)/2^(5/2))/2^(7/2))
+        +log((5*sqrt(2)-4)/2^(5/2))/2^(7/2)+atan((sqrt(2)-1)/sqrt(2))/2^(5/2)
+        +atan((-sqrt(2)-1)/sqrt(2))/2^(5/2)+(%i*%pi-log(2))/8-log(3/2)/8
+        -atan(1/2)/4-(%i*%pi)/8,-0.500217463872434]$
+
 
 /*
  * Bug [ 1582625 ] integrate(t^2*log(t)/((t^2-1)*(t^4+1)), t, 0, 1) wrong?
@@ -913,7 +912,7 @@ block ([foo],
     foo : integrate (cos(a*x)/(1 + x^2), x, 0, inf),
     forget (equal (a, 0)),
     foo);
-%e^-a * (%pi*%e^(2*a) + %pi)/4;
+(%e^-a*(%e^(2*a)+1)*%pi)/4$
 
 /* verify that verbified math functions are not evaluated to numbers
  * bug reported to mailing list 2007-11-19
