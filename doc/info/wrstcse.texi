@@ -84,7 +84,7 @@ For example two 1% resistors that both will change over the temperature range by
 @section Functions and Variables for wrstcse
 
 @anchor{wc_typicalvalues}
-@deffn {Function} wc_typicalvalues (@var{expression}, [@var{num}])
+@deffn {Function} wc_typicalvalues (@var{expression})
 
 Returns what happens if all tolerances (that are represented by @var{tol[n]} that can
 vary from 0 to 1) happen to be 0.
