@@ -27,7 +27,7 @@ New items in share:
  * New package gamma_simp: simplification of gamma function
  * Package descriptive: function cov accepts optional argument for per-datum weights
  * Package wrstcse: Support tolerance calculations using the RMS method
-
+ * Package wrstcse: wc_ewc_simplify() permits O(n)-complete brute-force WCAs.
 Changes in core:
 ----------------
  * Add answers_from_file option to run_testsuite
