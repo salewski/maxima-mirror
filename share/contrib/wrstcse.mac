@@ -180,6 +180,7 @@ wc_mintypmax_rss(x,sigmas):=float(block([rssparams:wc_getrssparams(x)],
 wc_mintypmax_rss_percent(x,sigmas):=block([rssparams:wc_getrssparams(x)],
     [
         'min=((rssparams@mu-sigmas*rssparams@sigma)/rssparams@mu-1)*100*"%",
+        'typ=wc_typicalvalues(x),
         'max=((rssparams@mu+sigmas*rssparams@sigma)/rssparams@mu-1)*100*"%",
         Fail=float(1-(erf(sigmas/sqrt(2))))*1e6*"ppm"
     ]
