@@ -6,24 +6,46 @@
 @node Introduction to wrstcse, Functions and Variables for wrstcse, Package wrstcse, Package wrstcse
 @section Introduction to wrstcse
 
-@code{wrstcse} is a naive go at interval arithmetics is powerful enough to
-perform worst case calculations that appear in engineering by applying
-all combinations of tolerances to all parameters.
+@code{wrstcse} provides a few aproaches to worst case calculations that are powerful enough
+for most engineering problems, but avoid the problems that make a true interval arithmetics
+unfeasible for non-trivial problems:
+@itemize
+@item
+Extreme worst case calculation by determining which combination of
+extreme input values will yield the most extreme result
+(@mrefcomma{wc_mintypmax} @mref{wc_systematic}). Its approach isn't
+guaranteed to find local minima and maxima in the middle of 
+the input parameter space. In most real-world problems, though, the
+derivation of the result to each parameter doesn't change its sign in
+the tolerance space, which moves the extreme cases to the edges of the
+tolerance space making them accessible to this
+method.
+Via @mref{wc_ewc_simplify} this method can typically be reduced from a
+brute-force approach to being O(n)-complete.
+@item
+The monte carlo approach that assigns each parameter random values in
+the tolerance space and, when repeated n times will yield a
+view of the distribution n samples might have. The view provided by
+this method is pessimistic, as most real-wprld items are more
+probabible to lie in the middle of the tolerance space than at its
+end.
+@item
+The root mean square approach that knowing an approximation of the
+parameters of the gaussian distribution of the input values one can
+determine how big the tolerances will realistically be if one requires
+a given yield (see @mref{wc_mintypmax_rss}). Note that even rectangles
+tend to quickly add up to approximation of gauss curve, if affecting
+the same tolerance which makes this method applicable to most
+real-world problems.
+@end itemize
 
-Its approach isn't guaranteed to find local minima and maxima in the middle of
-the input parameter space. But if setting all input values to the right
-combination of extreme values will result in the extreme output values it will find it
-avoiding the problems that make a true interval arithmetics unfeasible for non-trivial
-problems. For example it will always succeed if the derivation of the result to each
-tolerance-laden parameter doesn't change its sign in the tolerance space.
-
-Tolerances are applied to parameters by providing each tolerance-laden parameter
-with a @var{tol[n]} that wrstcase will vary between -1 and 1 looking for extreme results.
-Using the same @var{n} for two parameters will make both parameters have coupled
-tolerances.
-
-For example two 1% resistors that both will change over the temperature range by another
-2% in the same way can be defined as follows:
+Tolerances are applied to parameters by providing each
+tolerance-laden parameter with a @var{tol[n]} that wrstcase will vary
+between -1 and 1 looking for extreme results, while @var{rol[n]}=0
+should yield the typical value of a parameter.. Using the same @var{n} 
+for two parameters will make both parameters have coupled tolerances.
+Therefore two  1% resistors that both will change over the
+temperature range by another 2% in the same way can be defined as follows:
 @c ===beg===
 @c load("wrstcse")$
 @c vals: [
@@ -86,8 +108,8 @@ For example two 1% resistors that both will change over the temperature range by
 @anchor{wc_typicalvalues}
 @deffn {Function} wc_typicalvalues (@var{expression})
 
-Returns what happens if all tolerances (that are represented by @var{tol[n]} that can
-vary from 0 to 1) happen to be 0.
+Returns what happens if all @var{tol[n]} happen to be 0, which moves
+all parameter to the middle of their tolerance range.
 
 Example:
 @c ===beg===
@@ -726,8 +748,13 @@ R_4 = 1000.0 (0.01 tol  + 1)]
 @anchor{wc_mintypmax2tol}
 @deffn {Function} wc_mintypmax2tol (@var{tolname}, @var{minval}, @var{typval}, @var{maxval})
 
-Generates a parameter that uses the tolerance @var{tolname} that tolerates between the
+Generates a parameter that uses the tolerance @var{tolname} and tolerates between the
 given values.
+
+Caveat: This function returns a quadratic equation. If
+@code{typval-minval} greatly differs from @code{maxval-typval} the
+resulting curve will overshoot, if this parameter is used with values
+of @var{tolname} that aren't integers.
 
 Example:
 @c ===beg===
