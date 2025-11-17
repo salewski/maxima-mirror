@@ -1892,6 +1892,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#+nil
 (defun simp-log-gamma (expr z simpflag)
   (oneargcheck expr)
   (setq z (simpcheck (cadr expr) simpflag))
@@ -1933,6 +1934,37 @@
      (simplify (list '(%log) (simplify (list '(mfactorial) (- z 1))))))
 
     (t (eqtest (list '(%log_gamma) z) expr))))
+
+(def-simplifier log_gamma (z)
+  (cond
+    ;; Check for specific values
+    ((and (mnump z)
+          (or (zerop1 z)
+              (and (eq ($sign z) '$neg)
+                   (zerop1 (sub z ($truncate z))))))
+     ;; We have zero, a negative integer or a float or bigfloat representation.
+     (simp-domain-error 
+      (intl:gettext "log_gamma: log_gamma(~:M) is undefined.") z))
+
+    ((eq z '$inf) '$inf)
+    ;; Check for numerical evaluation
+    ((float-numerical-eval-p z)
+     (complexify (log-gamma-lanczos (complex ($float z) 0))))
+    ((complex-float-numerical-eval-p z)
+     (complexify 
+      (log-gamma-lanczos 
+       (complex ($float ($realpart z)) ($float ($imagpart z))))))
+    ((bigfloat-numerical-eval-p z) 
+     (bfloat-log-gamma ($bfloat z)))
+    ((complex-bigfloat-numerical-eval-p z)
+     (complex-bfloat-log-gamma 
+      (add ($bfloat ($realpart z)) (mul '$%i ($bfloat ($imagpart z))))))
+    ;; Transform to Logarithm of Factorial for integer values
+    ;; At this point the integer value is positive and not zero.
+    ((integerp z)
+     (simplify (list '(%log) (simplify (list '(mfactorial) (- z 1))))))
+    (t
+     (give-up))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; The functions log-gamma-lanczos, bfloat-log-gamma and 
