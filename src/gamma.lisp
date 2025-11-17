@@ -1858,6 +1858,8 @@
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#+nil
+(progn
 (defmfun $log_gamma (z)
   (simplify (list '(%log_gamma) z)))
 
@@ -1872,7 +1874,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defprop %log_gamma simp-log-gamma operators)
-
+)
 ;;; Logarithm of the Gamma function distributes over bags
 
 (defprop %log_gamma (mlist $matrix mequal) distribute_over)
