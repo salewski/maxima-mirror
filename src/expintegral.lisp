@@ -1835,7 +1835,7 @@
 	((eql z 0) '$minf)
 	((eq z '$und) (throw 'limit nil))
         ;; The general simplifier for expintegral_ci handles inputs minf & inf
-	(t (simplifier)))))
+	(t (simplifier))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
