@@ -254,7 +254,7 @@
  (let (op)
   (cond ((not $simp) x)
         ((atom x)
-         (cond ((and $%enumer $numer (eq x '$%e))
+         (cond ((and (eq x '$%e) $%enumer $numer)
                 ;; Replace $%e with its numerical value,
                 ;; when %enumer and $numer TRUE
                 (setq x %e-val))
@@ -353,7 +353,7 @@
   (cond ((= 1 (length (cdr expr)))
          ;; Distribute over for a function with one argument.
          (cond ((and (not (atom (cadr expr)))
-                     (member (caaadr expr) (get (caar expr) 'distribute_over)))
+                     (member (caaadr expr) (get (caar expr) 'distribute_over) :test #'eq))
                 (simplifya
                   (cons (caadr expr)
                         (mapcar #'(lambda (u) (simplifya (list (car expr) u) args-simped))
@@ -367,7 +367,7 @@
              ((null args) nil)
            (when (and (not (atom (car args)))
                       (member (caar (car args))
-                              (get (caar expr) 'distribute_over)))
+                              (get (caar expr) 'distribute_over) :test #'eq))
              ;; Distribute the function over the arguments and simplify again.
              (return 
                (simplifya
@@ -849,7 +849,7 @@
 (defun pls (x out)
   (prog (fm *plusflag*)
      (if (mtimesp x) (setq x (testtneg x)))
-     (when (and $numer (atom x) (eq x '$%e))
+     (when (and (eq x '$%e) $numer)
        ;; Replace $%e with its numerical value, when $numer is TRUE
        (setq x %e-val))
      (cond ((null out)
@@ -2215,9 +2215,8 @@
               ;; big-float-eval, but we can't use big-float-eval.)
               (when (and (not (member 'simp (car x)))
                          (complex-number-p pot 'bigfloat-or-number-p))
-                (let ((x ($realpart pot))
-                      (y ($imagpart pot)))
-                  (cond ((and ($bfloatp x) (like 0 y))
+                (destructuring-bind (x . y) (trisplit pot)
+                  (cond ((and ($bfloatp x) (eql 0 y))
                          (return ($bfloat `((mexpt simp) $%e ,pot))))
                         ((or ($bfloatp x) ($bfloatp y))
                          (let ((z (add ($bfloat x) (mul '$%i ($bfloat y)))))
@@ -2893,13 +2892,18 @@
                 ;; Compare mantissas and exponents first.
                 (when (and (= (cadr x) (cadr y)) (= (caddr x) (caddr y)))
                   ;; Mantissas and exponents are the same.
-                  ;; Still need to compare precision and maybe radix (binary/decimal).
+                  ;; If the CARs are EQ (see BCONS), we're done. Otherwise, we
+                  ;; still need to compare precision and maybe radix (binary/decimal).
                   ;; If there's a SIMP flag, it must be ignored.
+                  (if (eq car-x car-y)
+                  t
                   (let ((rest-x (if (eq 'simp (cadar x)) (cddar x) (cdar x)))
                         (rest-y (if (eq 'simp (cadar y)) (cddar y) (cdar y))))
                     (and (= (car rest-x) (car rest-y))
-                         (eq (cadr rest-x) (cadr rest-y))))))
-              ((eq (memqarr (cdar x)) (memqarr (cdar y)))
+                         (eq (cadr rest-x) (cadr rest-y)))))))
+              ;; General case: First check for CARs being EQ (see EQTEST).
+              ;; If not, just check whether both have or don't have the ARRAY flag.
+              ((or (eq car-x car-y) (eq (memqarr (cdar x)) (memqarr (cdar y))))
                (alike (cdr x) (cdr y)))
               (t nil))
            ;; (foo) and (foo) test non-alike because the car's aren't standard
@@ -2962,12 +2966,7 @@
 	 (not (member (caar e) '(rat bigfloat))))
 	((eq (caar e) 'mrat)) ;; all MRATs succeed all atoms
 	((null (margs e)) nil)
-	((eq (caar e) 'mexpt)
-	 (cond ((and (maxima-constantp (cadr e))
-		     (or (not (constant a)) (not (maxima-constantp (caddr e)))))
-		(or (not (free (caddr e) a)) (great (caddr e) a)))
-	       ((eq (cadr e) a) (great (caddr e) 1))
-	       (t (great (cadr e) a))))
+	((eq (caar e) 'mexpt) (ordmexpt e a))
 	((member (caar e) '(mplus mtimes))
 	 (let ((u (car (last e))))
 	   (cond ((eq u a) (not (ordhack e))) (t (great u a)))))
@@ -3023,39 +3022,24 @@
   (if (and (cddr x) (null (cdddr x)))
       (great (if (eq (caar x) 'mplus) 0 1) (cadr x))))
 
+;; Return great(x,y), where x is an `mexpt` expression and y is any Maxima expression. 
 (defun ordmexpt (x y)
-  (cond ((eq (caar y) 'mexpt)
-	 (cond ((alike1 (cadr x) (cadr y)) (great (caddr x) (caddr y)))
-	 ((maxima-constantp (cadr x))
-		(if (maxima-constantp (cadr y))
-		    (if (or (alike1 (caddr x) (caddr y))
-			    (and (mnump (caddr x)) (mnump (caddr y))))
-			(great (cadr x) (cadr y))
-			(great (caddr x) (caddr y)))
-		    (if (alike1 x (cadr y))
-			  (great 1 (caddr y))
-			  (great x (cadr y)))))
-	       ((maxima-constantp (cadr y))
-		     (if (alike1 (cadr x) y)
-			   (great (caddr x) 1)
-			   (great (cadr x) y)))
-	       ((mnump (caddr x))
-		     (if (mnump (caddr y))
-		       (great (cadr x) (cadr y))
-			   (if (alike1 (cadr x) y)
-			     (great (caddr x) 1)
-			     (great (cadr x) y))))
-	       ((mnump (caddr y))
-		     (if (alike1 x (cadr y))
-			   (great 1 (caddr y))
-			   (great x (cadr y))))
-	       (t (let ((x1 (simpln1 x)) (y1 (simpln1 y)))
-		    (if (alike1 x1 y1) (great (cadr x) (cadr y))
-			(great x1 y1))))))
-	((alike1 (cadr x) y) (great (caddr x) 1))
-	((mnump (caddr x)) (great (cadr x) y))
-	(t (great (simpln1 x)
-		  (ftake '%log y)))))
+  "Subroutine to function 'great'. Requires `x` to be a `mexpt` expression and `y` may 
+  or may not be a `mexpt` expression."
+  ;(assert (mexptp x) (x) "ordmexpt: first argument must be a mexpt expression")
+  ;; Decompose both x & y as x = base-x^exp-x & y = base-y^exp-y. The input x is 
+  ;; required to be a mexpt expression, but y need not be a mexpt expression.
+  (let ((base-x (second x)) (exp-x (third x)))
+     (multiple-value-bind (base-y exp-y)
+        (if (mexptp y)
+            (values (second y) (third y))
+            (values y 1))
+    (cond 
+      ;; bases are alike; compare exponents
+      ((alike1 base-x base-y)
+       (great exp-x exp-y))
+      ;; default: comparison between bases
+      (t (great base-x base-y))))))
 
 (defun ordbfloat (x y)
   "'Greater than' predicate (in the expression ordering, not numerical sense)

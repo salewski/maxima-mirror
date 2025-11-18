@@ -418,20 +418,19 @@
 
 (defun big-float-eval (op z)
   (when (complex-number-p z 'bigfloat-or-number-p)
-    (let ((x ($realpart z))
-	  (y ($imagpart z))
-	  (bop (gethash op *big-float-op*)))
+   (destructuring-bind (x . y) (trisplit z)
+    (let ((bop (gethash op *big-float-op*)))
       ;; If bop is non-NIL, we want to try that first.  If bop
       ;; declines (by returning NIL), we silently give up and use the
       ;; rectform version.
-      (cond ((and ($bfloatp x) (like 0 y))
+      (cond ((and ($bfloatp x) (eql 0 y))
 	     (or (and bop (funcall bop x))
 		 ($bfloat `((,op simp) ,x))))
 	    ((or ($bfloatp x) ($bfloatp y))
 	     (or (and bop (funcall bop ($bfloat x) ($bfloat y)))
 		 (let ((z (add ($bfloat x) (mul '$%i ($bfloat y)))))
 		   (setq z ($rectform `((,op simp) ,z)))
-		   ($bfloat z))))))))
+		   ($bfloat z)))))))))
 	 
 ;; For complex big float evaluation, it's important to check the 
 ;; simp flag -- otherwise Maxima can get stuck in an infinite loop:
@@ -443,7 +442,7 @@
 (def-simplifier sin (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (cdar form))) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) 0)
 			       ((has-const-or-int-term y '$%pi) (%piargs-sin/cos y)))))
@@ -466,7 +465,7 @@
 (def-simplifier cos (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (cdar form))) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) 1)
 			       ((has-const-or-int-term y '$%pi)
@@ -547,7 +546,7 @@
 (def-simplifier tan (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (cdar form))) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) 0)
 			       ((has-const-or-int-term y '$%pi) (%piargs-tan/cot y)))))
@@ -570,7 +569,7 @@
 (def-simplifier cot (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (cdar form))) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs
                 (cond ((zerop1 y) (domain-error y 'cot))
@@ -640,7 +639,7 @@
 (def-simplifier csc (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (cdar form))) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs
                 (cond ((zerop1 y) (domain-error y 'csc))
@@ -668,7 +667,7 @@
 (def-simplifier sec (y)
   (let (z)
     (cond ((flonum-eval (mop form) y))
-	  ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+	  ((and (not (member 'simp (cdar form))) (big-float-eval (mop form) y)))
 	  ((taylorize (mop form) (second form)))
 	  ((and $%piargs (cond ((zerop1 y) 1)
 			       ((has-const-or-int-term y '$%pi)
@@ -706,7 +705,7 @@
 
 (def-simplifier atan (y)
   (cond ((flonum-eval (mop form) y))
-        ((and (not (member 'simp (car form))) (big-float-eval (mop form) y)))
+        ((and (not (member 'simp (cdar form))) (big-float-eval (mop form) y)))
         ((taylorize (mop form) (second form)))
         ;; Simplification for special values
         ((zerop1 y) y)

@@ -665,13 +665,13 @@ limit(atan2(0,1-3^x),x,0,'minus);
 
 /* #3895 limit */
 limit((x^x-a^a)/(x-a), x, a);
-a^a*log(a)+a^a$
+a^a*(log(a)+1)$
 
 limit((x^x-2^2)/(x-2), x, 2);
 4*log(2)+4$
 
 tlimit((x^x-a^a)/(x-a), x, a);
-a^a*log(a)+a^a$
+a^a*(log(a)+1)$
 
 /* #3844 Wrong limit involving gamma function */
 limit(gamma(1/x) - x, x, inf);
@@ -1414,6 +1414,55 @@ log(a) + %i*%pi$
 
 (forget(a>0),0);
 0$
+
+/* #4536 atan2(0,0) undefined error while evaluating a limit */
+
+(xxx : x*log(1/tan(x)-1)-(2*x*log((tan(x)^2-2*tan(x)+1)/2)+(%pi-2*atan2((tan(x)-1)/2,-((tan(x)-1)/2)))*
+log(tan(x)^2+1)+2*%i*li[2](-((%i*((%i+1)*tan(x)+%i-1))/2))+2*%i*li[2](%i*tan(x)+1)-2*%i*li[2](1-%i*tan(x))
+-2*%i*li[2](-((%i*((%i-1)*tan(x)+%i+1))/2))-4*x*log(tan(x)))/4, 0);
+0$
+
+/* see \#4614 atan2 reflection rule*/
+[trigsimp(block([trigsign : false], limit(xxx,x,%pi/4,'minus))), block([trigsign : true], limit(xxx,x,%pi/4,'minus))];
+[%catalan,%catalan]$
+
+[block([trigsign : false], limit(xxx,x,%pi/4,'plus)), block([trigsign : true], limit(xxx,x,%pi/4,'plus))];
+[-((-(4*%pi*log(2))-2*%i*%pi^2-8*%catalan)/8), -((-(4*%pi*log(2))-2*%i*%pi^2-8*%catalan)/8)]$
+
+ (remvalue(xxx),0);
+ 0$
+
+limit(atan2(exp(x)-cos(x), -x*sin(x)),x,0,minus);
+-%pi/2$
+
+limit(atan2((tan(x)-1)/2,-(tan(x)-1)/2),x,0);
+-%pi/4$
+
+/* #4563 limit of high degree polynomials*/
+limit((x-45)*(x-7)^90000 + 45*(x-45),x,45);
+0$
+
+limit((x-45)*(x-7)^90000 + 45*(x-45) + 107,x,45);
+107$
+
+block ([display2d : false, stream : make_string_output_stream (),ans],
+  trace(?taylim),
+  with_stdout(stream, tlimit((1+sqrt(1+n))^(-n-1)/(1+sqrt(n))^-n,n,inf)),
+  ans : get_output_stream_string (stream),
+  untrace(?taylim),
+  ans);
+"1 Call   taylim [(sqrt(n)+1)^n*(sqrt(n+1)+1)^(-n-1),n,inf,think]
+1 Return taylim zeroa
+"$
+/* \#4619 limit(inf = inf) causes stack overflow*/
+block([ans : limit(minf = minf)], [inpart(ans,0),args(ans)]);
+["=", [minf, minf]]$
+
+block([ans : limit(minf = minf,x,42)], [inpart(ans,0),args(ans)]);
+["=", [minf, minf]]$
+
+block([ans : limit(x < 8)], [inpart(ans,0),args(ans)]);
+["<", [x, 8]]$
 
 /* clean up*/
 (kill(values),0);

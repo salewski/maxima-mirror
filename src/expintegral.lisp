@@ -97,23 +97,36 @@
 ;;; Globals for the Maxima Users
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defvar $expintexpand nil
+(defmvar $expintexpand nil
   "When not nil we expand for a half integral parameter of the Exponential 
    Integral in a series in terms of the Erfc or Erf function and for positive 
-   integer in terms of the Ei function.")
-
-(defvar $expintrep nil
-  "Change the representation of the Exponential Integral. 
-   Values are: gamma_incomplete, expintegral_e1, expintegral_ei, 
-   expintegral_li, expintegral_trig, expintegral_hyp.")
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Global to this file
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   integer in terms of the Ei function."
+  :setting-list (t nil %erf))
 
 (defvar *expintflag* '(%expintegral_e1   %expintegral_ei  %expintegral_li
                        $expintegral_trig $expintegral_hyp %gamma_incomplete)
   "Allowed flags to transform the Exponential Integral.")
+
+(defmvar $expintrep nil
+  "Change the representation of the Exponential Integral. 
+   Values are: gamma_incomplete, expintegral_e1, expintegral_ei, 
+   expintegral_li, expintegral_trig, expintegral_hyp."
+  :setting-predicate
+  #'(lambda (val)
+      (let ((result
+              (or (null val)
+                  (member val *expintflag*))))
+        (values result
+                (let ((*print-case* :downcase))
+                  (format nil "~%  must be false or one of~{~<~%    ~1,80:; ~A~>~^,~}"
+                          (mapcar #'(lambda (v)
+                                      (stripdollar ($verbify v)))
+                                  *expintflag*)))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Global to this file
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun simp-domain-error (&rest args)
   (if errorsw
@@ -875,6 +888,18 @@
                (setq *debug-expint-fracbfloatmaxit*
                      (max *debug-expint-fracbfloatmaxit* i)))
              (return r))))))))
+
+
+;; computes first pw terms of asymptotic expansion of expintegral_ei(z)
+;; DLMF 8.20.2, using Ei(x) = E_1(-x)
+(defun ei-asymptotic-expansion (pw z)
+  (m* (m^ '$%e z)
+      (m^ z -1)
+      (m+l (loop for k from 0 to pw collect
+		 (m* `((mfactorial) ,k)
+		     (m^ z (m- k)))))))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;

@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-dnl If git is available, the version number here is not used.  
+dnl If git is available, the version number here is not used.
 dnl Instead, git is used to derive the version based on the closest
 dnl annotated branch tag.
 dnl
@@ -8,7 +8,7 @@ dnl Note: during Lisp-based builds (see INSTALL.lisp) the version
 dnl number is read from the following AC_INIT line.  It's sensitive to
 dnl whitespace so when updating the version number only make changes
 dnl within the second pair of square brackets.
-AC_INIT([maxima], [5.47post])
+AC_INIT([maxima], [5.48post])
 AC_CONFIG_SRCDIR([src/macsys.lisp])
 AM_INIT_AUTOMAKE([-Wno-portability tar-ustar])
 
@@ -535,7 +535,7 @@ dnl       Are these checks (especially Windows, Linux PPC64) okay?
 dnl Probably at the end we could check if another - CCL64 unsupported - OS was used.
 dnl
 dnl of course the ccl directory needs to be in the path.
-dnl another possibilty would be to default to "ccl64", which is - MAYBE - a platform independent
+dnl another possibility would be to default to "ccl64", which is - MAYBE - a platform independent
 dnl startscript in /usr/local/bin.
 case "${host_os}" in
     *linux-powerpc64*)
@@ -655,6 +655,25 @@ AC_ARG_ENABLE(build-docs,
 	 esac],
 	 [enable_build_docs=true])
 
+AC_ARG_ENABLE(syntax-highlighting,
+  [AS_HELP_STRING([--enable-syntax-highlighting],
+    [Enable syntax highlighting for the HTML manual (default = no).
+       Set to "highlightjs" to use highlightjs or "pygments" to use pygments.  No value implies highlightjs])],
+  [case "${enableval}" in
+          yes|highlightjs) syntax_highlighting=highlightjs ;;
+          pygments) syntax_highlighting=pygments ;;
+          no)  syntax_highlighting=false ;;
+          *) AC_MSG_ERROR(bad value ${enableval} for --enable-syntax-highlighting) ;;
+   esac],
+  [syntax_highlighting=false])
+
+AS_IF([test "x$syntax_highlighting" = "xpygments"],
+  [AC_CHECK_PROG([pygmentize_found], [pygmentize],
+    true,
+    false)
+    AS_IF([test "x$pygmetize_found" = "xfalse"],
+      AC_MSG_FAILURE(
+        [--enable-syntax-highlighting set to "pygments" but pygmentize not found]))])
 
 AM_CONDITIONAL(ENABLE_BUILD_DOCS, test x$enable_build_docs = xtrue)
 
@@ -668,7 +687,7 @@ if test x"${enable_build_docs}" = xtrue ; then
 [makeinfo not found; Maxima needs makeinfo to build docs.
 If you have makeinfo installed somewhere not in PATH,
 specify where it is by using
-  ./configure MAKEINFO=/path/to/makinfo
+  ./configure MAKEINFO=/path/to/makeinfo
 Or disable building of the docs using
   ./configure --disable-build-docs
 ])
@@ -722,12 +741,43 @@ if test x"${enable_build_docs}" = xtrue ; then
            TEXI_EXTRA_TAIL=''
         else
            TEXI_EXTRA_HEAD='texinfo_set_from_init_file("EXTRA_HEAD", '
-           HLJS_CSS_SELECTOR="'.example-preformatted'"
+           HLJS_CSS_SELECTOR="'.example.user-maxima .example-preformatted'"
            TEXI_EXTRA_TAIL=')'
         fi
+        if test x${syntax_highlighting} = xhighlightjs; then
+           dnl Update HIGHTLIGHT_VER, LIGHTMODE, and DARKMODE
+           dnl variables if we decide to change the version, the light
+           dnl mode style or the dark mode style.
+           CDN="https://cdnjs.cloudflare.com/ajax/libs/highlight.js"
+           HIGHLIGHT_VER="11.11.1"
+           HIGHLIGHTJS_HASH="sha512-EBLzUL8XLl+va/zAsmXwS7Z2B1F9HUHkZwyS/VKwh3S7T/U0nF4BaU29EP/ZSf6zgiIxYAnKLu6bJ8dqpmX5uw=="
+           MAXIMAJS_HASH="sha512-AhvLFkEPexok+HSQKpnwMdX1f0PVRUYera3PJV8u3lotioIqfR9ThqCEydkI7RkSjQNcJm/pQl15AgqWcufw1Q=="
+           LIGHTMODE="github.min.css"
+           LIGHTMODECSS_HASH="sha512-0aPQyyeZrWj9sCA46UlmWgKOP0mUipLQ6OZXu8l4IcAmD2u31EPEy9VcIMvl7SoAaKe8bLXZhYoMaE/in+gcgA=="
+           DARKMODE="github-dark.min.css"
+           DARKMODECSS_HASH="sha512-rO+olRTkcf304DQBxSWxln8JXCzTHlKnIdnMUwYvQa9/Jd4cQaNkItIUj6Z4nvW1dqK0SKXLbn9h4KwZTNtAyw=="
+           dnl Make sure HIGHLIGHT1 and HIGHLIGHT2 are all on one line
+           dnl because these variables are placed in the Makefile and
+           dnl make doesn't support multiple-line variable
+           dnl assignments.
+           HIGHLIGHT1=$(cat <<EOF
+<link rel="stylesheet" media="(prefers-color-scheme: light)" href="$CDN/$HIGHLIGHT_VER/styles/$LIGHTMODE" integrity="$LIGHTMODECSS_HASH"  crossorigin="anonymous"> <link rel="stylesheet" media="(prefers-color-scheme: dark)" href="$CDN/$HIGHLIGHT_VER/styles/$DARKMODE" integrity="$DARKMODECSS_HASH" crossorigin="anonymous"> <script src="$CDN/$HIGHLIGHT_VER/highlight.min.js" integrity="$HIGHLIGHTJS_HASH"  crossorigin="anonymous"></script> <script src="$CDN/$HIGHLIGHT_VER/languages/maxima.min.js" integrity="$MAXIMAJS_HASH" crossorigin="anonymous"></script>
+EOF
+)
+           HIGHLIGHT2="<script> hljs.configure({languages: [['Maxima']], cssSelector: ${HLJS_CSS_SELECTOR}}); hljs.highlightAll(); </script>"
+        fi
+        if test x${syntax_highlighting} = xpygments; then
+           if test ${makeinfo_version} -ge 702; then
+             USE_PYGMENTS=true
+           else
+             AC_MSG_ERROR([Makeinfo version (${makeinfo_version_string}) too old to use pygments for syntax highlighting.  Disable or use highlightjs])
+           fi
+        fi
         AC_SUBST(TEXI_EXTRA_HEAD)
-        AC_SUBST(HLJS_CSS_SELECTOR)
         AC_SUBST(TEXI_EXTRA_TAIL)
+	AC_SUBST(HIGHLIGHT1)
+	AC_SUBST(HIGHLIGHT2)
+        AC_SUBST(USE_PYGMENTS)
         TEXI2HTML=texi2html.init
         AC_SUBST(TEXI2HTML)
 
@@ -740,7 +790,7 @@ if test x"${enable_build_docs}" = xtrue ; then
 	fi
 	if test x"${need_mathjax}" = xtrue; then
             dnl Need to include Mathjax.
-	    NEED_MATHJAX='<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>'
+	    NEED_MATHJAX='<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script>'
 	    dnl This also means that makeinfo doesn't support
 	    dnl @displaymath, so we need to do something else.
 	    NO_DISPLAYMATH='true'
@@ -1313,6 +1363,7 @@ AC_ARG_WITH(emacs-prefix,
 	[EMACSDIR="${datarootdir}/emacs/site-lisp"])
 AC_SUBST(EMACSDIR)
 
+
 dnl Tell defsystem that this isn't a lisp-only build
 lisp_only_build="nil"
 AC_SUBST(lisp_only_build)
@@ -1355,6 +1406,7 @@ doc/info/figures/Makefile \
 doc/info/de/Makefile \
 doc/info/de/include-maxima.texi \
 doc/info/es/Makefile \
+doc/info/es/include-maxima.texi \
 doc/info/ja/Makefile \
 doc/info/ja/include-maxima.texi \
 doc/info/pt_BR/include-maxima.texi \
@@ -1379,7 +1431,7 @@ share/contrib/maxima-odesolve/Makefile \
 share/contrib/symplectic_ode/Makefile \
 share/nelder_mead/Makefile \
 share/raddenest/Makefile \
-share/draw/Makefile share/logic/Makefile  doc/info/es/include-maxima.texi \
+share/draw/Makefile share/logic/Makefile \
 src/lisp])
 AC_OUTPUT
 
@@ -1507,3 +1559,13 @@ if test x"${xmaxima_exe}" = xtrue ; then
      AC_MSG_WARN([A prerequisite for xmaxima.exe not found.  The missing components can be defined on the make command line.])
    fi
 fi
+
+if test -n "x$MAKEINFO"; then
+  echo "Using makeinfo ${MAKEINFO} to generate docs"
+fi
+
+if test "x${syntax_highlighting}" = "xfalse"; then
+  echo "HTML syntax highlighting disabled"
+else
+  echo "HTML syntax highlighting enabled using ${syntax_highlighting}"
+fi  

@@ -11,8 +11,8 @@
 # updated setup-file automatically.
 
 if(BUILD_64BIT)
-    set(SBCLVERSION "2.5.4")
-    set(SBCL_MD5 "5f149a85324801753fbefc48cd50f516")
+    set(SBCLVERSION "2.5.10")
+    set(SBCL_MD5 "a2cab608e33ba0a28aa4898e6af3e7e4")
     set(SBCL_INSTALLERNAME "sbcl-${SBCLVERSION}-x86-64-windows-binary.msi")
 else()
     set(SBCLVERSION "2.3.2")

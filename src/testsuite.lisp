@@ -22,7 +22,7 @@
 	 #+allegro ((mlist simp) 11 13))
         "rtestnset" 
         ((mlist simp) "rtest1"
-	 ((mlist simp) 183 186))
+	 ((mlist simp)))
         ((mlist simp) "rtest1a" ((mlist simp) 33))
         ((mlist simp) "rtest2" ((mlist simp) 86 95))
 	"rtest4"
@@ -84,8 +84,7 @@
         "rtest_diff_invtrig"
         "rtest_scalarp"
         "rtest_everysome"
-        ((mlist simp) "rtestint"
-	 ((mlist simp) 232))
+        ((mlist simp) "rtestint" ((mlist simp)))
         "rtest_numth"
         "rtestifactor"
         ((mlist simp) "rtest_equal"
@@ -100,7 +99,7 @@
         ((mlist simp) "rtest_map"
 	 ((mlist simp) 2 3 4))
         ((mlist simp) "rtest_sign"
-	 ((mlist simp) 21 25 30 40 65 145 180))
+	 ((mlist simp) 21 25 30 40 145))
         "rtest_algebraic"
 	;; Using the gcl version 2.6.14 the tests pass.
 	;;
@@ -126,7 +125,7 @@
         "rtestdefstruct"
 	;; Tested with acl 10.1
 	((mlist simp) "rtest_limit"
-         ((mlist simp) 113 158 159))
+         ((mlist simp) 113 159 160))
         "rtest_powerseries"
         ((mlist simp) "rtest_laplace"
 	 ((mlist simp) 29 49 50 51 59 60 61 62 78 80))
@@ -140,14 +139,17 @@
                          124 125 126 127 132 133 135 136 137
                          224 238 
                          239 240 241 242 243 244 245 246 249
-                         259 261 262 267 268 269 270 271 272
+                         261 262 267 268 269 270 271 272
                          280 281 282 357 358))
          ((mlist simp) "rtest_limit_gruntz"
           ((mlist simp) 20 25 28 29 30 36 37 38 39 86 96))
 
          ((mlist simp) "rtest_limit_wester"
           ((mlist simp) 12 13))
-          
+
+         ((mlist simp) "rtest_great" ((mlist simp)))
+        
+         ((mlist simp) "rtest_atan2" ((mlist simp) 65))
         "rtest_gcd"
 	;; The tests that failed with abcl 1.5.0
 	((mlist simp) "rtest_hg"
@@ -170,7 +172,8 @@
 ;; can actually find these files. (file_search_maxima is a good choice.)
 (defparameter $share_testsuite_files
   '((mlist simp)
-    "rtest_facexp"
+    ((mlist simp) "rtest_facexp"
+    #+gcl ((mlist simp) 37))
     "rtest_orthopoly"
     "rtest_pslq"
     "rtestflatten"
@@ -261,7 +264,7 @@
      #+clisp
      ((mlist simp) 27 38 61 63 65 69)
      #+gcl
-     ((mlist simp) 7 29 38 39 40 48 61)
+     ((mlist simp) 7 38 39 40 61)
      ;; The tests that failed with abcl 1.5.0
      #+abcl
      ((mlist simp) 38 40 61 63 65 69)
@@ -279,9 +282,7 @@
     ((mlist simp) "rtest_abs_integrate" ((mlist) 173 249))
     "rtest_pochhammer"
     ((mlist simp) "rtest_to_poly_solve"
-     #+gcl ((mlist simp) 64 74 80 116 140 141 168 184 242 245 322)
-     #-(or gcl) ((mlist simp) 64 74 80 116 140 141 168 184 242 245 322)
-     )
+     ((mlist simp) 64 74 80 116 140 141 168 184 242 245 322))
     ((mlist simp) "rtest_sym"
      #-(or sbcl ccl gcl clisp cmucl ecl) ((mlist simp) 15 64)
      #+sbcl ((mlist simp))

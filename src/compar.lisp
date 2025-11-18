@@ -1494,6 +1494,26 @@ TDNEG TDZERO TDPN) to store it, and also sets SIGN."
 		((zerop1 (add xrhs -1))				;; c = -1
 		 (setq sgn '$nz))))
     
+    ;; sign(cosh(x)+c)
+    (when (and (not (atom xlhs))
+               (eq (caar xlhs) '%cosh)
+               (zerop1 ($imagpart (cadr xlhs))))
+      (cond
+        ((eq (sign* (add xrhs -1)) '$neg)
+          (setq sgn '$pos))
+        ((zerop1 (add xrhs -1))
+          (setq sgn '$pz))))
+
+    ;; sign(sech(x)+c)
+    (when (and (not (atom xlhs))
+               (eq (caar xlhs) '%sech)
+               (zerop1 ($imagpart (cadr xlhs))))
+      (cond
+        ((eq (sign* (add xrhs -1)) '$pos)
+          (setq sgn '$neg))
+        ((zerop1 (add xrhs -1))
+          (setq sgn '$nz))))
+    
     ;; sign(signum(x)+c)
     (when (and (not (atom xlhs))
 	          (eq (caar xlhs) '%signum)
@@ -1811,7 +1831,7 @@ TDNEG TDZERO TDPN) to store it, and also sets SIGN."
 ;; This code could handle sin({zerob, zeroa, ind}), but it doesn't.
 
 ;; Finally, sometimes the argument to sin is not simplified; for example,
-;; running the testsuite sometimes this code recieves the expression sin(1/(1/x)). 
+;; running the testsuite sometimes this code receives the expression sin(1/(1/x)).
 ;; We could simplify it, but I think that it would be better to fix the code 
 ;; so that the input to sign-sin is always simplified.
 (defun sign-sin (e) ; e = sin(x)

@@ -189,12 +189,6 @@
 	    (when (indefinite-integral-p exp var)
 		  	(return (cons (list '%limit) args)))
 
-		;; This returns a limit nounform for expressions such as 
-		;; limit(x < 8,x,0), limit(diff(f(x),x,x,0), and ...
-        (unless (eq var genfoo)
-		  (when (limunknown exp)
-			    (return `((%limit) ,@(cons exp1 (cdr args))))))	
-
 	      (setq varlist (ncons var) genvar nil origval val)
 	      ;; Transform limits to minf to limits to inf by
 	      ;; replacing var with -var everywhere.
@@ -350,8 +344,8 @@
                      (t
                       '$ind))))))))
 
-;; Return true when Maxima should return a limit nounform for limit(e,x,var,val).
-(defun limunknown (e)
+(defun limunknown (e var)
+  "Return true when Maxima should return a limit nounform for limit(e,x,var,val)."
   (not (limit-ok e var)))
 
 ;; Return true when Maxima's limit code should be able to determine limit
@@ -664,13 +658,15 @@ ignoring dummy variables and array indices."
 ;; The function `limit1` dispatches `factor` on the expression `exp`. When 
 ;; the expression involves a floating point number, these numbers are converted 
 ;; to rational approximations. This can cause bugs for limit calculations. 
-;; Although a bit inelegant, this code dispatches `simplimit` when `exp` a 
+;; Although a bit inelegant, this code dispatches `simplimit` when `exp` is a 
 ;; floating point number.
 (defun limit (exp var val *i*)
   (cond
     ((among '$und exp)  '$und)
     ((eq var exp)  val)
     ((atom exp)  exp)
+	;; Throw an limit error for expressions such as limit(x < 8,x,0), limit(diff(f(x),x),x,0), and ...
+    ((limunknown exp var) (throw 'limit t))
     ((not (among var exp))
      (cond ((amongl '($inf $minf $infinity $ind) exp)
 	    (simpinf exp))
@@ -683,7 +679,16 @@ ignoring dummy variables and array indices."
 				  (null taylored)
 				  (tlimp exp var))
 			     (taylim exp var val *i*))
-			    ((ratp exp var) (ratlim exp))
+				;; Limit of a rational expression:
+                ;; For polynomial cases toward zero, the function `limit-of-polynomial` returns the limit 
+                ;; without expansion or other transformations. For non-polynomial cases, call `ratlim`.
+                ;; This special case addresses bugs such as #4563 limit of high degree polynomials.
+                ;; Additionally, it simplifies some testsuite cases.
+				((ratp exp var) 
+				   (or
+				     (limit-of-polynomial exp var val)
+					 (ratlim exp)))
+			  
 				((has-float exp) (simplimit exp var val))
 			    ((or (eq *i* t) (radicalp exp var))
 			     (limit1 exp var val))
@@ -961,8 +966,8 @@ ignoring dummy variables and array indices."
 			(cond ((not (equal (setq gcp (gcpower n dn)) 1))
 			       (return (colexpt n dn gcp)))
 			      ((and (eq '$inf val)
-				    (or (involve dn '(mfactorial %gamma))
-					(involve n '(mfactorial %gamma))))
+				    (or (involve dn '(mfactorial %gamma %expintegral_ei))
+					(involve n '(mfactorial %gamma %expintegral_ei))))
 			       (return (limfact n dn))))))
 		  ((eq n1 d1) (setq lim-sign 1) (go cp))
 		  (t (setq lim-sign -1) (go cp))))
@@ -1200,8 +1205,8 @@ ignoring dummy variables and array indices."
 	  ((eq (caar ans) '%limit)  ())
 	  (t ans))))
 
-;; substitute asymptotic approximations for gamma, factorial, and
-;; polylogarithm
+;; substitute asymptotic approximations for gamma, factorial,
+;; polylogarithm, and expintegral_ei
 (defun stirling0 (e)
    (cond ((atom e) e)
 	((and (setq e (cons (car e) (mapcar 'stirling0 (cdr e))))
@@ -1234,6 +1239,10 @@ ignoring dummy variables and array indices."
 	 (li-asymptotic-expansion (m- (car (subfunsubs e)) 1) 
 				   (car (subfunsubs e))
 				   (car (subfunargs e))))
+	((and (eq (caar e) '%expintegral_ei)
+	      (let ((arglim (limit (cadr e) var val 'think)))
+		(eq arglim '$inf)))
+	 (ei-asymptotic-expansion $lhospitallim (cadr e)))
 	(t e)))
 
 (defun stirling (x)
@@ -1480,6 +1489,30 @@ ignoring dummy variables and array indices."
     (setq baslim (limit bas var val 'think))
     (setq expolim (limit expo var val 'think))
     (simplimexpt bas expo baslim expolim)))
+
+(defun zero-fixup (e x pt)
+  "Assuming `substitute(pt, x, e)` vanishes, attempt to determine if the zero is `zerob` or `zeroa`.
+   If determination is possible, return `zeroa` or `zerob`; otherwise, return 0."
+  (let* ((e ($totaldisrep ($taylor e x pt 1)))
+         (dir (behavior e x pt)))
+    (cond
+      ((eql dir -1) '$zerob)
+      ((eql dir 1) '$zeroa)
+      (t 0))))
+
+(defun limit-of-polynomial (e x pt)
+  "When `e` is an explicit polynomial in `x` and `pt` is either `zerob`, `zeroa` or 0, return limit(e,x,pt);
+   otherwise, return nil. When the limit vanishes, attempt to determine if the limit is `zerob` or
+   `zeroa` and return accordingly. For a polynomial to be `explicit`, the exponents must be explicit 
+   nonnegative integers, not declared integers."
+  (cond
+    ((and (or (eq pt '$zeroa) (eq pt '$zerob) (eql pt 0))
+          ($polynomialp e (ftake 'mlist x) #'(lambda (q) (freeof x q))))
+     (let ((ans (maxima-substitute 0 x e)))
+       (if (eql 0 ans)
+           (zero-fixup e x pt)
+           ans)))
+    (t nil)))
 
 ;; this function is responsible for the following bug:
 ;; limit(x^2 + %i*x, x, inf)  -> inf	(should be infinity)
@@ -3217,7 +3250,7 @@ ignoring dummy variables and array indices."
 	       (let* ((z (trisplit arglim)) (xx (car z))  (yy (cdr z)) (sgn))
            ;; When yy vanishes, find the sign of xx. But when the sign is 'pnz', 
 		   ;; use asksign. We could use 'meqp' or 'askequal' to  test for a vanishing yy,
-		   ;; but for now, we'll test for a syntatic zero 
+		   ;; but for now, we'll test for a syntactic zero
 			(when (eql 0 yy)
 				(setq sgn (maybe-asksign xx))
 				(when (eq sgn '$pnz)
@@ -3691,13 +3724,26 @@ ignoring dummy variables and array indices."
          (b (fifth e))               ;lower limit or nil if indefinite
 	 (alim) (blim))
     (cond ((and a b ($freeof x ee) ($freeof x var))
-	   (setq alim (limit a x pt 'think))
-	   (setq blim (limit b x pt 'think))
+	   (setq alim (ridofab (limit a x pt 'think)))
+	   (setq blim (ridofab (limit b x pt 'think)))
 	   (if (and (lenient-extended-realp alim) 
 		    (lenient-extended-realp blim)
 		    (not (eq alim '$infinity))
 		    (not (eq blim '$infinity)))
-	       (ftake '%integrate ee var alim blim)
+	       (let ((ans (ftake '%integrate ee var alim blim)))
+		 (if (and (consp ans)
+			  (eq (caar ans) '%integrate))
+		     ;; could not find antideriv
+		     (if (and ; upper limit of integration growing with x
+			      (eq blim '$inf)
+			      (not (eq alim '$minf))
+			      (eq ($sign (limit ee var blim 'think)) '$pos))
+			 ;; divergent, even if could not find antideriv.
+			 ;; could be extended to handle negative ee,
+			 ;; x in lower limit of integration.
+			 '$inf
+		      	 (throw 'limit t))
+		     ans)) ; found antideriv, answer from ftake '%integrate
 	       (throw 'limit t)))
           (t
            (throw 'limit t)))))

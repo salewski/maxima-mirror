@@ -632,6 +632,12 @@ wrapper for this."
 	      (if (and f (or (not (eq x y))
 			     (member f '(neverset) :test #'eq)))
 		  (if (eq (funcall f x y) 'munbindp) (return nil))))
+            (let ((f (get x 'setter-method)))
+              (when f
+                ;; There's a setter method defined.  Call it to set
+                ;; the variable to the appropriate value.  Return
+                ;; whatever the setter returns.
+                (return (funcall f x y))))
 	    (cond ((and (not (boundp x))
 			(not dsksetp))
 		   (add2lnc x $values))
@@ -1129,9 +1135,9 @@ wrapper for this."
   (if munbindp
       'munbindp
       (if reason
-	  (merror (intl:gettext "assignment: cannot assign ~M to `~:M': ~M.")
+	  (merror (intl:gettext "assignment: cannot assign `~M' to `~:M': ~M.")
 		  val name reason)
-	  (merror (intl:gettext "assignment: cannot assign ~M to `~:M'.") val name))))
+	  (merror (intl:gettext "assignment: cannot assign `~M' to `~:M'.") val name))))
 
 ;; assign properties
 (mapc #'(lambda (x) (putprop (car x) (cadr x) 'assign))

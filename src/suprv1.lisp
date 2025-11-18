@@ -87,7 +87,8 @@
 (defun makelabel10 (x)
   (let (*print-radix*
 	(*print-base* 10.))
-    ($concat '|| x $linenum)))
+    ;; x should be a symbol (one of $inchar, $outchar, $linechar)
+    ($concat x $linenum)))
 (defun makelabel (x)
   (setq *linelabel* (makelabel10 x))
   (unless $nolabels
@@ -247,7 +248,7 @@
       (when (not (get x 'sysconst))
 	(remprop x 'lineinfo)
 	(remprop x 'mprops))
-      (dolist (u '(bindtest nonarray evfun evflag opers special mode))
+      (dolist (u '(bindtest nonarray evfun evflag opers mode))
 	(remprop x u))
       (dolist (u opers)
 	(when (and (remprop x u)
@@ -383,7 +384,7 @@
 		    (setf (symbol-value x)
 			  (gethash x *builtin-symbol-values*)))
 		  t)
-		 ((get x 'special)
+		 ((get x 'reset-on-kill)
 		  (makunbound x)
 		  (when (member x *builtin-symbols-with-values* :test #'equal)
 		    (setf (symbol-value x)

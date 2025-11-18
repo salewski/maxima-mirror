@@ -210,7 +210,7 @@ maxima [options] --batch-string='batch_answers_from_file:false; ...'
 	 (lisp-patterns (list ext "lisp"))
 	 (maxima-patterns '("mac" "wxm"))
 	 (lisp+maxima-patterns (append lisp-patterns maxima-patterns))
-	 (demo-patterns '("dem"))
+	 (demo-patterns '("dem" "demo"))
 	 (usage-patterns '("usg")))
 
     (flet ((build-search-list (path-info)
@@ -526,6 +526,12 @@ maxima [options] --batch-string='batch_answers_from_file:false; ...'
 						    port-string))
                                      (setf input-stream *standard-input*))
 			 :help-string "Connect Maxima to server on <port>.")
+	 (make-cl-option :names '("--suppress-input-echo")
+			 :action #'(lambda ()
+				     (declare (special *suppress-input-echo*))
+				     (setq *suppress-input-echo* t))
+			 :help-string
+			 "Do not print input expressions when processing noninteractively.")
 	 (make-cl-option :names '("-u" "--use-version")
 			 :argument "<version>"
 			 :action nil
@@ -683,18 +689,19 @@ maxima [options] --batch-string='batch_answers_from_file:false; ...'
                                      "/share/locale/"
                                      "/locale/")))
           intl::*locale-directories*))
-  ;; Set up $browser for displaying help in browser.
+  ;; Set up $browser for displaying help in browser in Linux.
   (cond ((and (boundp '*autoconf-windows*)
 	      (string-equal *autoconf-windows* "true"))
-	 ;; Starts the default browser on Windows.
-	 (setf $browser "start ~A"))
+	 ;; "start" will open the default browser in Windows.
+	 (setf $browser "start"))
 	((boundp '*autoconf-host*)
-	 ;; Determine what kind of OS we're using from the host and
-	 ;; set up the default browser appropriately.
 	 (cond ((pregexp:pregexp-match-positions "(?:darwin)" *autoconf-host*)
-		(setf $browser "open '~A'"))
+	        ;; "open"  will open the default browser in MacOS.
+		(setf $browser "open"))
 	       ((pregexp:pregexp-match-positions "(?i:linux)" *autoconf-host*)
-		(setf $browser "xdg-open '~A'")))))
+	        ;; "xdg-open"  will open the default browser in Linux.
+		(setf $browser "xdg-open")))))
+
   (setf %e-val (mget '$%e '$numer))
 
   ;; Initialize *bigprimes* here instead of globals.lisp because we
@@ -713,6 +720,7 @@ maxima [options] --batch-string='batch_answers_from_file:false; ...'
   (setf $pointbound *alpha)
   (setf (gethash '$pointbound *variable-initial-values*)
 	*alpha)
+  (initialize-atan2-hashtable)
   (values))
 
 (defun adjust-character-encoding ()
