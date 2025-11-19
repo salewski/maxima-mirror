@@ -125,7 +125,7 @@
         "rtestdefstruct"
 	;; Tested with acl 10.1
 	((mlist simp) "rtest_limit"
-         ((mlist simp) 113 158 159))
+         ((mlist simp) 113 159 160))
         "rtest_powerseries"
         ((mlist simp) "rtest_laplace"
 	 ((mlist simp) 29 49 50 51 59 60 61 62 78 80))
@@ -148,7 +148,8 @@
           ((mlist simp) 12 13))
 
          ((mlist simp) "rtest_great" ((mlist simp)))
-          
+        
+         ((mlist simp) "rtest_atan2" ((mlist simp) 65))
         "rtest_gcd"
 	;; The tests that failed with abcl 1.5.0
 	((mlist simp) "rtest_hg"
@@ -281,9 +282,7 @@
     ((mlist simp) "rtest_abs_integrate" ((mlist) 173 249))
     "rtest_pochhammer"
     ((mlist simp) "rtest_to_poly_solve"
-     #+gcl ((mlist simp) 64 74 80 116 140 141 168 184 242 245 322)
-     #-(or gcl) ((mlist simp) 64 74 80 116 140 141 168 184 242 245 322)
-     )
+     ((mlist simp) 64 74 80 116 140 141 168 184 242 245 322))
     ((mlist simp) "rtest_sym"
      #-(or sbcl ccl gcl clisp cmucl ecl) ((mlist simp) 15 64)
      #+sbcl ((mlist simp))

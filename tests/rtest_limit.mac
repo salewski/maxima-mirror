@@ -452,6 +452,10 @@ limit( ((1/%pi)*(atan(n/%pi) + %pi/2))^n, n, inf);
 limit(x*expintegral_ei(x), x, 0);
 0;
 
+/* #4276 expintegral_ei incorrect behavior at infinity */
+limit(((expintegral_ei(x)/%e^x)*x-1)*x,x,inf);
+1;
+
 /* #3865 crash from taking limit of factorial(x) + 1 */
 limit(factorial(x) + 1, x, 0);
 2;
@@ -1008,6 +1012,10 @@ limit(integrate (bessel_j(0, x) * unit_step(x), x), x, 1);
 limit (integrate (baz(0, x) * foo(x), x), x, 1);
  'limit (integrate (baz(0, x) * foo(x), x), x, 1);
 
+/* #4587 limit of integral expression incorrect, should be 1/e^2, not 0 */
+limit( ( integrate((1-1/t)^t*%e^(%e*t), t, %e, x) / %e^(%e*x) ) , x, inf);
+%e^-2;
+
  /* #4275 ldefint returns zero */
 
  /* not wrong and not optimal*/
@@ -1033,3 +1041,38 @@ inf$
 
 (kill(facts),0);
 0$
+
+/* SF bug #4627: "box(inf) causes infinite recursion in limit and integrate" */
+
+/* preliminaries -- verify that box works as expected in test cases */
+
+box(1);
+box(1);
+
+box(2, "FOO");
+box(2, "FOO");
+
+box(2, "FOO");
+''(box(2, "FOO"));
+
+/* now back to bug report */
+
+limit(x,x,box(3));
+box(3);
+
+integrate(x,x,0,box(3));
+box(3)^2/2;
+
+limit(x,x,box(3),minus);
+box(3);
+
+limit(x,x,box(3),plus);
+box(3);
+
+/* provokes "third argument must be a finite value or one of: inf, minf, infinity" */
+errcatch (limit(x,x,box(inf)));
+[];
+
+/* provokes "integral is divergent" */
+errcatch (integrate(x,x,0,box(inf)));
+[];

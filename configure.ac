@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-dnl If git is available, the version number here is not used.  
+dnl If git is available, the version number here is not used.
 dnl Instead, git is used to derive the version based on the closest
 dnl annotated branch tag.
 dnl
@@ -745,10 +745,33 @@ if test x"${enable_build_docs}" = xtrue ; then
            TEXI_EXTRA_TAIL=')'
         fi
         if test x${syntax_highlighting} = xhighlightjs; then
-	   HIGHLIGHT1='<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github.min.css"> <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script> <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/maxima.min.js"> </script>
-'
-	   HIGHLIGHT2="<script> hljs.configure({languages: [['Maxima']], cssSelector: ${HLJS_CSS_SELECTOR}}); hljs.highlightAll(); </script>
-"
+           dnl Update HIGHTLIGHT_VER, LIGHTMODE, and DARKMODE
+           dnl variables if we decide to change the version, the light
+           dnl mode style or the dark mode style.
+           CDN="https://cdnjs.cloudflare.com/ajax/libs/highlight.js"
+           HIGHLIGHT_VER="11.11.1"
+           HIGHLIGHTJS_HASH="sha512-EBLzUL8XLl+va/zAsmXwS7Z2B1F9HUHkZwyS/VKwh3S7T/U0nF4BaU29EP/ZSf6zgiIxYAnKLu6bJ8dqpmX5uw=="
+           MAXIMAJS_HASH="sha512-AhvLFkEPexok+HSQKpnwMdX1f0PVRUYera3PJV8u3lotioIqfR9ThqCEydkI7RkSjQNcJm/pQl15AgqWcufw1Q=="
+           LIGHTMODE="github.min.css"
+           LIGHTMODECSS_HASH="sha512-0aPQyyeZrWj9sCA46UlmWgKOP0mUipLQ6OZXu8l4IcAmD2u31EPEy9VcIMvl7SoAaKe8bLXZhYoMaE/in+gcgA=="
+           DARKMODE="github-dark.min.css"
+           DARKMODECSS_HASH="sha512-rO+olRTkcf304DQBxSWxln8JXCzTHlKnIdnMUwYvQa9/Jd4cQaNkItIUj6Z4nvW1dqK0SKXLbn9h4KwZTNtAyw=="
+           dnl Make sure HIGHLIGHT1 and HIGHLIGHT2 are all on one line
+           dnl because these variables are placed in the Makefile and
+           dnl make doesn't support multiple-line variable
+           dnl assignments.
+           HIGHLIGHT1=$(cat <<EOF
+<link rel="stylesheet" media="(prefers-color-scheme: light)" href="$CDN/$HIGHLIGHT_VER/styles/$LIGHTMODE" integrity="$LIGHTMODECSS_HASH"  crossorigin="anonymous"> <link rel="stylesheet" media="(prefers-color-scheme: dark)" href="$CDN/$HIGHLIGHT_VER/styles/$DARKMODE" integrity="$DARKMODECSS_HASH" crossorigin="anonymous"> <script src="$CDN/$HIGHLIGHT_VER/highlight.min.js" integrity="$HIGHLIGHTJS_HASH"  crossorigin="anonymous"></script> <script src="$CDN/$HIGHLIGHT_VER/languages/maxima.min.js" integrity="$MAXIMAJS_HASH" crossorigin="anonymous"></script>
+EOF
+)
+           HIGHLIGHT2="<script> hljs.configure({languages: [['Maxima']], cssSelector: ${HLJS_CSS_SELECTOR}}); hljs.highlightAll(); </script>"
+        fi
+        if test x${syntax_highlighting} = xpygments; then
+           if test ${makeinfo_version} -ge 702; then
+             USE_PYGMENTS=true
+           else
+             AC_MSG_ERROR([Makeinfo version (${makeinfo_version_string}) too old to use pygments for syntax highlighting.  Disable or use highlightjs])
+           fi
         fi
         if test x${syntax_highlighting} = xpygments; then
            if test ${makeinfo_version} -ge 702; then
@@ -758,10 +781,9 @@ if test x"${enable_build_docs}" = xtrue ; then
            fi
         fi
         AC_SUBST(TEXI_EXTRA_HEAD)
-        dnl AC_SUBST(HLJS_CSS_SELECTOR)
         AC_SUBST(TEXI_EXTRA_TAIL)
 	AC_SUBST(HIGHLIGHT1)
-        AC_SUBST(HIGHLIGHT2)
+	AC_SUBST(HIGHLIGHT2)
         AC_SUBST(USE_PYGMENTS)
         TEXI2HTML=texi2html.init
         AC_SUBST(TEXI2HTML)
@@ -775,7 +797,7 @@ if test x"${enable_build_docs}" = xtrue ; then
 	fi
 	if test x"${need_mathjax}" = xtrue; then
             dnl Need to include Mathjax.
-	    NEED_MATHJAX='<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>'
+	    NEED_MATHJAX='<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script>'
 	    dnl This also means that makeinfo doesn't support
 	    dnl @displaymath, so we need to do something else.
 	    NO_DISPLAYMATH='true'
@@ -1391,6 +1413,7 @@ doc/info/figures/Makefile \
 doc/info/de/Makefile \
 doc/info/de/include-maxima.texi \
 doc/info/es/Makefile \
+doc/info/es/include-maxima.texi \
 doc/info/ja/Makefile \
 doc/info/ja/include-maxima.texi \
 doc/info/pt_BR/include-maxima.texi \
@@ -1415,7 +1438,7 @@ share/contrib/maxima-odesolve/Makefile \
 share/contrib/symplectic_ode/Makefile \
 share/nelder_mead/Makefile \
 share/raddenest/Makefile \
-share/draw/Makefile share/logic/Makefile  doc/info/es/include-maxima.texi \
+share/draw/Makefile share/logic/Makefile \
 src/lisp])
 AC_OUTPUT
 

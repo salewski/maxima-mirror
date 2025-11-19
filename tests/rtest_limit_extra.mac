@@ -1422,11 +1422,12 @@ log(tan(x)^2+1)+2*%i*li[2](-((%i*((%i+1)*tan(x)+%i-1))/2))+2*%i*li[2](%i*tan(x)+
 -2*%i*li[2](-((%i*((%i-1)*tan(x)+%i+1))/2))-4*x*log(tan(x)))/4, 0);
 0$
 
-limit(xxx,x,%pi/4,'minus);
- (4*%i*log(2)*log(sqrt(2)*%i+sqrt(2))-4*%i*log(2)^2+%pi*log(2)+8*%catalan)/8$
+/* see \#4614 atan2 reflection rule*/
+[trigsimp(block([trigsign : false], limit(xxx,x,%pi/4,'minus))), block([trigsign : true], limit(xxx,x,%pi/4,'minus))];
+[%catalan,%catalan]$
 
-limit(xxx,x,%pi/4,'plus);
--((4*%i*log(2)*log(sqrt(2)*%i-sqrt(2))-4*%i*log(2)^2-%pi*log(2)-2*%i*%pi^2-8*%catalan)/8)$
+[block([trigsign : false], limit(xxx,x,%pi/4,'plus)), block([trigsign : true], limit(xxx,x,%pi/4,'plus))];
+[-((-(4*%pi*log(2))-2*%i*%pi^2-8*%catalan)/8), -((-(4*%pi*log(2))-2*%i*%pi^2-8*%catalan)/8)]$
 
  (remvalue(xxx),0);
  0$
@@ -1453,6 +1454,15 @@ block ([display2d : false, stream : make_string_output_stream (),ans],
 "1 Call   taylim [(sqrt(n)+1)^n*(sqrt(n+1)+1)^(-n-1),n,inf,think]
 1 Return taylim zeroa
 "$
+/* \#4619 limit(inf = inf) causes stack overflow*/
+block([ans : limit(minf = minf)], [inpart(ans,0),args(ans)]);
+["=", [minf, minf]]$
+
+block([ans : limit(minf = minf,x,42)], [inpart(ans,0),args(ans)]);
+["=", [minf, minf]]$
+
+block([ans : limit(x < 8)], [inpart(ans,0),args(ans)]);
+["<", [x, 8]]$
 
 /* clean up*/
 (kill(values),0);

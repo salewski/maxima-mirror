@@ -55,7 +55,16 @@ pre.example, pre.example-preformatted {
     padding: 5px;
     background-color: var(--example-background-color);
     /* Add scrollbar for examples for narrow windows */
-    overflow: auto
+    overflow: auto;
+}
+
+/*
+ * For pygments, make the background color of the highlighted code the
+ * same as the example background color.  Without this, it looks funny.
+ */
+
+div.highlight {
+    background-color: var(--example-background-color) !important;
 }
 
 /*
@@ -100,14 +109,6 @@ div.highlight pre {
     line-height: normal !important;
 }
 
-/*
- * Forcefully override the pygments background color for examples, if
- * pygments is used for highlighting.
- */
-div.highlight {
-    background: rgb(238,238,255) !important;
-}
-
 /* Reduce the indentation of lists and descriptions */
 ul,ol { padding-left: 1em }
 dd { margin-left: 0.5em }
@@ -150,4 +151,16 @@ dd { margin-left: 0.5em }
     }
     div.categorybox { background-color: #544 }
     div.textbox, div.titlebox, div.synopsisbox { color: black;}
+}
+
+/* CSS for pygment highlighting */
+.example.user-maxima {
+    overflow-x: auto
+}
+
+.highlight.pre {
+    /* Lines for highlighted examples are too close by default with
+     *  pygments.  Make it larger.
+     */
+    line-height: normal !important;
 }
