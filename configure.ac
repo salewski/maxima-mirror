@@ -68,7 +68,8 @@ lisps_enabled=""
 
 dnl Compiling with abcl requires a jre and the path to abcl.jar
 AC_ARG_ENABLE(abcl,
-	[  --enable-abcl                Use abcl, requires --with-abcl-jar],
+	[AS_HELP_STRING([--enable-abcl],
+        [Use abcl, requires --with-abcl-jar])],
      	[case "${enableval}" in
        		yes) abcl=true 
 		     lisps_enabled="${lisps_enabled} abcl"
@@ -80,14 +81,16 @@ AC_ARG_ENABLE(abcl,
 	[abcl=false])
 ABCL_JAR=`pwd`/"abcl.jar"
 AC_ARG_WITH(abcl-jar,
-	[  --with-abcl-jar=<jarfile>    Use <jarfile> as abcl install (default ./abcl.jar)],
+	[AS_HELP_STRING([--with-abcl-jar=<jarfile>],
+        [Use <jarfile> as abcl install (default ./abcl.jar)])],
 	[abcl=true
 	lisps_enabled="${lisps_enabled} abcl"
 	explicit_lisp=true
 	ABCL_JAR="${withval}"])
 	
 AC_ARG_WITH(jre,
- 	[  --with-jre=<jre>             When compiling with abcl: use <jre> as Java interpreter],
+ 	[AS_HELP_STRING([--with-jre=<jre>],
+        [When compiling with abcl: use <jre> as Java interpreter])],
  	[JRE="${withval}"],
  	[JRE="java"])
 
@@ -102,7 +105,8 @@ fi
 dnl n.b. clisp_default_name is hardcoded in "with" message
 clisp_default_name=clisp
 AC_ARG_ENABLE(clisp,
-	[  --enable-clisp               Use clisp],
+	[AS_HELP_STRING([--enable-clisp],
+        [Use clisp])],
      	[case "${enableval}" in
        		yes) clisp=true 
 		     lisps_enabled="${lisps_enabled} clisp"
@@ -113,7 +117,8 @@ AC_ARG_ENABLE(clisp,
 	explicit_lisp=true],
 	[clisp=false])
 AC_ARG_WITH(clisp,
-	[  --with-clisp=<prog>          Use clisp executable <prog> (default clisp)],
+	[AS_HELP_STRING([--with-clisp=<prog>],
+        [Use clisp executable <prog> (default clisp)])],
 	[clisp=true
 	lisps_enabled="${lisps_enabled} clisp"
 	explicit_lisp=true
@@ -125,18 +130,20 @@ AC_ARG_WITH(clisp,
 	[CLISP_NAME=${clisp_default_name}])
 	CLISP_RUNTIME="lisp${CLISPEXT}"
 AC_ARG_WITH(clisp-runtime,
-	[  --with-clisp-runtime=<path>  Use clisp runtime <path> (default
+	[AS_HELP_STRING([--with-clisp-runtime=<path>],
+        [Use clisp runtime <path> (default
 	                          *lib-directory*/base/lisp.run on unix,
-	   		          *lib-directory*\\lisp.exe on windows) ],
+	   		          *lib-directory*\\lisp.exe on windows) ])],
 	[clisp=true
 	lisps_enabled="${lisps_enabled} clisp"
 	CLISP_RUNTIME_PATH="$withval"
 	CLISP_RUNTIME=`basename ${CLISP_RUNTIME_PATH}`],
 	[])
 AC_ARG_ENABLE(clisp-exec,
-	[  --enable-clisp-exec          Create a maxima executable image using CLISP.
+	[AS_HELP_STRING([--enable-clisp-exec],
+        [Create a maxima executable image using CLISP.
                                 No check is made if the version of 
-                                CLISP supports executable images],
+                                CLISP supports executable images])],
 	[case "${enableval}" in
 	    yes) clisp_exec=true 
                  clisp=true 
@@ -189,7 +196,8 @@ dnl n.b. cmucl_default_name is hardcoded in "with" message
 cmucl_default_name=lisp
 CMUCL_RUNTIME=lisp
 AC_ARG_ENABLE(cmucl,
-	[  --enable-cmucl               Use CMUCL],
+	[AS_HELP_STRING([--enable-cmucl],
+        [Use CMUCL])],
      	[case "${enableval}" in
        		yes) cmucl=true 
 		     lisps_enabled="${lisps_enabled} cmucl"
@@ -200,7 +208,8 @@ AC_ARG_ENABLE(cmucl,
 	explicit_lisp=true],
 	[cmucl=false])
 AC_ARG_WITH(cmucl,
-	[  --with-cmucl=<prog>          Use CMUCL executable <prog> (default lisp)],
+	[AS_HELP_STRING([--with-cmucl=<prog>],
+        [Use CMUCL executable <prog> (default lisp)])],
 	[cmucl=true
 	lisps_enabled="${lisps_enabled} cmucl"
 	explicit_lisp=true
@@ -211,17 +220,19 @@ AC_ARG_WITH(cmucl,
 	fi],
 	[CMUCL_NAME=${cmucl_default_name}])
 AC_ARG_WITH(cmucl-runtime,
-	[  --with-cmucl-runtime=<path>  Use CMUCL runtime <path> (default
-	                          *cmucl-lib*/../bin/lisp)],
+	[AS_HELP_STRING([--with-cmucl-runtime=<path>],
+        [Use CMUCL runtime <path> (default
+	                          *cmucl-lib*/../bin/lisp)])],
 	[cmucl=true
 	lisps_enabled="${lisps_enabled} cmucl"
 	CMUCL_RUNTIME_PATH="$withval"
 	CMUCL_RUNTIME=`basename ${CMUCL_RUNTIME_PATH}`],
 	[])
 AC_ARG_ENABLE(cmucl-exec,
-	[  --enable-cmucl-exec          Create a maxima executable image using CMUCL.
+	[AS_HELP_STRING([--enable-cmucl-exec],
+        [Create a maxima executable image using CMUCL.
                                 No check is made if the version of 
-                                CMUCL supports executable images],
+                                CMUCL supports executable images])],
 	[case "${enableval}" in
 	    yes) cmucl_exec=true
                  cmucl=true 
@@ -253,7 +264,8 @@ dnl n.b. scl_default_name is hardcoded in "with" message
 scl_default_name=scl
 SCL_RUNTIME=lisp
 AC_ARG_ENABLE(scl,
-	[  --enable-scl                 Use SCL],
+	[AS_HELP_STRING([--enable-scl],
+        [Use SCL])],
      	[case "${enableval}" in
        		yes) scl=true 
 		     lisps_enabled="${lisps_enabled} scl"
@@ -264,7 +276,8 @@ AC_ARG_ENABLE(scl,
 	explicit_lisp=true],
 	[scl=false])
 AC_ARG_WITH(scl,
-	[  --with-scl=<prog>            Use SCL executable <prog> (default scl)],
+	[AS_HELP_STRING([--with-scl=<prog>],
+        [Use SCL executable <prog> (default scl)])],
 	[scl=true
 	lisps_enabled="${lisps_enabled} scl"
 	explicit_lisp=true
@@ -275,8 +288,9 @@ AC_ARG_WITH(scl,
 	fi],
 	[SCL_NAME=${scl_default_name}])
 AC_ARG_WITH(scl-runtime,
-	[  --with-scl-runtime=<path>    Use SCL runtime <path> (default
-	                          file://library/../bin/lisp)],
+	[AS_HELP_STRING([--with-scl-runtime=<path>],
+        [Use SCL runtime <path> (default
+	                          file://library/../bin/lisp)])],
 	[scl=true
 	lisps_enabled="${lisps_enabled} scl"
 	SCL_RUNTIME_PATH="$withval"
@@ -301,7 +315,8 @@ fi
 dnl n.b. sbcl_default_name is hardcoded in "with" message
 sbcl_default_name=sbcl
 AC_ARG_ENABLE(sbcl,
-	[  --enable-sbcl                Use SBCL],
+	[AS_HELP_STRING([--enable-sbcl],
+        [Use SBCL])],
      	[case "${enableval}" in
        		yes) sbcl=true 
 		     lisps_enabled="${lisps_enabled} sbcl"
@@ -312,7 +327,8 @@ AC_ARG_ENABLE(sbcl,
 	explicit_lisp=true],
 	[sbcl=false])
 AC_ARG_WITH(sbcl,
-	[  --with-sbcl=<prog>           Use SBCL executable <prog> (default sbcl)],
+	[AS_HELP_STRING([--with-sbcl=<prog>],
+        [Use SBCL executable <prog> (default sbcl)])],
 	[sbcl=true
 	lisps_enabled="${lisps_enabled} sbcl"
 	explicit_lisp=true
@@ -323,9 +339,10 @@ AC_ARG_WITH(sbcl,
 	fi],
 	[SBCL_NAME="${sbcl_default_name}"])
 AC_ARG_ENABLE(sbcl-exec,
-	[  --enable-sbcl-exec           Create a maxima executable image using SBCL.
+	[AS_HELP_STRING([--enable-sbcl-exec],
+        [Create a maxima executable image using SBCL.
                                 No check is made if the version of 
-                                SBCL supports executable images],
+                                SBCL supports executable images])],
 	[case "${enableval}" in
 	    yes) sbcl_exec=true 
                  sbcl=true 
@@ -356,7 +373,8 @@ fi
 dnl n.b. acl_default_name is hardcoded in "with" message
 acl_default_name=lisp
 AC_ARG_ENABLE(acl,
-	[  --enable-acl                 Use ACL],
+	[AS_HELP_STRING([--enable-acl],
+        [Use ACL])],
      	[case "${enableval}" in
        		yes) acl=true 
 		     lisps_enabled="${lisps_enabled} acl"
@@ -367,7 +385,8 @@ AC_ARG_ENABLE(acl,
 	explicit_lisp=true],
 	[acl=false])
 AC_ARG_WITH(acl,
-	[  --with-acl=<prog>            Use ACL executable <prog> (default lisp)],
+	[AS_HELP_STRING([--with-acl=<prog>],
+        [Use ACL executable <prog> (default lisp)])],
 	[acl=true
 	lisps_enabled="${lisps_enabled} acl"
 	explicit_lisp=true
@@ -396,7 +415,8 @@ fi
 dnl n.b. gcl_default_name is hardcoded in "with" message
 gcl_default_name=gcl
 AC_ARG_ENABLE(gcl,
-	[  --enable-gcl                 Use GCL],
+	[AS_HELP_STRING([--enable-gcl],
+        [Use GCL])],
      	[case "${enableval}" in
        		yes) gcl=true 
 		     lisps_enabled="${lisps_enabled} gcl"
@@ -406,7 +426,8 @@ AC_ARG_ENABLE(gcl,
      	esac],
 	[gcl=false])
 AC_ARG_WITH(gcl,
-	[  --with-gcl=<prog>            Use GCL executable <prog> (default gcl)],
+	[AS_HELP_STRING([--with-gcl=<prog>],
+        [Use GCL executable <prog> (default gcl)])],
 	[gcl=true
 	lisps_enabled="${lisps_enabled} gcl"
 	explicit_lisp=true
@@ -434,7 +455,8 @@ fi
 dnl n.b. openmcl_default_name is hardcoded in "with" message
 openmcl_default_name=openmcl
 AC_ARG_ENABLE(openmcl,
-	[  --enable-openmcl             Use OpenMCL],
+	[AS_HELP_STRING([--enable-openmcl],
+        [Use OpenMCL])],
      	[case "${enableval}" in
        		yes) openmcl=true 
 		     lisps_enabled="${lisps_enabled} openmcl"
@@ -444,7 +466,8 @@ AC_ARG_ENABLE(openmcl,
      	esac],
 	[openmcl=false])
 AC_ARG_WITH(openmcl,
-	[  --with-openmcl=<prog>        Use OpenMCL executable <prog> (default openmcl)],
+	[AS_HELP_STRING([--with-openmcl=<prog>],
+        [Use OpenMCL executable <prog> (default openmcl)])],
 	[openmcl=true
 	lisps_enabled="${lisps_enabled} openmcl"
 	explicit_lisp=true
@@ -455,9 +478,10 @@ AC_ARG_WITH(openmcl,
 	fi],
 	[OPENMCL_NAME=${openmcl_default_name}])
 AC_ARG_ENABLE(openmcl-exec,
-	[  --enable-openmcl-exec        Create a maxima executable image using OPENMCL.
+	[AS_HELP_STRING([--enable-openmcl-exec],
+        [Create a maxima executable image using OPENMCL.
                                 No check is made if the version of 
-                                OPENMCL supports executable images],
+                                OPENMCL supports executable images])],
 	[case "${enableval}" in
 	    yes) openmcl_exec=true
                  openmcl=true 
@@ -472,7 +496,8 @@ AC_ARG_ENABLE(openmcl-exec,
 
 dnl Define ccl as an alias (essentially) for openmcl
 AC_ARG_ENABLE(ccl,
-	[  --enable-ccl                 Use CCL (Clozure Common Lisp)],
+	[AS_HELP_STRING([--enable-ccl],
+        [Use CCL (Clozure Common Lisp)])],
      	[case "${enableval}" in
        		yes) openmcl=true 
 		     lisps_enabled="${lisps_enabled} openmcl"
@@ -482,7 +507,8 @@ AC_ARG_ENABLE(ccl,
      	esac],
 	[openmcl=false])
 AC_ARG_WITH(ccl,
-	[  --with-ccl=<prog>            Use OpenMCL executable <prog> (default ccl)],
+	[AS_HELP_STRING([--with-ccl=<prog>],
+        [Use OpenMCL executable <prog> (default ccl)])],
 	[openmcl=true
 	lisps_enabled="${lisps_enabled} openmcl"
 	explicit_lisp=true
@@ -493,9 +519,10 @@ AC_ARG_WITH(ccl,
 	fi],
 	[OPENMCL_NAME=${openmcl_default_name}])
 AC_ARG_ENABLE(ccl-exec,
-	[  --enable-ccl-exec            Create a maxima executable image using CCL.
+	[AS_HELP_STRING([--enable-ccl-exec],
+        [Create a maxima executable image using CCL.
                                 No check is made if the version of 
-                                CCL supports executable images],
+                                CCL supports executable images])],
 	[case "${enableval}" in
 	    yes) openmcl_exec=true
                  openmcl=true 
@@ -559,7 +586,8 @@ case "${host_os}" in
 esac
 
 AC_ARG_ENABLE(ccl64,
-	[  --enable-ccl64               Use CCL (Clozure Common Lisp), 64-bit],
+	[AS_HELP_STRING([--enable-ccl64],
+        [Use CCL (Clozure Common Lisp), 64-bit])],
      	[case "${enableval}" in
        		yes) ccl64=true 
 		     lisps_enabled="${lisps_enabled} ccl64"
@@ -569,7 +597,8 @@ AC_ARG_ENABLE(ccl64,
      	esac],
 	[ccl64=false])
 AC_ARG_WITH(ccl64,
-	[  --with-ccl64=<prog>          Use ccl64 executable <prog> (default ${ccl64_default_name})],
+	[AS_HELP_STRING([--with-ccl64=<prog>],
+        [Use ccl64 executable <prog> (default ${ccl64_default_name})])],
 	[ccl64=true
 	lisps_enabled="${lisps_enabled} ccl64"
 	explicit_lisp=true
@@ -580,9 +609,10 @@ AC_ARG_WITH(ccl64,
 	fi],
 	[CCL64_NAME=${ccl64_default_name}])
 AC_ARG_ENABLE(ccl64-exec,
-	[  --enable-ccl64-exec          Create a maxima executable image using CCL.
+	[AS_HELP_STRING([--enable-ccl64-exec],
+        [Create a maxima executable image using CCL.
                                 No check is made if the version of 
-                                CCL supports executable images],
+                                CCL supports executable images])],
 	[case "${enableval}" in
 	    yes) ccl64_exec=true
                  ccl64=true 
@@ -598,7 +628,8 @@ AC_ARG_ENABLE(ccl64-exec,
 dnl n.b. ecl_default_name is hardcoded in "with" message
 ecl_default_name=ecl
 AC_ARG_ENABLE(ecl,
-	[  --enable-ecl                 Use ECL],
+	[AS_HELP_STRING([--enable-ecl],
+        [Use ECL])],
      	[case "${enableval}" in
        		yes) ecl=true 
 		     lisps_enabled="${lisps_enabled} ecl"
@@ -608,7 +639,8 @@ AC_ARG_ENABLE(ecl,
      	esac],
 	[ecl=false])
 AC_ARG_WITH(ecl,
-	[  --with-ecl=<prog>            Use ECL executable <prog> (default ecl)],
+	[AS_HELP_STRING([--with-ecl=<prog>],
+        [Use ECL executable <prog> (default ecl)])],
 	[ecl=true
 	lisps_enabled="${lisps_enabled} ecl"
 	explicit_lisp=true
@@ -635,7 +667,8 @@ fi
 
 dnl xgettext
 AC_ARG_ENABLE(gettext,
-	[  --enable-gettext             Locale support],
+	[AS_HELP_STRING([--enable-gettext],
+        [Locale support])],
 	[case "${enableval}" in
 	       yes) enable_gettext=true  ;;
  	       no)  enable_gettext=false ;;
@@ -647,7 +680,8 @@ AC_ARG_ENABLE(gettext,
 AM_CONDITIONAL(ENABLE_GETTEXT, test x$enable_gettext = xtrue)
 
 AC_ARG_ENABLE(build-docs,
-	[  --enable-build-docs        Execute make in doc directories],
+	[AS_HELP_STRING([--enable-build-docs],
+        [Execute make in doc directories])],
 	[case "${enableval}" in
 	       yes) enable_build_docs=true  ;;
  	       no)  enable_build_docs=false ;;
@@ -945,7 +979,8 @@ fi
 
 dnl languages
 AC_ARG_ENABLE(lang-de,
-	[  --enable-lang-de             German language support],
+	[AS_HELP_STRING([--enable-lang-de],
+        [German language support])],
      	[case "${enableval}" in
        		yes) lang_de=true  ;;
        		no)  lang_de=false ;;
@@ -956,7 +991,8 @@ AC_ARG_ENABLE(lang-de,
 AM_CONDITIONAL(LANG_DE, test x$lang_de = xtrue)
 
 AC_ARG_ENABLE(lang-ja,
-	[  --enable-lang-ja             Japanese language support],
+	[AS_HELP_STRING([--enable-lang-ja],
+        [Japanese language support])],
      	[case "${enableval}" in
        		yes) lang_ja=true  ;;
        		no)  lang_ja=false ;;
@@ -967,7 +1003,8 @@ AC_ARG_ENABLE(lang-ja,
 AM_CONDITIONAL(LANG_JA, test x$lang_ja = xtrue)
 
 AC_ARG_ENABLE(lang-es,
-	[  --enable-lang-es             Spanish language support],
+	[AS_HELP_STRING([--enable-lang-es],
+        [Spanish language support])],
      	[case "${enableval}" in
        		yes) lang_es=true  ;;
        		no)  lang_es=false ;;
@@ -979,7 +1016,8 @@ AC_SUBST(lang_es)
 AM_CONDITIONAL(LANG_ES, test x$lang_es = xtrue)
 
 AC_ARG_ENABLE(lang-pt,
-	[  --enable-lang-pt             Portuguese language support],
+	[AS_HELP_STRING([--enable-lang-pt],
+        [Portuguese language support])],
      	[case "${enableval}" in
        		yes) lang_pt=true  ;;
        		no)  lang_pt=false ;;
@@ -991,7 +1029,8 @@ AC_SUBST(lang_pt)
 AM_CONDITIONAL(LANG_PT, test x$lang_pt = xtrue)
 
 AC_ARG_ENABLE(lang-pt_BR,
-	[  --enable-lang-pt_BR          Brazilian Portuguese language support],
+	[AS_HELP_STRING([--enable-lang-pt_BR],
+        [Brazilian Portuguese language support])],
      	[case "${enableval}" in
        		yes) lang_pt_br=true  ;;
        		no)  lang_pt_br=false ;;
@@ -1003,7 +1042,8 @@ AC_SUBST(lang_pt_br)
 AM_CONDITIONAL(LANG_PT_BR, test x$lang_pt_br = xtrue)
 
 AC_ARG_ENABLE(lang-ru,
-	[  --enable-lang-ru             Russian language support],
+	[AS_HELP_STRING([--enable-lang-ru],
+        [Russian language support])],
      	[case "${enableval}" in
        		yes) lang_ru=true  ;;
        		no)  lang_ru=false ;;
@@ -1016,7 +1056,8 @@ AM_CONDITIONAL(LANG_RU, test x$lang_ru = xtrue)
 dnl Optionally build the windows CHM help files
 dnl default to false as requires win32 and Microsoft HTML Help Workshop
 AC_ARG_ENABLE(chm,
-  [  --enable-chm                 Build Windows CHM help files],
+  [AS_HELP_STRING([--enable-chm],
+  [Build Windows CHM help files])],
   [case "${enableval}" in
        		yes) chm=true ;;
        		no)  chm=false ;;
@@ -1027,7 +1068,8 @@ AM_CONDITIONAL(CHM, test x$chm = xtrue)
 dnl hhc is the HTML Help Compiler for CHM documentation
 hhc_default_name=hhc$EXEEXT
 AC_ARG_WITH(hhc,
-	[  --with-hhc=<prog>            Use HTML Help Compiler executable <prog> (default hhc)],
+	[AS_HELP_STRING([--with-hhc=<prog>],
+        [Use HTML Help Compiler executable <prog> (default hhc)])],
 	[hhc=true
 	if test "$withval" = "yes"; then
 		HHC="${hhc_default_name}"
@@ -1054,7 +1096,8 @@ fi
 
 dnl Make the build quiet
 AC_ARG_ENABLE(quiet_build,
-  [  --enable-quiet-build         Make the build quieter],
+  [AS_HELP_STRING([--enable-quiet-build],
+  [Make the build quieter])],
   [case "${enableval}" in
      yes) quiet_build=true ;;
      no)  quiet_build=false ;;
@@ -1066,7 +1109,8 @@ AM_CONDITIONAL(QUIET_BUILD, test x${quiet_build} = xtrue)
 dnl Optionally build xmaxima.exe under windows
 dnl default to false as additional software
 AC_ARG_ENABLE(xmaxima_exe,
-  [  --enable-xmaxima-exe         Build Windows xmaxima.exe for installer],
+  [AS_HELP_STRING([--enable-xmaxima-exe],
+  [Build Windows xmaxima.exe for installer])],
   [case "${enableval}" in
        		yes) xmaxima_exe=true ;;
        		no)  xmaxima_exe=false ;;
@@ -1078,7 +1122,8 @@ AM_CONDITIONAL(XMAXIMA_EXE, test x$xmaxima_exe = xtrue)
 dnl Optionally build winkill.exe under windows
 dnl default to false as additional software
 AC_ARG_ENABLE(winkill_exe,
-  [  --enable-winkill             Build Windows winkill.exe and winkill_lib.dll for installer],
+  [AS_HELP_STRING([--enable-winkill],
+  [Build Windows winkill.exe and winkill_lib.dll for installer])],
   [case "${enableval}" in
        		yes) winkill_exe=true ;;
        		no)  winkill_exe=false ;;
@@ -1089,7 +1134,8 @@ AM_CONDITIONAL(WINKILL_EXE, test x$winkill_exe = xtrue)
 
 dnl Should we build a win64 installer?
 AC_ARG_ENABLE(win64-installer,
-  [  --enable-win64-installer     Build a 64bit installer on Windows],
+  [AS_HELP_STRING([--enable-win64-installer],
+  [Build a 64bit installer on Windows])],
   [case "${enableval}" in
                 yes) win64_installer=true ;;
                 no) win64_installer=false ;;
@@ -1295,7 +1341,8 @@ The gcl ANSI-CL check returned
 fi
 
 AC_ARG_ENABLE(gcl-alt-link,
-	[  --enable-gcl-alt-link        Use GCL's alternate linking mechanism],
+	[AS_HELP_STRING([--enable-gcl-alt-link],
+        [Use GCL's alternate linking mechanism])],
      	[case "${enableval}" in
        		yes) gcl_alt_link=true ;;
        		no)  gcl_alt_link=false ;;
@@ -1306,7 +1353,8 @@ AC_ARG_ENABLE(gcl-alt-link,
 AM_CONDITIONAL(GCL_ALT_LINK, test x$gcl_alt_link = xtrue)
 
 AC_ARG_WITH(default-lisp,
-	[  --with-default-lisp=<lisp>   Set default lisp implementation to <lisp>],
+	[AS_HELP_STRING([--with-default-lisp=<lisp>],
+        [Set default lisp implementation to <lisp>])],
      	[case "${withval}" in
        		clisp)
 			if test x"${clisp}" = xtrue ; then
@@ -1429,12 +1477,14 @@ AC_SUBST(ABCL_JAR)
 AC_SUBST(JRE)
 
 AC_ARG_WITH(posix-shell,
-	[  --with-posix-shell=<path>    Use <shell> for maxima script (default /bin/sh)],
+	[AS_HELP_STRING([--with-posix-shell=<path>],
+        [Use <shell> for maxima script (default /bin/sh)])],
 	[posix_shell_list="${withval}"],
 	[posix_shell_list="/bin/sh /bin/bash /usr/bin/bash /usr/local/bin/bash"])
 
 AC_ARG_WITH(wish,
-	[  --with-wish=<prog>           Use <prog> for Tk wish shell (default wish)],
+	[AS_HELP_STRING([--with-wish=<prog>],
+        [Use <prog> for Tk wish shell (default wish)])],
 	[WISH="${withval}"],
 	[WISH="wish"])
 AC_SUBST(WISH)
@@ -1501,7 +1551,8 @@ AC_SUBST(default_layout_autotools)
 AC_SUBST(LDFLAGS)
 
 AC_ARG_WITH(emacs-prefix,
-	[  --emacs-prefix=<path>        Where to install the emacs modes to],
+	[AS_HELP_STRING([--emacs-prefix=<path>],
+        [Where to install the emacs modes to])],
 	[EMACSDIR="$withval"],
 	[EMACSDIR="${datarootdir}/emacs/site-lisp"])
 AC_SUBST(EMACSDIR)

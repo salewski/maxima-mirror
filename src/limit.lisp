@@ -137,8 +137,7 @@
 	       (logcombed ()) (lhp? ())
 	       (varlist ()) (ans ()) (genvar ()) (loginprod? ())
 	       (limit-answers ()) (limitp t) (simplimplus-problems ())
-	       (lenargs (length args))
-	       (genfoo ()))
+	       (lenargs (length args)))
 	   (declare (special lhcount *behavior-count-now* exp var val *indicator
 			     taylored origval logcombed lhp?
 			     varlist genvar loginprod? limitp))
@@ -154,7 +153,7 @@
                 ;; The expression is 'T or 'NIL. Return immediately.
                 (return exp1))
 	      (cond ((= lenargs 1)
-		     (setq var (setq genfoo (gensym)) ; Use a gensym. Not foo.
+		     (setq var (gensym)
 		           val 0))
 		    (t
 		     (setq var (second args))
@@ -221,16 +220,23 @@
 	      ;; Make assumptions about limit var being very small or very large.
 	      ;; Assumptions are forgotten upon exit.
 	      (unless (= lenargs 1)
-		(limit-context var val dr))
-            ;; Resimplify in light of new assumptions. Changing ($expand exp 1 0)
-			;; to ($expand exp 0 0) results in a bad testsuite failure for
-			;; (assume(a>2), limit(integrate(t/log(t),t,2,a)/a,a,inf)) and
-			;; some testsuite results that are more messy.
+		    (limit-context var val dr))
+
+			;; Use $expand to resimplify `exp` in light of new assumptions. When `exp` is free of the limit 
+			;; `var`, perform pure simplification using ($expand exp 0 0)  otherwise, call ($expand exp 1 0).
+			;; Replacing ($expand exp 1 0) with ($expand exp 0 0) causes a serious testsuite failure for
+            ;; (assume(a > 2), limit(integrate(t/log(t), t, 2, a)/a, a, inf)) and produces messier results 
+			;; in other cases.
+
+            ;; Performing pure simplification for expressions free of the limit variable
+            ;; fixes the bug: limit(inf*(zeroa + inf)) -> und. Eventually, the call to ($expand exp 1 0) 
+			;; be replaced with ($expand exp 0 0) for all limit expressions `exp`.
+
             (setq exp (resimplify 
 			          ($minfactorial
 			          (extra-simp 
-					  ($expand exp 1 0)))))
-           
+					  ($expand exp (if ($freeof var exp) 0 1) 0)))))
+			          
 	      (if (not (or (real-epsilonp val)		;; if direction of limit not specified
 			   (infinityp val)))
 		  (setq ans (both-side exp var val))	;; compute from both sides
@@ -1243,7 +1249,40 @@ ignoring dummy variables and array indices."
 	      (let ((arglim (limit (cadr e) var val 'think)))
 		(eq arglim '$inf)))
 	 (ei-asymptotic-expansion $lhospitallim (cadr e)))
+	((eq (caar e) '%gamma_incomplete) (gamma-incomplete-asymptotic e var val $lhospitallim))
 	(t e)))
+
+;; See http://dlmf.nist.gov/8.11.i
+(defun gamma-incomplete-asymptotic (e x pt n)
+	(let* ((aaa (second e)) (z (third e)) (xxx (limit z x pt 'think)))
+		(cond 
+          ;; Case 1: Asymptotic expansion when z -> +/- inf and aaa is free of x
+          ;; For the series, see http://dlmf.nist.gov/8.11.i
+		  ((and (or (eq '$inf xxx) (eq '$minf xxx)) (freeof x aaa))
+		         (let ((f 1) (s 0))
+		           (dotimes (k n)
+				      (setq s (add s f))
+                      (setq f (mul f (div (add aaa -1 (- k)) z))))
+				 ;; return z^(a-1)*exp(-z)*s
+				 (mul (ftake 'mexpt z (sub aaa 1)) (ftake 'mexpt '$%e (mul -1 z)) s)))
+           ;; Case 2: Asymptotic expansion when z -> 0, aaa integer, and aaa <= 0
+		   ;; For the series, see http://dlmf.nist.gov/8.4.E15
+		   ((and (zerop2 xxx) (integerp aaa) (>= 0 aaa))
+		      (let ((s 0))
+		      (flet ((fn (k) (if (eql (add k aaa) 0) 
+			                        0 
+									(div (power (neg z) k) (mul (ftake 'mfactorial k) (add k aaa))))))
+					(dotimes (k n)
+						(setq s (add s (fn k))))
+					
+					(sub (mul
+					       (div (ftake 'mexpt -1 (neg aaa)) (ftake 'mfactorial (neg aaa)))
+					       (sub 
+					         (simplifya (subfunmake '$psi (list 0) (list (add (neg aaa) 1))) nil)
+						     (ftake '%log z)))
+						 (mul (ftake 'mexpt z (neg aaa)) s)))))
+	       ;; Case 3: fall back			
+           (t (ftake '%gamma_incomplete aaa z)))))
 
 (defun stirling (x)
   "Return sqrt(2*%pi/x)*(x/%e)^x, the Stirling approximation of

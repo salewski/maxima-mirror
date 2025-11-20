@@ -3,6 +3,7 @@ Maxima 5.48-post change log
 
 Bug fixes for numbered bugs:
 ----------------------------
+ * \#3041: limit(inf*(zeroa+inf)) => und, should be inf
  * \#3750: Quoting atan2 inhibits simplification
  * \#4383: great not transitive (so simplifya not idempotent)
  * \#4577: Update CSS for examples and nav bar
@@ -14,7 +15,8 @@ Bug fixes for numbered bugs:
  * \#4615: carg range is not in (-%pi, %pi]
  * \#4603: Control stack regression with abs_integrate / 5.48.0
  * \#4619: limit(inf = inf) causes stack overflow
-
+ * \#4633: integrate(exp(- t) log(t), t, 0, 1) --> integral nounform
+ 
 Changes in the Windows installer:
 ---------------------------------
  * Update SBCL
