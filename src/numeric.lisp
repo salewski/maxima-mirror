@@ -673,8 +673,10 @@
        (rmax2 (cl:* rbig rmin2))
        (be (cl:/ 2 (cl:* eps eps)))
        (2/eps (cl:/ 2 eps)))
+  (declare (double-float eps rmin rbig rmin2 rminscal rmax2 be 2/eps))
   (defun cdiv-double-float (x y)
-    (declare (type (cl:complex double-float) x y))
+    (declare (type (cl:complex double-float) x y)
+             (optimize (speed 3) (safety 0)))
     (labels
 	((internal-compreal (a b c d r tt)
 	   (declare (double-float a b c d r tt))
@@ -692,7 +694,7 @@
 	   ;;                       = (a + b*r)/(c + d*r).
 	   ;;
 	   ;; Thus tt = (c + d*r).
-	   (cond ((cl:>= (abs r) rmin)
+	   (cond ((cl:>= (cl:abs r) rmin)
 		  (let ((br (cl:* b r)))
 		    #+nil
 		    (format t "br = ~A~%" br)
@@ -732,7 +734,9 @@
 		 (b (cl:imagpart x))
 		 (c (cl:realpart y))
 		 (d (cl:imagpart y)))
-	     (flet ((maybe-scale (abs-tst)
+             (declare (double-float a b c d))
+	     (flet ((maybe-scale (abs-tst a b c d)
+                      (declare (double-float abs-tst a b c d))
 		      ;; This implements McGehearty's iteration 3 to
 		      ;; handle the case when some values are too big
 		      ;; and should be scaled down.  Also if some
@@ -760,15 +764,17 @@
 				    (setf a (cl:* a rminscal)
 					  b (cl:* b rminscal)
 					  c (cl:* c rminscal)
-					  d (cl:* d rminscal))))))))
+					  d (cl:* d rminscal)))))
+                        (values a b c d))))
 	       (cond
 		 ((cl:<= (cl:abs d) (cl:abs c))
 		  ;; |d| <= |c|, so we can use robust-subinternal to
 		  ;; perform the division.
-		  (maybe-scale (abs c))
-		  (multiple-value-bind (e f)
-		      (robust-subinternal a b c d)
-		    (cl:complex e f)))
+		  (multiple-value-bind (a b c d)
+                      (maybe-scale (cl:abs c) a b c d)
+		    (multiple-value-bind (e f)
+		        (robust-subinternal a b c d)
+		      (cl:complex e f))))
 		 (t
 		  ;; |d| > |c|.  So, instead compute
 		  ;;
@@ -778,10 +784,11 @@
 		  ;; realpart of the former is the same, but the
 		  ;; imagpart of the former is the negative of the
 		  ;; desired division.
-		  (maybe-scale (cl:abs d))
-		  (multiple-value-bind (e f)
-		      (robust-subinternal b a d c)
-		    (cl:complex e (cl:- f)))))))))
+		  (multiple-value-bind (a b c d)
+                      (maybe-scale (cl:abs d) a b c d)
+		    (multiple-value-bind (e f)
+		        (robust-subinternal b a d c)
+		      (cl:complex e (cl:- f))))))))))
       (let* ((a (cl:realpart x))
 	     (b (cl:imagpart x))
 	     (c (cl:realpart y))
@@ -789,6 +796,7 @@
 	     (ab (cl:max (cl:abs a) (cl:abs b)))
 	     (cd (cl:max (cl:abs c) (cl:abs d)))
 	     (s 1d0))
+        (declare (double-float s))
 	;; If a or b is big, scale down a and b.
 	(when (cl:>= ab rbig)
 	  (setf x (cl:/ x 2)
@@ -829,7 +837,6 @@
 		  (f (float (/ (- b (* a r)) denom) 1f0)))
 	     (complex e f))))))
 
-#||
 ;;; Tests for cdiv-double-float
 
 (defun parse-%a (string)
@@ -841,11 +848,11 @@
 	 (lead (parse-integer string :start (1- dot-posn) :end dot-posn))
 	 (frac (parse-integer string :start (1+ dot-posn) :end p-posn :radix 16))
 	 (exp (parse-integer string :start (1+ p-posn))))
-    (* sign
-       (scale-float (float (+ (ash lead 52)
-			      frac)
-			   1d0)
-		    (- exp 52)))))
+    (cl:* sign
+          (cl:scale-float (cl:float (cl:+ (cl:ash lead 52)
+			                  frac)
+			      1d0)
+		          (cl:- exp 52)))))
 
 ;; Tests for complex division.  Tests 1-10 are from Baudin and Smith.
 ;; Test 11 is an example from Maxima.  Test 12 is an example from the
@@ -857,55 +864,55 @@
 (defparameter *test-cases*
   (list
    ;; 1
-   (list (complex 1d0 1d0)
-	 (complex 1d0 (scale-float 1d0 1023))
-	 (complex (scale-float 1d0 -1023)
-		  (scale-float -1d0 -1023))
+   (list (cl:complex 1d0 1d0)
+	 (cl:complex 1d0 (cl:scale-float 1d0 1023))
+	 (cl:complex (cl:scale-float 1d0 -1023)
+		  (cl:scale-float -1d0 -1023))
 	 53)
    ;; 2
-   (list (complex 1d0 1d0)
-	 (complex (scale-float 1d0 -1023) (scale-float 1d0 -1023))
-	 (complex (scale-float 1d0 1023) 0)
+   (list (cl:complex 1d0 1d0)
+	 (cl:complex (cl:scale-float 1d0 -1023) (cl:scale-float 1d0 -1023))
+	 (cl:complex (cl:scale-float 1d0 1023) 0)
 	 53)
    ;; 3
-   (list (complex (scale-float 1d0 1023) (scale-float 1d0 -1023))
-	 (complex (scale-float 1d0 677) (scale-float 1d0 -677))
-	 (complex (scale-float 1d0 346) (scale-float -1d0 -1008))
+   (list (cl:complex (cl:scale-float 1d0 1023) (cl:scale-float 1d0 -1023))
+	 (cl:complex (cl:scale-float 1d0 677) (cl:scale-float 1d0 -677))
+	 (cl:complex (cl:scale-float 1d0 346) (cl:scale-float -1d0 -1008))
 	 53)
    ;; 4
-   (list (complex (scale-float 1d0 1023) (scale-float 1d0 1023))
-	 (complex 1d0 1d0)
-	 (complex (scale-float 1d0 1023) 0)
+   (list (cl:complex (cl:scale-float 1d0 1023) (cl:scale-float 1d0 1023))
+	 (cl:complex 1d0 1d0)
+	 (cl:complex (cl:scale-float 1d0 1023) 0)
 	 53)
    ;; 5
-   (list (complex (scale-float 1d0 1020) (scale-float 1d0 -844))
-	 (complex (scale-float 1d0 656) (scale-float 1d0 -780))
-	 (complex (scale-float 1d0 364) (scale-float -1d0 -1072))
+   (list (cl:complex (cl:scale-float 1d0 1020) (cl:scale-float 1d0 -844))
+	 (cl:complex (cl:scale-float 1d0 656) (cl:scale-float 1d0 -780))
+	 (cl:complex (cl:scale-float 1d0 364) (cl:scale-float -1d0 -1072))
 	 53)
    ;; 6
-   (list (complex (scale-float 1d0 -71) (scale-float 1d0 1021))
-	 (complex (scale-float 1d0 1001) (scale-float 1d0 -323))
-	 (complex (scale-float 1d0 -1072) (scale-float 1d0 20))
+   (list (cl:complex (cl:scale-float 1d0 -71) (cl:scale-float 1d0 1021))
+	 (cl:complex (cl:scale-float 1d0 1001) (cl:scale-float 1d0 -323))
+	 (cl:complex (cl:scale-float 1d0 -1072) (cl:scale-float 1d0 20))
 	 53)
    ;; 7
-   (list (complex (scale-float 1d0 -347) (scale-float 1d0 -54))
-	 (complex (scale-float 1d0 -1037) (scale-float 1d0 -1058))
-	 (complex 3.898125604559113300d289 8.174961907852353577d295)
+   (list (cl:complex (cl:scale-float 1d0 -347) (cl:scale-float 1d0 -54))
+	 (cl:complex (cl:scale-float 1d0 -1037) (cl:scale-float 1d0 -1058))
+	 (cl:complex 3.898125604559113300d289 8.174961907852353577d295)
 	 53)
    ;; 8
-   (list (complex (scale-float 1d0 -1074) (scale-float 1d0 -1074))
-	 (complex (scale-float 1d0 -1073) (scale-float 1d0 -1074))
-	 (complex 0.6d0 0.2d0)
+   (list (cl:complex (cl:scale-float 1d0 -1074) (cl:scale-float 1d0 -1074))
+	 (cl:complex (cl:scale-float 1d0 -1073) (cl:scale-float 1d0 -1074))
+	 (cl:complex 0.6d0 0.2d0)
 	 53)
    ;; 9
-   (list (complex (scale-float 1d0 1015) (scale-float 1d0 -989))
-	 (complex (scale-float 1d0 1023) (scale-float 1d0 1023))
-	 (complex 0.001953125d0 -0.001953125d0)
+   (list (cl:complex (cl:scale-float 1d0 1015) (cl:scale-float 1d0 -989))
+	 (cl:complex (cl:scale-float 1d0 1023) (cl:scale-float 1d0 1023))
+	 (cl:complex 0.001953125d0 -0.001953125d0)
 	 53)
    ;; 10
-   (list (complex (scale-float 1d0 -622) (scale-float 1d0 -1071))
-	 (complex (scale-float 1d0 -343) (scale-float 1d0 -798))
-	 (complex 1.02951151789360578d-84 6.97145987515076231d-220)
+   (list (cl:complex (cl:scale-float 1d0 -622) (cl:scale-float 1d0 -1071))
+	 (cl:complex (cl:scale-float 1d0 -343) (cl:scale-float 1d0 -798))
+	 (cl:complex 1.02951151789360578d-84 6.97145987515076231d-220)
 	 53)
    ;; 11
    ;; From Maxima
@@ -923,30 +930,30 @@
    ;; 13
    ;; Iteration 1.  Without this, we would instead return
    ;;
-   ;;   (complex (parse-%a "0x1.ba8df8075bceep+155") (parse-%a "-0x1.a4ad6329485f0p-895"))
+   ;;   (cl:complex (parse-%a "0x1.ba8df8075bceep+155") (parse-%a "-0x1.a4ad6329485f0p-895"))
    ;;
    ;; whose imaginary part is quite a bit off.
-   (list (complex (parse-%a "0x1.73a3dac1d2f1fp+509") (parse-%a "-0x1.c4dba4ba1ee79p-620"))
-	 (complex (parse-%a "0x1.adf526c249cf0p+353") (parse-%a "0x1.98b3fbc1677bbp-697"))
-	 (complex (parse-%a "0x1.BA8DF8075BCEEp+155") (parse-%a "-0x1.A4AD628DA5B74p-895"))
+   (list (cl:complex (parse-%a "0x1.73a3dac1d2f1fp+509") (parse-%a "-0x1.c4dba4ba1ee79p-620"))
+	 (cl:complex (parse-%a "0x1.adf526c249cf0p+353") (parse-%a "0x1.98b3fbc1677bbp-697"))
+	 (cl:complex (parse-%a "0x1.BA8DF8075BCEEp+155") (parse-%a "-0x1.A4AD628DA5B74p-895"))
 	 53)
    ;; 14
    ;; Iteration 2.
-   (list (complex (parse-%a "-0x0.000000008e4f8p-1022") (parse-%a "0x0.0000060366ba7p-1022"))
-	 (complex (parse-%a "-0x1.605b467369526p-245") (parse-%a "0x1.417bd33105808p-256"))
-	 (complex (parse-%a "0x1.cde593daa4ffep-810") (parse-%a "-0x1.179b9a63df6d3p-799"))
+   (list (cl:complex (parse-%a "-0x0.000000008e4f8p-1022") (parse-%a "0x0.0000060366ba7p-1022"))
+	 (cl:complex (parse-%a "-0x1.605b467369526p-245") (parse-%a "0x1.417bd33105808p-256"))
+	 (cl:complex (parse-%a "0x1.cde593daa4ffep-810") (parse-%a "-0x1.179b9a63df6d3p-799"))
 	 52)
    ;; 15
    ;; Iteration 3
-   (list (complex (parse-%a "0x1.cb27eece7c585p-355 ") (parse-%a "0x0.000000223b8a8p-1022"))
-	 (complex (parse-%a "-0x1.74e7ed2b9189fp-22") (parse-%a "0x1.3d80439e9a119p-731"))
-	 (complex (parse-%a "-0x1.3b35ed806ae5ap-333") (parse-%a "-0x0.05e01bcbfd9f6p-1022"))
+   (list (cl:complex (parse-%a "0x1.cb27eece7c585p-355 ") (parse-%a "0x0.000000223b8a8p-1022"))
+	 (cl:complex (parse-%a "-0x1.74e7ed2b9189fp-22") (parse-%a "0x1.3d80439e9a119p-731"))
+	 (cl:complex (parse-%a "-0x1.3b35ed806ae5ap-333") (parse-%a "-0x0.05e01bcbfd9f6p-1022"))
 	 53)
    ;; 16
    ;; Iteration 4
-   (list (complex (parse-%a "-0x1.f5c75c69829f0p-530") (parse-%a "-0x1.e73b1fde6b909p+316"))
-	 (complex (parse-%a "-0x1.ff96c3957742bp+1023") (parse-%a "0x1.5bd78c9335899p+1021"))
-	 (complex (parse-%a "-0x1.423c6ce00c73bp-710") (parse-%a "0x1.d9edcf45bcb0ep-708"))
+   (list (cl:complex (parse-%a "-0x1.f5c75c69829f0p-530") (parse-%a "-0x1.e73b1fde6b909p+316"))
+	 (cl:complex (parse-%a "-0x1.ff96c3957742bp+1023") (parse-%a "0x1.5bd78c9335899p+1021"))
+	 (cl:complex (parse-%a "-0x1.423c6ce00c73bp-710") (parse-%a "0x1.d9edcf45bcb0ep-708"))
 	 52)
    ))
 
@@ -956,12 +963,12 @@
 ;; of the bits of accuracy of the real and imaginary parts.
 (defun rel-err (computed expected)
   (flet ((rerr (c e)
-	   (let ((diff (abs (- c e))))
-	     (if (zerop diff)
-		 (float-digits diff)
-		 (floor (- (log (/ diff (abs e)) 2d0)))))))
-    (min (rerr (realpart computed) (realpart expected))
-	 (rerr (imagpart computed) (imagpart expected)))))
+	   (let ((diff (cl:abs (cl:- c e))))
+	     (if (cl:zerop diff)
+		 (cl:float-digits diff)
+		 (cl:floor (cl:- (cl:log (cl:/ diff (cl:abs e)) 2d0)))))))
+    (cl:min (rerr (cl:realpart computed) (cl:realpart expected))
+	    (rerr (cl:imagpart computed) (cl:imagpart expected)))))
 
 (defun test-cdiv-double ()
   (loop for k from 1
@@ -969,7 +976,7 @@
 	do
 	   (destructuring-bind (x y z-true expected-rel)
 	       test
-	     (let* ((z (/ x y))
+	     (let* ((z (cdiv-double-float x y))
 		    (rel (rel-err z z-true)))
                (when (< rel expected-rel)
                  (format t "Test ~D failed~%" k)
@@ -978,7 +985,6 @@
                  (format t "  z    = ~A~%" z)
                  (format t "  true = ~A~%" z-true)
                  (format t "  acc  = ~D, expected ~D~%" rel expected-rel))))))
-||#
 
 ;;; Divide two numbers
 (defmethod two-arg-/ ((a cl:complex) (b cl:complex))
