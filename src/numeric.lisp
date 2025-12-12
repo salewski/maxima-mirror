@@ -992,7 +992,19 @@
     ((cl:complex cl:double-float)
      (typecase b
        ((cl:complex cl:double-float)
-        (cdiv-double-float a b))
+        (let ((ax (cl:abs (cl:realpart a)))
+              (ay (cl:abs (cl:imagpart a)))
+              (bx (cl:abs (cl:realpart b)))
+              (by (cl:abs (cl:imagpart b)))
+              (rbig (sqrt most-positive-double-float))
+              (rmin (sqrt least-positive-normalized-double-float)))
+          ;; If any component is too big (rbig) or too small (rmin),
+          ;; use the accurate version.  Otherwise, we'll assume CL:/
+          ;; does a good job.
+          (if (or (cl:> ax rbig) (cl:> ay rbig) (cl:> bx rbig) (cl:> by rbig)
+                  (cl:< ax rmin) (cl:< ay rmin) (cl:< bx rmin) (cl:< by rmin))
+              (cdiv-double-float a b)
+              (cl:/ a b))))
        (t
         (cl:/ a b))))
     (t
