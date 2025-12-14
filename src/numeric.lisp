@@ -842,157 +842,155 @@
 		  (f (float (/ (- b (* a r)) denom) 1f0)))
 	     (complex e f))))))
 
+
+;;; Simple test program for accurate complex double-float division.
 #+nil
-(progn
-;;; Tests for cdiv-double-float
-
-(defun parse-%a (string)
-  (let* ((sign (if (char= (aref string 0) #\-)
-		   -1
-		   1))
-	 (dot-posn (position #\. string))
-	 (p-posn (position #\p string))
-	 (lead (parse-integer string :start (1- dot-posn) :end dot-posn))
-	 (frac (parse-integer string :start (1+ dot-posn) :end p-posn :radix 16))
-	 (exp (parse-integer string :start (1+ p-posn))))
-    (cl:* sign
-          (cl:scale-float (cl:float (cl:+ (cl:ash lead 52)
-			                  frac)
-			      1d0)
-		          (cl:- exp 52)))))
-
-;; Tests for complex division.  Tests 1-10 are from Baudin and Smith.
-;; Test 11 is an example from Maxima.  Test 12 is an example from the
-;; ansi-tests.  Tests 13-16 are for examples for improvement
-;; iterations 1-4 from McGehearty.
-;;
-;; Each test is a list of values: x, y, z-true (the value of x/y), and
-;; the bits of accuracy.
-(defparameter *test-cases*
-  (list
-   ;; 1
-   (list (cl:complex 1d0 1d0)
-	 (cl:complex 1d0 (cl:scale-float 1d0 1023))
-	 (cl:complex (cl:scale-float 1d0 -1023)
-		  (cl:scale-float -1d0 -1023))
-	 53)
-   ;; 2
-   (list (cl:complex 1d0 1d0)
-	 (cl:complex (cl:scale-float 1d0 -1023) (cl:scale-float 1d0 -1023))
-	 (cl:complex (cl:scale-float 1d0 1023) 0)
-	 53)
-   ;; 3
-   (list (cl:complex (cl:scale-float 1d0 1023) (cl:scale-float 1d0 -1023))
-	 (cl:complex (cl:scale-float 1d0 677) (cl:scale-float 1d0 -677))
-	 (cl:complex (cl:scale-float 1d0 346) (cl:scale-float -1d0 -1008))
-	 53)
-   ;; 4
-   (list (cl:complex (cl:scale-float 1d0 1023) (cl:scale-float 1d0 1023))
-	 (cl:complex 1d0 1d0)
-	 (cl:complex (cl:scale-float 1d0 1023) 0)
-	 53)
-   ;; 5
-   (list (cl:complex (cl:scale-float 1d0 1020) (cl:scale-float 1d0 -844))
-	 (cl:complex (cl:scale-float 1d0 656) (cl:scale-float 1d0 -780))
-	 (cl:complex (cl:scale-float 1d0 364) (cl:scale-float -1d0 -1072))
-	 53)
-   ;; 6
-   (list (cl:complex (cl:scale-float 1d0 -71) (cl:scale-float 1d0 1021))
-	 (cl:complex (cl:scale-float 1d0 1001) (cl:scale-float 1d0 -323))
-	 (cl:complex (cl:scale-float 1d0 -1072) (cl:scale-float 1d0 20))
-	 53)
-   ;; 7
-   (list (cl:complex (cl:scale-float 1d0 -347) (cl:scale-float 1d0 -54))
-	 (cl:complex (cl:scale-float 1d0 -1037) (cl:scale-float 1d0 -1058))
-	 (cl:complex 3.898125604559113300d289 8.174961907852353577d295)
-	 53)
-   ;; 8
-   (list (cl:complex (cl:scale-float 1d0 -1074) (cl:scale-float 1d0 -1074))
-	 (cl:complex (cl:scale-float 1d0 -1073) (cl:scale-float 1d0 -1074))
-	 (cl:complex 0.6d0 0.2d0)
-	 53)
-   ;; 9
-   (list (cl:complex (cl:scale-float 1d0 1015) (cl:scale-float 1d0 -989))
-	 (cl:complex (cl:scale-float 1d0 1023) (cl:scale-float 1d0 1023))
-	 (cl:complex 0.001953125d0 -0.001953125d0)
-	 53)
-   ;; 10
-   (list (cl:complex (cl:scale-float 1d0 -622) (cl:scale-float 1d0 -1071))
-	 (cl:complex (cl:scale-float 1d0 -343) (cl:scale-float 1d0 -798))
-	 (cl:complex 1.02951151789360578d-84 6.97145987515076231d-220)
-	 53)
-   ;; 11
-   ;; From Maxima
-   (list #c(5.43d-10 1.13d-100)
-	 #c(1.2d-311 5.7d-312)
-	 #c(3.691993880674614517999740937026568563794896024143749539711267954d301
-	    -1.753697093319947872394996242210428954266103103602859195409591583d301)
-	 52)
-   ;; 12
-   ;; Found by ansi tests. z/z should be exactly 1.
-   (list #c(1.565640716292489d19 0.0d0)
-	 #c(1.565640716292489d19 0.0d0)
-	 #c(1d0 0)
-	 53)
-   ;; 13
-   ;; Iteration 1.  Without this, we would instead return
-   ;;
-   ;;   (cl:complex (parse-%a "0x1.ba8df8075bceep+155") (parse-%a "-0x1.a4ad6329485f0p-895"))
-   ;;
-   ;; whose imaginary part is quite a bit off.
-   (list (cl:complex (parse-%a "0x1.73a3dac1d2f1fp+509") (parse-%a "-0x1.c4dba4ba1ee79p-620"))
-	 (cl:complex (parse-%a "0x1.adf526c249cf0p+353") (parse-%a "0x1.98b3fbc1677bbp-697"))
-	 (cl:complex (parse-%a "0x1.BA8DF8075BCEEp+155") (parse-%a "-0x1.A4AD628DA5B74p-895"))
-	 53)
-   ;; 14
-   ;; Iteration 2.
-   (list (cl:complex (parse-%a "-0x0.000000008e4f8p-1022") (parse-%a "0x0.0000060366ba7p-1022"))
-	 (cl:complex (parse-%a "-0x1.605b467369526p-245") (parse-%a "0x1.417bd33105808p-256"))
-	 (cl:complex (parse-%a "0x1.cde593daa4ffep-810") (parse-%a "-0x1.179b9a63df6d3p-799"))
-	 52)
-   ;; 15
-   ;; Iteration 3
-   (list (cl:complex (parse-%a "0x1.cb27eece7c585p-355 ") (parse-%a "0x0.000000223b8a8p-1022"))
-	 (cl:complex (parse-%a "-0x1.74e7ed2b9189fp-22") (parse-%a "0x1.3d80439e9a119p-731"))
-	 (cl:complex (parse-%a "-0x1.3b35ed806ae5ap-333") (parse-%a "-0x0.05e01bcbfd9f6p-1022"))
-	 53)
-   ;; 16
-   ;; Iteration 4
-   (list (cl:complex (parse-%a "-0x1.f5c75c69829f0p-530") (parse-%a "-0x1.e73b1fde6b909p+316"))
-	 (cl:complex (parse-%a "-0x1.ff96c3957742bp+1023") (parse-%a "0x1.5bd78c9335899p+1021"))
-	 (cl:complex (parse-%a "-0x1.423c6ce00c73bp-710") (parse-%a "0x1.d9edcf45bcb0ep-708"))
-	 52)
-   ))
-
-;; Relative error in terms of bits of accuracy.  This is the
-;; definition used by Baudin and Smith.  A result of 53 means the two
-;; numbers have identical bits.  For complex numbers, we use the min
-;; of the bits of accuracy of the real and imaginary parts.
-(defun rel-err (computed expected)
-  (flet ((rerr (c e)
-	   (let ((diff (cl:abs (cl:- c e))))
-	     (if (cl:zerop diff)
-		 (cl:float-digits diff)
-		 (cl:floor (cl:- (cl:log (cl:/ diff (cl:abs e)) 2d0)))))))
-    (cl:min (rerr (cl:realpart computed) (cl:realpart expected))
-	    (rerr (cl:imagpart computed) (cl:imagpart expected)))))
-
 (defun test-cdiv-double ()
-  (loop for k from 1
-	for test in *test-cases*
-	do
-	   (destructuring-bind (x y z-true expected-rel)
-	       test
-	     (let* ((z (cdiv-double-float x y))
-		    (rel (rel-err z z-true)))
-               (when (< rel expected-rel)
-                 (format t "Test ~D failed~%" k)
-                 (format t "  x    = ~A~%" x)
-                 (format t "  y    = ~A~%" y)
-                 (format t "  z    = ~A~%" z)
-                 (format t "  true = ~A~%" z-true)
-                 (format t "  acc  = ~D, expected ~D~%" rel expected-rel))))))
-)
+  (flet ((rel-err (computed expected)
+           ;; Relative error in terms of bits of accuracy.  This is the
+           ;; definition used by Baudin and Smith.  A result of 53 means the two
+           ;; numbers have identical bits.  For complex numbers, we use the min
+           ;; of the bits of accuracy of the real and imaginary parts.
+           (flet ((rerr (c e)
+	            (let ((diff (cl:abs (cl:- c e))))
+	              (if (cl:zerop diff)
+		          (cl:float-digits diff)
+		          (cl:floor (cl:- (cl:log (cl:/ diff (cl:abs e)) 2d0)))))))
+             (cl:min (rerr (cl:realpart computed) (cl:realpart expected))
+	             (rerr (cl:imagpart computed) (cl:imagpart expected)))))
+         (parse-%a (string)
+           ;; A very rudimentary parser for the printed hexadecimal
+           ;; floating-point representation as produced the the %a
+           ;; format for printf.
+           (let* ((sign (if (char= (aref string 0) #\-)
+		            -1
+		            1))
+	          (dot-posn (position #\. string))
+	          (p-posn (position #\p string))
+	          (lead (parse-integer string :start (1- dot-posn) :end dot-posn))
+	          (frac (parse-integer string :start (1+ dot-posn) :end p-posn :radix 16))
+	          (exp (parse-integer string :start (1+ p-posn))))
+             (cl:* sign
+                   (cl:scale-float (cl:float (cl:+ (cl:ash lead 52)
+			                           frac)
+			               1d0)
+		                   (cl:- exp 52))))))
+    (let ((test-cases
+            ;; Tests for complex division.  Tests 1-10 are from Baudin and Smith.
+            ;; Test 11 is an example from Maxima.  Test 12 is an example from the
+            ;; ansi-tests.  Tests 13-16 are for examples for improvement
+            ;; iterations 1-4 from McGehearty.
+            ;;
+            ;; Each test is a list of values: x, y, z-true (the value of x/y), and
+            ;; the bits of accuracy.
+            (list
+             ;; 1
+             (list (cl:complex 1d0 1d0)
+	           (cl:complex 1d0 (cl:scale-float 1d0 1023))
+	           (cl:complex (cl:scale-float 1d0 -1023)
+		               (cl:scale-float -1d0 -1023))
+	           53)
+             ;; 2
+             (list (cl:complex 1d0 1d0)
+	           (cl:complex (cl:scale-float 1d0 -1023) (cl:scale-float 1d0 -1023))
+	           (cl:complex (cl:scale-float 1d0 1023) 0)
+	           53)
+             ;; 3
+             (list (cl:complex (cl:scale-float 1d0 1023) (cl:scale-float 1d0 -1023))
+	           (cl:complex (cl:scale-float 1d0 677) (cl:scale-float 1d0 -677))
+	           (cl:complex (cl:scale-float 1d0 346) (cl:scale-float -1d0 -1008))
+	           53)
+             ;; 4
+             (list (cl:complex (cl:scale-float 1d0 1023) (cl:scale-float 1d0 1023))
+	           (cl:complex 1d0 1d0)
+	           (cl:complex (cl:scale-float 1d0 1023) 0)
+	           53)
+             ;; 5
+             (list (cl:complex (cl:scale-float 1d0 1020) (cl:scale-float 1d0 -844))
+	           (cl:complex (cl:scale-float 1d0 656) (cl:scale-float 1d0 -780))
+	           (cl:complex (cl:scale-float 1d0 364) (cl:scale-float -1d0 -1072))
+	           53)
+             ;; 6
+             (list (cl:complex (cl:scale-float 1d0 -71) (cl:scale-float 1d0 1021))
+	           (cl:complex (cl:scale-float 1d0 1001) (cl:scale-float 1d0 -323))
+	           (cl:complex (cl:scale-float 1d0 -1072) (cl:scale-float 1d0 20))
+	           53)
+             ;; 7
+             (list (cl:complex (cl:scale-float 1d0 -347) (cl:scale-float 1d0 -54))
+	           (cl:complex (cl:scale-float 1d0 -1037) (cl:scale-float 1d0 -1058))
+	           (cl:complex 3.898125604559113300d289 8.174961907852353577d295)
+	           53)
+             ;; 8
+             (list (cl:complex (cl:scale-float 1d0 -1074) (cl:scale-float 1d0 -1074))
+	           (cl:complex (cl:scale-float 1d0 -1073) (cl:scale-float 1d0 -1074))
+	           (cl:complex 0.6d0 0.2d0)
+	           53)
+             ;; 9
+             (list (cl:complex (cl:scale-float 1d0 1015) (cl:scale-float 1d0 -989))
+	           (cl:complex (cl:scale-float 1d0 1023) (cl:scale-float 1d0 1023))
+	           (cl:complex 0.001953125d0 -0.001953125d0)
+	           53)
+             ;; 10
+             (list (cl:complex (cl:scale-float 1d0 -622) (cl:scale-float 1d0 -1071))
+	           (cl:complex (cl:scale-float 1d0 -343) (cl:scale-float 1d0 -798))
+	           (cl:complex 1.02951151789360578d-84 6.97145987515076231d-220)
+	           53)
+             ;; 11
+             ;; From Maxima
+             (list #c(5.43d-10 1.13d-100)
+	           #c(1.2d-311 5.7d-312)
+	           #c(3.691993880674614517999740937026568563794896024143749539711267954d301
+	              -1.753697093319947872394996242210428954266103103602859195409591583d301)
+	           52)
+             ;; 12
+             ;; Found by ansi tests. z/z should be exactly 1.
+             (list #c(1.565640716292489d19 0.0d0)
+	           #c(1.565640716292489d19 0.0d0)
+	           #c(1d0 0)
+	           53)
+             ;; 13
+             ;; Iteration 1.  Without this, we would instead return
+             ;;
+             ;;   (cl:complex (parse-%a "0x1.ba8df8075bceep+155") (parse-%a "-0x1.a4ad6329485f0p-895"))
+             ;;
+             ;; whose imaginary part is quite a bit off.
+             (list (cl:complex (parse-%a "0x1.73a3dac1d2f1fp+509") (parse-%a "-0x1.c4dba4ba1ee79p-620"))
+	           (cl:complex (parse-%a "0x1.adf526c249cf0p+353") (parse-%a "0x1.98b3fbc1677bbp-697"))
+	           (cl:complex (parse-%a "0x1.BA8DF8075BCEEp+155") (parse-%a "-0x1.A4AD628DA5B74p-895"))
+	           53)
+             ;; 14
+             ;; Iteration 2.
+             (list (cl:complex (parse-%a "-0x0.000000008e4f8p-1022") (parse-%a "0x0.0000060366ba7p-1022"))
+	           (cl:complex (parse-%a "-0x1.605b467369526p-245") (parse-%a "0x1.417bd33105808p-256"))
+	           (cl:complex (parse-%a "0x1.cde593daa4ffep-810") (parse-%a "-0x1.179b9a63df6d3p-799"))
+	           52)
+             ;; 15
+             ;; Iteration 3
+             (list (cl:complex (parse-%a "0x1.cb27eece7c585p-355 ") (parse-%a "0x0.000000223b8a8p-1022"))
+	           (cl:complex (parse-%a "-0x1.74e7ed2b9189fp-22") (parse-%a "0x1.3d80439e9a119p-731"))
+	           (cl:complex (parse-%a "-0x1.3b35ed806ae5ap-333") (parse-%a "-0x0.05e01bcbfd9f6p-1022"))
+	           53)
+             ;; 16
+             ;; Iteration 4
+             (list (cl:complex (parse-%a "-0x1.f5c75c69829f0p-530") (parse-%a "-0x1.e73b1fde6b909p+316"))
+	           (cl:complex (parse-%a "-0x1.ff96c3957742bp+1023") (parse-%a "0x1.5bd78c9335899p+1021"))
+	           (cl:complex (parse-%a "-0x1.423c6ce00c73bp-710") (parse-%a "0x1.d9edcf45bcb0ep-708"))
+	           52)
+             )))
+      (loop for k from 1
+	    for test in test-cases
+	    do
+	       (destructuring-bind (x y z-true expected-rel)
+	           test
+	         (let* ((z (cdiv-double-float x y))
+		        (rel (rel-err z z-true)))
+                   (format t "Test ~D ~A~%"
+                           k (if (< rel expected-rel) "failed" "passed"))
+                   (format t "  x    = ~A~%" x)
+                   (format t "  y    = ~A~%" y)
+                   (format t "  z    = ~A~%" z)
+                   (format t "  true = ~A~%" z-true)
+                   (format t "  acc  = ~D, expected ~D~%" rel expected-rel)))))))
 
 ;;; Divide two numbers
 (defmethod two-arg-/ ((a cl:complex) (b cl:complex))
