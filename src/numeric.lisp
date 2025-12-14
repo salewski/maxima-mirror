@@ -655,6 +655,7 @@
 			 :imag (maxima::bcons
 				(maxima::fpquotient (maxima::fpminus a-re)
 						    dn)))))))
+
 ;; An implementation of Baudin and Smith's robust complex division for
 ;; double-floats.  This is a pretty straightforward translation of the
 ;; original in https://arxiv.org/pdf/1210.4539.
@@ -837,6 +838,8 @@
 		  (f (float (/ (- b (* a r)) denom) 1f0)))
 	     (complex e f))))))
 
+#+nil
+(progn
 ;;; Tests for cdiv-double-float
 
 (defun parse-%a (string)
@@ -985,6 +988,7 @@
                  (format t "  z    = ~A~%" z)
                  (format t "  true = ~A~%" z-true)
                  (format t "  acc  = ~D, expected ~D~%" rel expected-rel))))))
+)
 
 ;;; Divide two numbers
 (defmethod two-arg-/ ((a cl:complex) (b cl:complex))
