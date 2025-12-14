@@ -998,9 +998,9 @@
     ((cl:complex cl:double-float)
      (typecase b
        ((cl:complex cl:double-float)
-          (if *use-accurate-complex-div*
-              (cdiv-double-float a b)
-              (cl:/ a b)))
+        (if *use-accurate-complex-div*
+            (cdiv-double-float a b)
+            (cl:/ a b)))
        (t
         (cl:/ a b))))
     (t
