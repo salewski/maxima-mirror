@@ -76,12 +76,13 @@ The change of variable can also be written @code{@var{f(x)} = @var{g(y)}}.
 @end group
 @end example
 
-An expression containing a noun form, such as the instances of @code{'integrate}
-above, may be evaluated by @code{ev} with the @code{nouns} flag.
-For example, the expression returned by @code{changevar} above may be evaluated
+An expression containing a noun form, such as the instances of
+@mxref{integrate, 'integrate}
+above, may be evaluated by @mref{ev} with the @mref{nouns} flag.
+For example, the expression returned by @mref{changevar} above may be evaluated
 by @code{ev (%o3, nouns)}.
 
-@code{changevar} may also be used to make changes in the indices of a sum or
+@mref{changevar} may also be used to make changes in the indices of a sum or
 product.  However, it must be realized that when a change is made in a
 sum or product, this change must be a shift, i.e., @code{i = j+ ...}, not a
 higher degree function.  E.g.,
@@ -185,14 +186,14 @@ example problem.
 @anchor{defint}
 @deffn {Function} defint (@var{expr}, @var{x}, @var{a}, @var{b})
 
-Attempts to compute a definite integral.  @code{defint} is called by
-@code{integrate} when limits of integration are specified, i.e., when
-@code{integrate} is called as
+Attempts to compute a definite integral.  @mref{defint} is called by
+@mref{integrate} when limits of integration are specified, i.e., when
+@mref{integrate} is called as
 @code{integrate (@var{expr}, @var{x}, @var{a}, @var{b})}.
 Thus from the user's point of view, it is sufficient to call @code{integrate}.
 @c SHOULD WE BOTHER TO DOCUMENT defint ??? NO FUNCTIONALITY HERE THAT IS NOT ALREADY PRESENT IN integrate !!!
 
-@code{defint} returns a symbolic expression, either the computed integral or the
+@mref{defint} returns a symbolic expression, either the computed integral or the
 noun form of the integral.  See @mref{quad_qag} and related functions for
 numerical approximation of definite integrals.
 
@@ -204,10 +205,10 @@ numerical approximation of definite integrals.
 @c -----------------------------------------------------------------------------
 @anchor{erfflag}
 @defvr {Option variable} erfflag
-Default value: @code{true}
+Default value: @mref{true}
 
-When @code{erfflag} is @code{false}, prevents @code{risch} from introducing the
-@code{erf} function in the answer if there were none in the integrand to
+When @mref{erfflag} is @mref{false}, prevents @mref{risch} from introducing the
+@mref{erf} function in the answer if there were none in the integrand to
 begin with.
 
 @opencatbox{Categories:}
@@ -224,12 +225,12 @@ begin with.
 Computes the inverse Laplace transform of @var{expr} with
 respect to @var{s} and parameter @var{t}. @var{expr} must be a ratio of
 polynomials whose denominator has only linear and quadratic factors;
-there is an extension of @code{ilt}, called @mref{pwilt} (Piece-Wise
+there is an extension of @mref{ilt}, called @mref{pwilt} (Piece-Wise
 Inverse Laplace Transform) that handles several other cases where
-@code{ilt} fails.
+@mref{ilt} fails.
 
-By using the functions @code{laplace} and @code{ilt} together with the
-@code{solve} or @code{linsolve} functions the user can solve a single
+By using the functions @mref{laplace} and @mref{ilt} together with the
+@mref{solve} or @mref{linsolve} functions the user can solve a single
 differential or convolution integral equation or a set of them.
 
 @c WARNING:  This needs manual editing for the last test to put the
@@ -295,11 +296,11 @@ pos;
 @c -----------------------------------------------------------------------------
 @anchor{intanalysis}
 @defvr {Option variable} intanalysis
-Default value: @code{true}
+Default value: @mref{true}
 
-When @code{true}, definite integration tries to find poles in the integrand in 
+When @mref{true}, definite integration tries to find poles in the integrand in 
 the interval of integration.  If there are, then the integral is evaluated
-appropriately as a principal value integral.  If intanalysis is @code{false}, 
+appropriately as a principal value integral.  If intanalysis is @mref{false}, 
 this check is not performed and integration is done assuming there are no poles.
 
 See also @mrefdot{ldefint}
@@ -307,7 +308,7 @@ See also @mrefdot{ldefint}
 Examples:
 
 Maxima can solve the following integrals, when @mref{intanalysis} is set to
-@code{false}:
+@mref{false}:
 
 @c ===beg===
 @c intanalysis:false;
