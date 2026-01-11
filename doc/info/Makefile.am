@@ -60,14 +60,17 @@ INFOLANG ?= en
 # We need the html docu to be generated on "make all" because if we fail
 # to do so a "sudo make install" will generate the html docu as read-only
 # fails conflicting with a subsequent "make html".
-all-local: html maxima.info maxima-index.lisp maxima-index-html.lisp
+all-local: html maxima.info maxima-info.info maxima-index.lisp maxima-index-html.lisp
 
 infoname = maxima
 include $(top_srcdir)/common-info.mk
 maxima.info : maxima.texi $(maxima_TEXINFOS)
-	$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) \
+	$(MAKEINFO) -D textmanual $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) \
 	  --split-size=1000000 $(srcdir)/maxima.texi
 
+maxima-info.info : maxima.texi $(maxima_TEXINFOS)
+	$(MAKEINFO) -o maxima-info.info $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) \
+	  --split-size=1000000 $(srcdir)/maxima.texi
 html: index.html
 
 maxima-index.lisp: build_index.pl maxima.info

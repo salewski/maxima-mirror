@@ -1623,6 +1623,121 @@ only the matrix elements are displayed.
 @end deffn
 
 @c -----------------------------------------------------------------------------
+@anchor{display_matrix_padding_horizontal}
+@deffn {Option variable} display_matrix_padding_horizontal
+Default value: @code{true}
+
+When @code{display_matrix_padding_horizontal} is @code{true},
+matrices are displayed with spaces between successive columns,
+and a space before the first column and a space after the last column.
+
+When @code{display_matrix_padding_horizontal} is @code{false},
+matrices are not displayed with spaces between successive columns,
+and no space before the first column and no space after the last column.
+Successive columns are immediately adjacent to each other,
+and the first column is immediately adjacent to the left bracket,
+and the last column is immediately adjacent to the right bracket,
+if the brackets are present (see @mref{display_matrix_brackets}).
+    
+See also @mrefdot{display_matrix_padding_vertical}
+
+Examples:
+
+@c ===beg===
+@c display_matrix_padding_horizontal;
+@c foo: matrix ([a, b, c], [d, e, f], [g, h, i]);
+@c display_matrix_padding_horizontal: false;
+@c foo;
+@c ===end===
+@example maxima
+@group
+(%i1) display_matrix_padding_horizontal;
+(%o1)                         true
+(%i2) foo: matrix ([a, b, c], [d, e, f], [g, h, i]);
+                           ┌         ┐
+                           │ a  b  c │
+                           │         │
+(%o2)                      │ d  e  f │
+                           │         │
+                           │ g  h  i │
+                           └         ┘
+@end group
+@group
+(%i3) display_matrix_padding_horizontal: false;
+(%o3)                         false
+(%i4) foo;
+                              ┌   ┐
+                              │abc│
+                              │   │
+(%o4)                         │def│
+                              │   │
+                              │ghi│
+                              └   ┘
+@end group
+@end example
+
+@opencatbox{Categories:}
+@category{Matrices}
+@category{Display flags and variables}
+@closecatbox
+
+@end deffn
+
+@c -----------------------------------------------------------------------------
+@anchor{display_matrix_padding_vertical}
+@deffn {Option variable} display_matrix_padding_vertical
+Default value: @code{true}
+
+When @code{display_matrix_padding_vertical} is @code{true},
+matrices are displayed with an empty line between successive rows.
+
+When @code{display_matrix_padding_vertical} is @code{false},
+matrices are not displayed with an empty line between successive rows;
+successive rows are immediately adjacent to each other.
+
+See also @mrefdot{display_matrix_padding_horizontal}
+
+Examples:
+
+@c ===beg===
+@c display_matrix_padding_vertical;
+@c foo: matrix ([a, b, c], [d, e, f], [g, h, i]);
+@c display_matrix_padding_vertical: false;
+@c foo;
+@c ===end===
+@example maxima
+@group
+(%i1) display_matrix_padding_vertical;
+(%o1)                         true
+(%i2) foo: matrix ([a, b, c], [d, e, f], [g, h, i]);
+                           ┌         ┐
+                           │ a  b  c │
+                           │         │
+(%o2)                      │ d  e  f │
+                           │         │
+                           │ g  h  i │
+                           └         ┘
+@end group
+@group
+(%i3) display_matrix_padding_vertical: false;
+(%o3)                         false
+(%i4) foo;
+                           ┌         ┐
+                           │ a  b  c │
+(%o4)                      │ d  e  f │
+                           │ g  h  i │
+                           └         ┘
+@end group
+@end example
+
+@opencatbox{Categories:}
+@category{Matrices}
+@category{Display flags and variables}
+@closecatbox
+
+@end deffn
+
+@c -----------------------------------------------------------------------------
 @anchor{matrix}
 @deffn {Function} matrix (@var{row_1}, @dots{}, @var{row_n})
 
@@ -1666,7 +1781,8 @@ See @mrefcomma{eigenvalues} @mrefcomma{eigenvectors} @mrefcomma{determinant}@w{}
 @mrefcomma{echelon} and @mrefdot{rank}
 @c CHECK -- WE PROBABLY WANT EXHAUSTIVE LIST HERE
 
-@mref{display_matrix_brackets} governs the display of matrices.
+Option variables @mref{display_matrix_brackets} and @mref{display_matrix_padding_vertical}
+govern the display of matrices.
 
 Examples:
 

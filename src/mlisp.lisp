@@ -448,6 +448,18 @@ is EQ to FNNAME if the latter is non-NIL."
 ;; option variable $errormsg is used as a local variable in a block.
 (defvar *$errormsg-value* nil)
 
+(defun symbol-values-in (expr)
+  (if (atom expr)
+    (if (symbolp expr)
+      (if (boundp expr)
+        ;; Do not take the actual value of $errormsg. It is
+        ;; always NIL at this point, but the value which
+        ;; is stored in *$errormsg-value*.
+        (if (eq expr '$errormsg) *$errormsg-value* (symbol-value expr))
+        munbound)
+      expr)
+    (cons (car expr) (mapcar 'symbol-values-in (cdr expr)))))
+
 (defun mbind-doit (lamvars fnargs fnname)
   "Makes a new frame where the variables in the list LAMVARS are bound
 to the corresponding elements in FNARGS.  Note that these elements are
@@ -471,16 +483,9 @@ wrapper for this."
 			    (cons (ncons fnname) lamvars))
 			(cons '(mlist) fnargs)))))
     (let ((var (car vars)))
-      (if (not (symbolp var))
+      (when (not (every 'symbolp (cdr ($listofvars var))))
 	  (merror (intl:gettext "Only symbols can be bound; found: ~M") var))
-      (let ((value (if (boundp var)
-                       (if (eq var '$errormsg)
-                           ;; Do not take the actual value of $errormsg. It is
-                           ;; always NIL at this point, but the value which
-                           ;; is stored in *$errormsg-value*.
-                           *$errormsg-value*
-                           (symbol-value var))
-                       munbound)))
+      (let ((value (symbol-values-in var)))
 	(mset var (car args))
 	(psetq bindlist (cons var bindlist)
 	       mspeclist (cons value mspeclist))))))
@@ -493,7 +498,7 @@ wrapper for this."
         ;; At this point store the value of $errormsg in a global. The macro
         ;; with-$error sets the value of $errormsg to NIL, but we need the
         ;; actual value in the routine mbind-doit.
-        (setq *$errormsg-value* $errormsg)
+        (setq *$errormsg-value* (if (boundp '$errormsg) $errormsg munbound))
 	(unwind-protect
 	     (prog1
 		 (with-$error (mbind-doit lamvars fnargs fnname))
@@ -522,12 +527,14 @@ wrapper for this."
   (finish-output)
   (values))
 
+(defun munbind-makunbound (var)
+  (makunbound var)
+  (setf $values (delete var $values :count 1 :test #'eq)))
+
 (defun munbind (vars)
   (dolist (var (reverse vars))
-    (cond ((eq (car mspeclist) munbound)
-	   (makunbound var)
-	   (setf $values (delete var $values :count 1 :test #'eq)))
-	  (t (let ((munbindp t)) (mset var (car mspeclist)))))
+    (let ((munbindp t))
+      (mset var (car mspeclist)))
     (setq mspeclist (cdr mspeclist) bindlist (cdr bindlist))))
 
 ;;This takes the place of something like
@@ -628,6 +635,9 @@ wrapper for this."
 	      (if (mget x '$numer)
 		  (merror (intl:gettext "assignment: cannot assign to ~M; it is a declared numeric quantity.") x)
 		  (merror (intl:gettext "assignment: cannot assign to ~M") x)))
+	    (when (and munbindp (eq y munbound))
+	      (munbind-makunbound x)
+          (return nil))
 	    (let ((f (get x 'assign)))
 	      (if (and f (or (not (eq x y))
 			     (member f '(neverset) :test #'eq)))
@@ -2229,11 +2239,31 @@ wrapper for this."
                        (merror (intl:gettext "do loop: illegal 'return': ~M") (car val)))
                       (t (return (car val))))))))
 
+(defun key-value-pairs-given-key-lists (x key-lists)
+  (mapcar (lambda (l) (list '(mlist) l (mfuncall '$arrayapply x l))) key-lists))
+
+(defun key-value-pairs-for-hashed-array (x)
+  (let*
+    ((1-d-hash-table (gethash 'dim1 x))
+     (info (mfuncall '$arrayinfo x))
+     (keys-raw (cdddr info))
+     (key-lists (if 1-d-hash-table (mapcar (lambda (y) (cons '(mlist) (list y))) keys-raw) keys-raw)))
+    (key-value-pairs-given-key-lists x key-lists)))
+
+(defun key-value-pairs-for-undeclared-array (x)
+  (let*
+    ((info (mfuncall '$arrayinfo x))
+     (key-lists (cdddr info)))
+    (key-value-pairs-given-key-lists x key-lists)))
+
 (defmspec mdoin (form)
   (setq form (cdr form))
   (funcall #'(lambda  (mdop my-var set test action)
 	       (setq set (if ($atom (setq set (format1 (meval (cadr form)))))
-			     (merror (intl:gettext "do loop: 'in' argument must be a nonatomic expression; found: ~M") set)
+			     (cond
+			       ((hash-table-p set) (key-value-pairs-for-hashed-array set))
+			       ((safe-mget set 'hashar) (key-value-pairs-for-undeclared-array set))
+			       (t (merror (intl:gettext "do loop: atomic 'in' argument must be a hashed or undeclared array; found: ~M") set)))
 			     (margs set))
 		     test (list '(mor)
 				(if (car (cddddr form))

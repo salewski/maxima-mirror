@@ -35,7 +35,7 @@
 (defmvar $lmxchar "["  "Character used for drawing the left edge of a matrix.")
 (defmvar $rmxchar "]"  "Character used for drawing the right edge of a matrix.")
 
-(defvar linearray (make-array 80. :initial-element nil))
+(defvar linearray (make-array 1000. :initial-element nil))
 
 (defun maxima-display (form &key (stream *standard-output*) )
   (let ((*standard-output* stream))
@@ -50,9 +50,6 @@
 	     (cond (*alt-display2d* (apply *alt-display2d* form ()))
 		   (t
 		    (let ((displayp t)
-			  (linearray (if displayp
-					 (make-array 80. :initial-element nil)
-					 linearray))
 			  (mratp (checkrat form))
 			  (maxht     1) (maxdp   0) (width   0)
 			  (height    0) (depth   0) (level   0) (size   2)
@@ -1201,6 +1198,8 @@
 (displa-def %matrix dim-$matrix)
 
 (defmvar $display_matrix_brackets t)
+(defmvar $display_matrix_padding_vertical t)
+(defmvar $display_matrix_padding_horizontal t)
 
 (defun dim-$matrix (form result)
   (prog (dmstr rstr cstr consp cols)
@@ -1220,14 +1219,14 @@
      (do ((r (cdr form) (cdr r)) (h1 0) (d1 0))
 	 ((or consp (null r))
 	  (setq width 0)
-	  (do ((cs cstr (cdr cs))) ((null cs)) (setq width (+ 2 (car cs) width)))
+	  (do ((cs cstr (cdr cs))) ((null cs)) (setq width (+ (if $display_matrix_padding_horizontal 2 0) (car cs) width)))
 	  (if (display2d-unicode-enabled)
 	    (setq h1 (1+ (+ h1 d1)) depth (truncate h1 2) height (- h1 depth))
 	    (setq h1 (1- (+ h1 d1)) depth (truncate h1 2) height (- h1 depth))))
        (do ((c (cdar r) (cdr c))
 	    (nc dmstr (cdr nc))
 	    (cs cstr (cdr cs)) (dummy) (h2 0) (d2 0))
-	   ((null c) (setq d1 (+ d1 h1 h2) h1 (1+ d2)))
+	   ((null c) (setq d1 (+ (if (or $display_matrix_padding_vertical (null rstr)) d1 (1- d1)) h1 h2) h1 (1+ d2)))
 	 (setq dummy (dimension (car c) nil 'mparen 'mparen nil 0)
 	       h2 (max h2 height) d2 (max d2 depth))
 	 (cond ((not (checkfit (+ 14. width))) (setq consp t) (return nil))
@@ -1244,7 +1243,7 @@
 
 (defun matout (dmstr cstr rstr result)
   (when $display_matrix_brackets (push `(d-matrix left ,height ,depth) result))
-  (push #\space result)
+  (when $display_matrix_padding_horizontal (push #\space result))
   (do ((d dmstr (cdr d)) (c cstr (cdr c)) (w 0 0))
       ((null d))
     (do ((d (car d) (cdr d)) (r rstr (cdr r))) ((null d))
@@ -1252,7 +1251,7 @@
       (rplaca (cdar d) (- (truncate (- (car c) (caar d)) 2) w))
       (setq w (truncate (+ (car c) (caar d)) 2))
       (rplaca d (cdar d)))
-    (setq result (cons (list (+ 2 (- (car c) w)) 0) (nreconc (car d) result))))
+    (setq result (cons (list (+ (if $display_matrix_padding_horizontal 2 (if (cdr c) 0 1)) (- (car c) w)) 0) (nreconc (car d) result))))
   (if $display_matrix_brackets
     (setq width (+ 2 width))
     (when $display2d_unicode
@@ -1283,7 +1282,7 @@
 (displa-def mbox dim-mbox-or-mlabox)
 (displa-def %mbox dim-mbox-or-mlabox)
 
-(defun dim-mbox-or-mlabox (form result &aux dummy)
+(defun dim-mbox-or-mlabox (form result)
   (if (= (length form) 3)
     (dim-mlabox form result)
     (dim-mbox form result)))
