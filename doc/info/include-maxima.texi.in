@@ -217,6 +217,7 @@ and develop DOE Macsyma, now called Maxima.
 * Package pslq::                   PSLQ algorithm for integer relations among inexact numbers
 * Package pytranslate::            Maxima to Python Translation
 * Package quantum_computing::      Quantum computing circuits simulator.
+* Package rk_adaptive::            Solves ODEs numerically with adaptive step size
 * Package ratpow::                 Determine the coefficients of polynoms.
 * Package romberg::                Romberg method for numerical integration.
 * Package simplex::                Linear programming.
@@ -1057,6 +1058,10 @@ Understanding maxima's output
 @node Package ratpow, Package romberg, Package quantum_computing, Top
 @chapter Package ratpow
 @include ratpow.texi
+
+@node Package rk_adaptive, Package romberg, Package ratpow, Top
+@chapter Package rk_adaptive
+@include rk_adaptive.texi
 
 @node Package romberg, Package simplex, Package ratpow, Top
 @chapter Package romberg
