@@ -1,3 +1,4 @@
+/* Todo: We could sometimes recycle values of offset_1step or offset_2steps */
 rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
     [
         result,
@@ -14,6 +15,7 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
         nexttime,
         minstepwarn:false
     ],
+    /* Interpret the optional parameters */
     for i in params do
     (
         if lhs(i)='maxstep then maxstep:rhs(i) else
@@ -32,8 +34,12 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
     if not listp(expr) then expr:[expr],
     if not listp(vars) then vars:[vars],
     if not listp(vars_initval) then vars_initval:[vars_initval],
+
+    /* Add the starting point to the result */
     point:vars_initval,
     result:[append([startval],vars_initval)],
+
+    /* Now calculate the other points */
     do (
         do (
             /* Calculate the next 2 points */
@@ -53,6 +59,7 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
             else if abserr<1/4*maxabserr then
                 timestep:sgn*min(maxstep*sgn,timestep*2),
 
+            /* See if we are happy with the results for this point*/
             if timestep=minstep then
             (
                 minstepwarn:true,
@@ -66,5 +73,6 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
         if sgn*time>sgn*endval then return()
     ),
     if minstepwarn = true then warning("rk_adaptive: Didn't meet the tolerance goal."),
+    /* Convert the result into a more user-friendly format (tm)*/
     args(transpose(apply('matrix,reverse(result))))
 );
