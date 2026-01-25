@@ -32,7 +32,9 @@ The following optional parameters are accepted:
 @item @code{maxstep=num}: The maximum step size to be used.
 @item @code{minstep=num}: The minimum step size to be used.
 @item @code{timestep_initial=num}: The initial guess for the optimum time step to start with.
-@item @code{maxerr=num}: The maximum error of the resulting curves.
+@item @code{maxabserr=num}: The maximum absolute error of the resulting curves.
+@item @code{maxrelerr=num}: The maximum relative error of the resulting curves as a
+      fallback for variables with big values for which @val{maxabserr} might be too sensitive.
 @end itemize
 
 See also @mrefdot{rk}

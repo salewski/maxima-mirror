@@ -7,8 +7,9 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
         offset_2steps,
         time:startval,
         timestep:float((endval-startval)/1000),
-        abserr,
+        err,
         maxabserr:1e-6,
+        maxrelerr:1e-6,
         maxstep:(endval-startval)/100,
         minstep:(endval-startval)/1000000,
         sgn,
@@ -21,10 +22,12 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
         if lhs(i)='maxstep then maxstep:rhs(i) else
         if lhs(i)='minstep then minstep:rhs(i) else
         if lhs(i)='timestep_initial then timestep:rhs(i) else
-        if lhs(i)='maxerr then maxabserr:rhs(i) else
+        if lhs(i)='maxabserr then maxabserr:rhs(i) else
+        if lhs(i)='maxrelerr then maxrelerr:rhs(i) else
         warning("rk_adaptive: Found a unknown param")
     ),
-    if maxabserr <= 0 then error("rk_adaptive: Illegal value for maxerr"),
+    if maxrelerr <= 0 then error("rk_adaptive: Illegal value for maxrelerr"),
+    if maxabserr <= 0 then error("rk_adaptive: Illegal value for maxabserr"),
     if maxstep <= 0 then error("rk_adaptive: Illegal value for maxstep"),
     if minstep <= 0 then error("rk_adaptive: Illegal value for minstep"),
     if timestep_initial = 0 then error("rk_adaptive: Illegal value for timestep_initial"),
@@ -49,14 +52,28 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
             offset_2steps:offset_1step+sgn*subst(var=time+timestep*2,
                 subst(map("=",vars,point+offset_1step),expr)
             )*timestep,
-            /* Calculate the error */
-            abserr:apply('max,cabs(2*offset_1step-offset_2steps)),
+            /* Calculate the error. Err=1 is the limit */
+            err:apply('max,
+                map(
+                    lambda(
+                        [pnt,offs_1step,offs_2steps],
+                        if cabs(pnt) > maxrelerr then
+                           min(
+                               cabs(2*offs_1step-offs_2steps)/maxabserr,
+                               cabs((offs_1step-offs_2steps)/pnt)/maxrelerr
+                           )
+                        else
+                            cabs(2*offs_1step-offs_2steps)/maxabserr
+                    ),
+                    point,offset_1step,offset_2steps
+                )
+            ),
             /* Save the time offset_1step is at */
             nexttime:time+timestep,
             /* See if we should adjust the time step width */
-            if abserr>maxabserr then
+            if err>1.0 then
                 timestep:sgn*max(sgn*timestep/2,sgn*minstep)
-            else if abserr<1/4*maxabserr then
+            else if err<.25 then
                 timestep:sgn*min(maxstep*sgn,timestep*2),
 
             /* See if we are happy with the results for this point*/
@@ -65,7 +82,7 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
                 minstepwarn:true,
                 return()
             ),
-            if abserr<=maxabserr then return()
+            if err<=1 then return()
         ),
         time:nexttime,
         push(append([time],point+offset_1step),result),
