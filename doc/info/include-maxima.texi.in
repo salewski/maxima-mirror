@@ -1063,7 +1063,7 @@ Understanding maxima's output
 @chapter Package rk_adaptive
 @include rk_adaptive.texi
 
-@node Package romberg, Package simplex, Package ratpow, Top
+@node Package romberg, Package simplex, Package rk_adaptive, Top
 @chapter Package romberg
 @include romberg.texi
 
