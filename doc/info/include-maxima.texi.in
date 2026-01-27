@@ -1055,7 +1055,7 @@ Understanding maxima's output
 @chapter Package quantum_computing
 @include quantum_computing.texi
 
-@node Package ratpow, Package romberg, Package quantum_computing, Top
+@node Package ratpow, Package rk_adaptive, Package quantum_computing, Top
 @chapter Package ratpow
 @include ratpow.texi
 
