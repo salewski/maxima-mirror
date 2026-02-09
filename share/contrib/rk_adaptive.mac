@@ -13,11 +13,13 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
         maxstep:abs(endval-startval)/100,
         minstep:abs(endval-startval)/1000000,
         sgn:1,
-        minstepwarn:false,
-        keep_1step:false
+        minstepduration:0,
+        keep_1step:false,
+        debugmode:false,
+        file,
+        debugfile
     ],
     mode_declare(keep_1step,boolean),
-    mode_declare(minstepwarn,boolean),
     mode_declare(sgn,integer),
 
     if endval >= startval then sgn:1 else sgn:-1,
@@ -25,14 +27,17 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
     /* Interpret the optional parameters */
     for i in params do
     (
-        if not numberp(rhs(i)) then error (sconcat("rk_adaptive: Expected a number for parameter ",
-            lhs(i))),
-        if lhs(i)='maxstep then maxstep:rhs(i) else
-        if lhs(i)='minstep then minstep:rhs(i) else
+        if lhs(i)='debugfile then (debugfile:rhs(i),debugmode:true) else
+        (
+            if not numberp(rhs(i)) then error (sconcat("rk_adaptive: Expected a number for parameter ",
+                lhs(i))),
+            if lhs(i)='maxstep then maxstep:rhs(i) else
+            if lhs(i)='minstep then minstep:rhs(i) else
                 if lhs(i)='timestep_initial then timestep:rhs(i) else
-        if lhs(i)='maxabserr then maxabserr:rhs(i) else
-        if lhs(i)='maxrelerr then maxrelerr:rhs(i) else
-        warning("rk_adaptive: Found a unknown param")
+            if lhs(i)='maxabserr then maxabserr:rhs(i) else
+            if lhs(i)='maxrelerr then maxrelerr:rhs(i) else
+            warning("rk_adaptive: Found a unknown param")
+        )
     ),
     if maxrelerr <= 0 then error("rk_adaptive: Illegal value for maxrelerr"),
     if maxabserr <= 0 then error("rk_adaptive: Illegal value for maxabserr"),
@@ -45,6 +50,12 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
     if not listp(vars) then vars:[vars],
     if not listp(vars_initval) then vars_initval:[vars_initval],
 
+    /* Empty the debug file, if it is in use */
+    if debugmode then
+    (
+        file:openw(debugfile),
+        close(file)
+    ),
     /* Add the starting point to the result */
     point:vars_initval,
     result:[append([startval],vars_initval)],
@@ -76,6 +87,22 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
                     point,deriv_1step,deriv_2steps
                 )
             ),
+            if debugmode then
+            (
+                file:opena(debugfile),
+                printf(file,"~a~%",
+                    sconcat(
+                        var,"=",time,
+                        ",point=",point,
+                        ",deriv_1step=",deriv_1step,
+                        ",deriv_2steps=",deriv_2steps,
+                        ",timestep=",timestep,
+                        ",err=",err
+                    )
+                ),
+                close(file)
+            ),
+            
             /* See if we should adjust the time step width */
             if err>1.0 then
             (
@@ -87,7 +114,7 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
                     time:time+timestep,
                     push(append([time],point+deriv_1step*timestep),result),
                     point:point+deriv_1step*timestep,
-                    minstepwarn:true,
+                    minstepduration:minstepduration+timestep,
                     return()
                 )
             )
@@ -112,7 +139,13 @@ rk_adaptive(expr,vars,vars_initval,var,startval,endval,[params]):=block(
         ),
         if sgn*time>sgn*endval then return()
     ),
-    if minstepwarn = true then warning("rk_adaptive: Didn't meet the tolerance goal."),
+    if minstepduration>0 then warning(
+        sconcat(
+            "rk_adaptive: Ignored the tolerance goal for ",
+            minstepduration,
+            " units of ",var
+        )
+    ),
     /* Convert the result into a more user-friendly format (tm)*/
     args(transpose(apply('matrix,reverse(result))))
 );
