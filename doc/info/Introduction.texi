@@ -28,7 +28,7 @@ a string.
 The question mark @mref{?} (exact search) and double question mark @mref{??}@w{}
 (inexact search) are abbreviations for @code{describe}:
 
-@example maxima
+@example
 (%i1) ?? integ
  0: Functions and Variables for Elliptic Integrals
  1: Functions and Variables for Integration
