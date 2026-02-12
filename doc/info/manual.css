@@ -162,7 +162,12 @@ dd { margin-left: 0.5em }
     padding: 10px;
     display: flex;
     flex-wrap: wrap;
-    /* Hide commas via font size trick */
+
+    /*
+     * Texinfo adds commas between the buttons and labels, and we
+     * don't want those displayed.  Hide these commas via font size
+     *  trick.
+     */
     font-size: 0
 }
 
