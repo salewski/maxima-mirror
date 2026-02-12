@@ -279,7 +279,7 @@ wc_defaultvaluespertol:3;
 defstruct(wc_rssparams(sigma,mu));
 
 /* Determines the rss parameters of the tolerance of x */
-wc_getrssparams(x):=block([tols:[],derivates_linearized,derivates,sigmaval,meanval],
+wc_getrssparams(x):=block([tols:[],derivates_linearized,derivates,sigmaval,meanval,diffofwctol],
     /* Compile a list of tolerances */
     for i in listofvars(x) do
         if not(freeof('tol,i)) then
@@ -287,13 +287,15 @@ wc_getrssparams(x):=block([tols:[],derivates_linearized,derivates,sigmaval,meanv
     /* Create the mean value */
     meanval:wc_typicalvalues(x),
     /* Create a list of derivatives, linearized over the point that all tol[x] are 0.*/
-    derivates:makelist(block([derivate:limit(%wc_typicalvalues(diff(x,i),i),i,0)],
+    derivates:makelist(block(
+        [diffofwctol:%wc_typicalvalues(diff(x,i),i),derivate],
+        derivate:limit(diffofwctol,i,0),
         if derivate='ind then block([wc_poslimit,wc_neglimit],
            /* We have two derivates. As we are performing a worst case
               calculation we make a worst-case assumption and use the bigger
               one ignoring its sign */
-           wc_poslimit:limit(wc_diffofwctol,wc_tol,0,'plus),
-           wc_neglimit:limit(wc_diffofwctol,wc_tol,0,'minus),
+           wc_poslimit:limit(diffofwctol,i,0,'plus),
+           wc_neglimit:limit(diffofwctol,i,0,'minus),
            derivate:max(abs(wc_poslimit),abs(wc_neglimit)),
            /* If we can determine which of the limits is bigger we can
               do without the abs() */
