@@ -845,6 +845,18 @@ if test x"${enable_build_docs}" = xtrue ; then
             AC_MSG_RESULT([${makeinfo_version_string} (6.8 or later preferred)])
 	fi
 
+        dnl If makeinfo supports the class for the navigation panel, enable
+        dnl CSS styling for the panel.
+        if test ${makeinfo_version} -ge 70290; then
+           AC_MSG_RESULT([  Enabled Custom CSS for navigation panel for HTML manual])
+           NAV_PANEL_CSS="$(cat | tr -s '\n' ' ' <<EOF
+<link rel="stylesheet"
+      type="text/css"
+      href="nav-panel.css">
+EOF
+)"
+        fi
+        
         dnl Enable JS highlighting of examples in the HTML docs.
         dnl The API has changed between 6.8 and 7.0, so we need to substitute the
         dnl the appropriate things.
@@ -957,6 +969,7 @@ EOF
         AC_SUBST(USE_CUSTOM_HILITE)
         AC_SUBST(CUSTOM_PYGMENTS)
         AC_SUBST(CUSTOM_PYGMENTS_CSS)
+        AC_SUBST(NAV_PANEL_CSS)
         TEXI2HTML=texi2html.init
         AC_SUBST(TEXI2HTML)
 
