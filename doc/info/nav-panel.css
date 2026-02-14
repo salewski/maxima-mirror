@@ -1,5 +1,8 @@
 /*
  * Style for the texinfo navigation panel (Next/Previous/Up)
+ *
+ * This requires texinfo 7.2.90 or later which added the nessary classes
+ * to be able to do this styling.
  */
 
 /* 1. Nav Panel Container:  Background Color and Setup */
