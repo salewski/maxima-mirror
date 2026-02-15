@@ -845,10 +845,9 @@ if test x"${enable_build_docs}" = xtrue ; then
             AC_MSG_RESULT([${makeinfo_version_string} (6.8 or later preferred)])
 	fi
 
-        dnl If makeinfo supports the class for the navigation panel, enable
-        dnl CSS styling for the panel.
+        dnl If makeinfo supports the classes for the navigation panel, enable
+        dnl CSS styling for the panel.  This support was added in 7.2.90.
         if test ${makeinfo_version} -ge 70290; then
-           AC_MSG_RESULT([  Enabled Custom CSS for navigation panel for HTML manual])
            NAV_PANEL_CSS="$(cat | tr -s '\n' ' ' <<EOF
 <link rel="stylesheet"
       type="text/css"
