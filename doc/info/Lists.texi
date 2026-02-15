@@ -1668,6 +1668,249 @@ Examples:
 @end deffn
 
 @c -----------------------------------------------------------------------------
+@anchor{ranks}
+@deffn {Function} ranks @
+@fname{ranks} (@var{L}, @var{P}, @var{ties_method}) @
+@fname{ranks} (@var{L}, @var{P}) @
+@fname{ranks} (@var{L})
+
+Returns the ranks of the elements of the list @var{L} as ordered by the predicate @var{P},
+and handling elements which are equivalent under @var{P} by @var{ties_method}.
+
+If @var{ties_method} is absent, @code{mean_rank} is assumed.
+Note that if @var{ties_method} is present,
+then @var{P} must also be present.
+
+If @var{P} is absent, @code{orderlessp} is assumed.
+
+Elements @code{@var{L}[i]} and @code{@var{L}[j]} are said to be equivalent under @var{P}
+if neither @code{@var{P}(@var{L}[i], @var{L}[j])} nor @code{@var{P}(@var{L}[j], @var{L}[i])}.
+An element @code{@var{L}[j]} is said to precede @code{@var{L}[i]} under @var{P}
+if @code{@var{P}(@var{L}[j], @var{L}[i])}.
+
+Let @code{m} be the number of elements equivalent to @code{@var{L}[i]}.
+Let @code{n} be the number of elements preceding @code{@var{L}[i]}.
+The rank of the @code{i}-th element is @code{n}
+plus a term which accounts for equivalent elements as follows.
+
+@itemize @bullet
+@item
+@code{mean_rank} Rank is @code{n} plus @code{(m + 1)/2}.
+@item
+@code{min_rank} Rank is @code{n} plus 1.
+@item
+@code{max_rank} Rank is @code{n} plus @code{m}.
+@item
+@code{distinct_ranks} Let @code{@var{L}[j[1]], @var{L}[j[2]], ..., @var{L}[j[m]]} be the elements of @var{L}
+which are equivalent to @code{@var{L}[i]},
+such that @code{j[1] < j[2] < ... < j[m]}.
+That is, the equivalent elements are indexed in the order in which they appear in @var{L}.
+Rank is @code{n} plus @code{k} where @code{j[k] = i}.
+@end itemize
+
+When @code{@var{L}[i]} is not equivalent to any other element,
+all four methods yield the same result, namely @code{n} plus 1.
+
+When no two elements of @var{L} are equivalent,
+there are no ties,
+and @code{ranks} returns the inverse permutation of @code{ordering}.
+
+Examples:
+
+@code{ranks} returns the ranks of the elements of the list @var{L} as ordered by the predicate @var{P},
+and handling elements which are equivalent under @var{P} by @var{ties_method}.
+If not specified, @var{P} is assumed to be @code{orderlessp},
+and @var{ties_method} is assumed to be @code{mean_rank}.
+Sort the list and inspect the ranks to see the effect of @code{mean_rank} more clearly.
+
+@c ===beg===
+@c L: [ sin(z), cos(y), tan(x), 1 - x, f(u), cos(y), g(a), 1/h, tanh(s), sin(z), 1 - x, sec(u) ];
+@c L1: sort (L);
+@c ranks (L1);
+@c ranks (L);
+@c ===end===
+@example maxima
+@group
+(%i1) L: [ sin(z), cos(y), tan(x), 1 - x, f(u), cos(y), g(a), 1/h, tanh(s), sin(z), 1 - x, sec(u) ];
+                                                          1
+(%o1) [sin(z), cos(y), tan(x), 1 - x, f(u), cos(y), g(a), -, 
+                                                          h
+                                  tanh(s), sin(z), 1 - x, sec(u)]
+@end group
+@group
+(%i2) L1: sort (L);
+             1
+(%o2) [g(a), -, tanh(s), f(u), sec(u), 1 - x, 1 - x, tan(x), 
+             h
+                                  cos(y), cos(y), sin(z), sin(z)]
+@end group
+@group
+(%i3) ranks (L1);
+                           13  13     19  19  23  23
+(%o3)      [1, 2, 3, 4, 5, --, --, 8, --, --, --, --]
+                           2   2      2   2   2   2
+@end group
+@group
+(%i4) ranks (L);
+            23  19     13     19           23  13
+(%o4)      [--, --, 8, --, 4, --, 1, 2, 3, --, --, 5]
+            2   2      2      2            2   2
+@end group
+@end example
+
+@var{ties_method} is @code{mean_rank}.
+Sort by @code{sgreaterp} so that @code{"aa"} has the highest rank.
+Sort the list and inspect the ranks to see the effect of @code{mean_rank} more clearly.
+
+@c ===beg===
+@c L: [ "dd", "aa", "zz", "aa", "bb", "zz", "cc", "aa", "aa", "cc", "zz", "aa" ];
+@c L1: sort (L, 'sgreaterp);
+@c ranks (L1, 'sgreaterp, 'mean_rank);
+@c ranks (L, 'sgreaterp, 'mean_rank);
+@c ===end===
+@example maxima
+@group
+(%i1) L: [ "dd", "aa", "zz", "aa", "bb", "zz", "cc", "aa", "aa", "cc", "zz", "aa" ];
+(%o1)   [dd, aa, zz, aa, bb, zz, cc, aa, aa, cc, zz, aa]
+@end group
+@group
+(%i2) L1: sort (L, 'sgreaterp);
+(%o2)   [zz, zz, zz, dd, cc, cc, bb, aa, aa, aa, aa, aa]
+@end group
+@group
+(%i3) ranks (L1, 'sgreaterp, 'mean_rank);
+                        11  11
+(%o3)      [2, 2, 2, 4, --, --, 7, 10, 10, 10, 10, 10]
+                        2   2
+@end group
+@group
+(%i4) ranks (L, 'sgreaterp, 'mean_rank);
+                                11          11
+(%o4)      [4, 10, 2, 10, 7, 2, --, 10, 10, --, 2, 10]
+                                2           2
+@end group
+@end example
+
+@var{ties_method} is @code{min_rank}.
+Sort by @code{sgreaterp} so that @code{"aa"} has the highest rank.
+Sort the list and inspect the ranks to see the effect of @code{min_rank} more clearly.
+
+@c ===beg===
+@c L: [ "dd", "aa", "zz", "aa", "bb", "zz", "cc", "aa", "aa", "cc", "zz", "aa" ];
+@c L1: sort (L, 'sgreaterp);
+@c ranks (L1, 'sgreaterp, 'min_rank);
+@c ranks (L, 'sgreaterp, 'min_rank);
+@c ===end===
+@example maxima
+@group
+(%i1) L: [ "dd", "aa", "zz", "aa", "bb", "zz", "cc", "aa", "aa", "cc", "zz", "aa" ];
+(%o1)   [dd, aa, zz, aa, bb, zz, cc, aa, aa, cc, zz, aa]
+@end group
+@group
+(%i2) L1: sort (L, 'sgreaterp);
+(%o2)   [zz, zz, zz, dd, cc, cc, bb, aa, aa, aa, aa, aa]
+@end group
+@group
+(%i3) ranks (L1, 'sgreaterp, 'min_rank);
+(%o3)         [1, 1, 1, 4, 5, 5, 7, 8, 8, 8, 8, 8]
+@end group
+@group
+(%i4) ranks (L, 'sgreaterp, 'min_rank);
+(%o4)         [4, 8, 1, 8, 7, 1, 5, 8, 8, 5, 1, 8]
+@end group
+@end example
+
+@var{ties_method} is @code{max_rank}.
+Sort by @code{sgreaterp} so that @code{"aa"} has the highest rank.
+Sort the list and inspect the ranks to see the effect of @code{max_rank} more clearly.
+
+@c ===beg===
+@c L: [ "dd", "aa", "zz", "aa", "bb", "zz", "cc", "aa", "aa", "cc", "zz", "aa" ];
+@c L1: sort (L, 'sgreaterp);
+@c ranks (L1, 'sgreaterp, 'max_rank);
+@c ranks (L, 'sgreaterp, 'max_rank);
+@c ===end===
+@example maxima
+@group
+(%i1) L: [ "dd", "aa", "zz", "aa", "bb", "zz", "cc", "aa", "aa", "cc", "zz", "aa" ];
+(%o1)   [dd, aa, zz, aa, bb, zz, cc, aa, aa, cc, zz, aa]
+@end group
+@group
+(%i2) L1: sort (L, 'sgreaterp);
+(%o2)   [zz, zz, zz, dd, cc, cc, bb, aa, aa, aa, aa, aa]
+@end group
+@group
+(%i3) ranks (L1, 'sgreaterp, 'max_rank);
+(%o3)       [3, 3, 3, 4, 6, 6, 7, 12, 12, 12, 12, 12]
+@end group
+@group
+(%i4) ranks (L, 'sgreaterp, 'max_rank);
+(%o4)       [4, 12, 3, 12, 7, 3, 6, 12, 12, 6, 3, 12]
+@end group
+@end example
+
+@var{ties_method} is @code{distinct_ranks}.
+Sort by @code{sgreaterp} so that @code{"aa"} has the highest rank.
+Sort the list and inspect the ranks to see the effect of @code{distinct_ranks} more clearly.
+
+@c ===beg===
+@c L: [ "dd", "aa", "zz", "aa", "bb", "zz", "cc", "aa", "aa", "cc", "zz", "aa" ];
+@c L1: sort (L, 'sgreaterp);
+@c ranks (L1, 'sgreaterp, 'distinct_ranks);
+@c ranks (L, 'sgreaterp, 'distinct_ranks);
+@c ===end===
+@example maxima
+@group
+(%i1) L: [ "dd", "aa", "zz", "aa", "bb", "zz", "cc", "aa", "aa", "cc", "zz", "aa" ];
+(%o1)   [dd, aa, zz, aa, bb, zz, cc, aa, aa, cc, zz, aa]
+@end group
+@group
+(%i2) L1: sort (L, 'sgreaterp);
+(%o2)   [zz, zz, zz, dd, cc, cc, bb, aa, aa, aa, aa, aa]
+@end group
+@group
+(%i3) ranks (L1, 'sgreaterp, 'distinct_ranks);
+(%o3)        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+@end group
+@group
+(%i4) ranks (L, 'sgreaterp, 'distinct_ranks);
+(%o4)        [4, 8, 1, 9, 7, 2, 5, 10, 11, 6, 3, 12]
+@end group
+@end example
+
+When no two elements of @var{L} are equivalent,
+there are no ties,
+and @code{ranks} returns the inverse permutation of @code{ordering}.
+Sort by @code{sgreaterp} so that @code{"ab"} has the highest rank.
+
+@c ===beg===
+@c L: [ "xyz", "z", "abc", "bc", "ab", "wyx", "tuvw", "ghi" ];
+@c R: ranks (L, 'sgreaterp);
+@c O: ordering (L, 'sgreaterp);
+@c is (R = perm_inverse (O));
+@c ===end===
+@example maxima
+@group
+(%i1) L: [ "xyz", "z", "abc", "bc", "ab", "wyx", "tuvw", "ghi" ];
+(%o1)         [xyz, z, abc, bc, ab, wyx, tuvw, ghi]
+@end group
+@group
+(%i2) R: ranks (L, 'sgreaterp);
+(%o2)               [2, 1, 7, 6, 8, 3, 4, 5]
+@end group
+@group
+(%i3) O: ordering (L, 'sgreaterp);
+(%o3)               [2, 1, 6, 7, 8, 4, 3, 5]
+@end group
+@group
+(%i4) is (R = perm_inverse (O));
+(%o4)                         true
+@end group
+@end example
+
+@end deffn
+
+@c -----------------------------------------------------------------------------
 @anchor{rest}
 @deffn  {Function} rest @
 @fname{rest} (@var{expr}, @var{n}) @
