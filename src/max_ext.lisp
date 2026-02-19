@@ -1,8 +1,9 @@
 ;;Autoloads for maxima
 (in-package :maxima)
 
-($auto_mexpr '$ordering "wilcoxon.mac") ;; MOVE ORDERING OUT OF WILCOXON.MAC AND INTO ORDERING.MAC
-($auto_mexpr '$ranks "wilcoxon.mac") ;; MOVE RANKS OUT OF WILCOXON.MAC AND INTO RANKS.MAC
+($auto_mexpr '$ordering "list_operations.mac")
+($auto_mexpr '$ranks "list_operations.mac")
+($auto_mexpr '$find_runs "list_operations.mac")
 
 ($auto_mexpr '$accumulate "accumulate.mac")
 

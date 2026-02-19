@@ -241,6 +241,8 @@
     ((mlist simp) "rtest_romberg"
      ((mlist simp) 18 20))
     "rtest_wilcoxon"
+    "rtest_accumulate"
+    "rtest_list_operations"
     "rtest_bitwise"
     "rtest_gf"
     "rtest_arag"
