@@ -74,7 +74,7 @@ maxima-info.info : maxima.texi $(maxima_TEXINFOS)
 html: index.html
 
 maxima-index.lisp: build_index.pl maxima.info
-	/usr/bin/env perl $^ ':crlf' > $@
+	/usr/bin/env perl $^ > $@
 
 # Really depends on all the individual html files, but let's assume
 # that if index.html is done, we have all the remaining html
