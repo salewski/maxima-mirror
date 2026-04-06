@@ -229,6 +229,7 @@
       hashtable)
     (stable-sort regex-matches #'string-lessp :key #'car)))
 
+#-gcl
 (defun read-info-text (dir-name parameters)
   (let*
     ((value (cdr parameters))
@@ -246,6 +247,104 @@
 	  (file-position in byte-offset)
 	  (read-sequence text in :start 0 :end char-count)
 	  text)
+      (error () (maxima::merror "Cannot find documentation for `~M': missing info file ~M~%"
+				(car parameters) (namestring path+filename))))))
+
+#+gcl
+(defun read-utf8-codepoint (stream octet-buffer)
+  "Read one UTF-8 encoded code point from STREAM, pushing each byte read
+   onto OCTET-BUFFER (an adjustable vector with a fill pointer).
+   Returns an integer code point, or NIL at end of stream."
+  (flet ((next-byte ()
+           (let ((b (read-byte stream nil nil)))
+             (when b
+               (vector-push-extend b octet-buffer))
+             b))
+         (read-continuation ()
+           (let ((b (read-byte stream nil nil)))
+             (when (null b)
+               (maxima::merror "UTF-8: unexpected end of stream in multi-byte sequence"))
+             (unless (= (logand b #xC0) #x80)
+               (maxima::merror "UTF-8: invalid continuation byte #x~2,'0X" b))
+             (vector-push-extend b octet-buffer)
+             (logand b #x3F))))
+
+    (let ((b0 (next-byte)))
+      (when (null b0)
+        (return-from read-utf8-codepoint nil))
+
+      (cond
+        ;; 1-byte: 0xxxxxxx  (U+0000–U+007F)
+        ((< b0 #x80)
+         b0)
+
+        ;; Bare continuation byte — malformed
+        ((< b0 #xC0)
+         (maxima::merror "UTF-8: unexpected continuation byte #x~2,'0X" b0))
+
+        ;; 2-byte: 110xxxxx 10xxxxxx  (U+0080–U+07FF)
+        ((< b0 #xE0)
+         (let ((cp (logior (ash (logand b0 #x1F) 6)
+                           (read-continuation))))
+           (when (< cp #x80)
+             (maxima::merror "UTF-8: overlong 2-byte sequence for U+~4,'0X" cp))
+           cp))
+
+        ;; 3-byte: 1110xxxx 10xxxxxx 10xxxxxx  (U+0800–U+FFFF)
+        ((< b0 #xF0)
+         (let ((cp (logior (ash (logand b0 #x0F) 12)
+                           (ash (read-continuation) 6)
+                           (read-continuation))))
+           (when (< cp #x800)
+             (maxima::merror "UTF-8: overlong 3-byte sequence for U+~4,'0X" cp))
+           (when (<= #xD800 cp #xDFFF)
+             (maxima::merror "UTF-8: surrogate code point U+~4,'0X is not valid" cp))
+           cp))
+
+        ;; 4-byte: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx  (U+10000–U+10FFFF)
+        ((< b0 #xF8)
+         (let ((cp (logior (ash (logand b0 #x07) 18)
+                           (ash (read-continuation) 12)
+                           (ash (read-continuation) 6)
+                           (read-continuation))))
+           (when (< cp #x10000)
+             (maxima::merror "UTF-8: overlong 4-byte sequence for U+~6,'0X" cp))
+           (when (> cp #x10FFFF)
+             (maxima::merror "UTF-8: code point U+~6,'0X out of Unicode range" cp))
+           cp))
+
+        (t
+         (maxima::merror "UTF-8: invalid leading byte #x~2,'0X" b0))))))
+
+#+gcl
+(defun read-info-text (dir-name parameters)
+  (let*
+    ((value (cdr parameters))
+     (filename (car value))
+     (byte-offset (cadr value))
+     (char-count (caddr value))
+     (octet-buffer (make-array char-count
+                               :fill-pointer 0
+                               :element-type '(unsigned-byte 8)))
+     (path+filename (merge-pathnames (make-pathname :name filename) dir-name)))
+    (handler-case
+	(with-open-file (in path+filename :direction :input :element-type '(unsigned-byte 8))
+	  (unless (plusp byte-offset)
+	    ;; If byte-offset isn't positive there must be some error in
+	    ;; the index.  Return nil and let the caller deal with it.
+	    (return-from read-info-text nil))
+	  (file-position in byte-offset)
+          ;; Read the requested number of characters.  We're assuming
+          ;; the file is UTF-8 encoded.
+          (let ((read-count 0))
+            (loop for count from 0 below char-count
+                  while (read-utf8-sequence in octet-buffer)
+                  do (incf read-count))
+            (unless (= read-count char-count)
+              (maxima::merror "Expected ~M characters but only got ~M~%"
+                              char-count read-count)))
+          ;; Got all the code points.  Convert the octets into characters.
+	  (map 'string #'code-char octet-buffer))
       (error () (maxima::merror "Cannot find documentation for `~M': missing info file ~M~%"
 				(car parameters) (namestring path+filename))))))
 
