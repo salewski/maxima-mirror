@@ -229,7 +229,7 @@
       hashtable)
     (stable-sort regex-matches #'string-lessp :key #'car)))
 
-#-gcl
+#+lisp-unicode-capable
 (defun read-info-text (dir-name parameters)
   (let*
     ((value (cdr parameters))
@@ -250,7 +250,29 @@
       (error () (maxima::merror "Cannot find documentation for `~M': missing info file ~M~%"
 				(car parameters) (namestring path+filename))))))
 
-#+gcl
+
+;; If Lisp doesn't support Unicode, like gcl 2.7.2 and earlier, we
+;; need to handle the UTF-8 encoded info files ourselves.
+;; READ-UTF8-CODEPOINT reads from STREAM and returns the codepoint
+;; while also pushing the octets read onto OCTET-BUFFER.  (Currently,
+;; we don't use the codepoint, but we return it anyway for
+;; completeness.)
+;;
+;; READ-INFO-TEXT uses this to read the data from the UTF-8 encoded
+;; info file.
+#-lisp-unicode-capable
+(progn
+(define-condition utf8-decode-error (error)
+  ((format-string :initarg :format-string
+                  :reader utf8-decode-error-format-string)
+   (format-args   :initarg :format-args
+                  :initform nil
+                  :reader utf8-decode-error-format-args))
+  (:report (lambda (condition stream)
+             (format stream "UTF-8 decode error: ~?"
+                     (utf8-decode-error-format-string condition)
+                     (utf8-decode-error-format-args   condition)))))
+  
 (defun read-utf8-codepoint (stream octet-buffer)
   "Read one UTF-8 encoded code point from STREAM, pushing each byte read
    onto OCTET-BUFFER (an adjustable vector with a fill pointer).
@@ -316,7 +338,6 @@
         (t
          (maxima::merror "UTF-8: invalid leading byte #x~2,'0X" b0))))))
 
-#+gcl
 (defun read-info-text (dir-name parameters)
   (let*
     ((value (cdr parameters))
@@ -335,18 +356,26 @@
 	    (return-from read-info-text nil))
 	  (file-position in byte-offset)
           ;; Read the requested number of characters.  We're assuming
-          ;; the file is UTF-8 encoded.
+          ;; the file is UTF-8 encoded.  The octets read are saved in
+          ;; OCTET-BUFFER.
           (let ((read-count 0))
-            (loop for count from 0 below char-count
-                  while (read-utf8-sequence in octet-buffer)
-                  do (incf read-count))
+            (handler-bind
+                ((utf8-decode-error
+                   (lambda (condition)
+                     (maxima::merror "UTF-8 decoding failed: ~A" condition))))
+              (loop for count from 0 below char-count
+                    while (read-utf8-codepoint in octet-buffer)
+                    do (incf read-count)))
+
             (unless (= read-count char-count)
               (maxima::merror "Expected ~M characters but only got ~M~%"
                               char-count read-count)))
-          ;; Got all the code points.  Convert the octets into characters.
+          ;; Got all the code points.  Convert the saved octets into
+          ;; characters.
 	  (map 'string #'code-char octet-buffer))
       (error () (maxima::merror "Cannot find documentation for `~M': missing info file ~M~%"
 				(car parameters) (namestring path+filename))))))
+)
 
 ; --------------- build help topic indices ---------------
 
