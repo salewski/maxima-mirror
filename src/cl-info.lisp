@@ -262,6 +262,8 @@
 ;; info file.
 #-lisp-unicode-capable
 (progn
+;; Errors that occur when reading a utf8 sequence are signaled with
+;; this condition type.
 (define-condition utf8-decode-error (error)
   ((format-string :initarg :format-string
                   :reader utf8-decode-error-format-string)
@@ -272,11 +274,19 @@
              (format stream "UTF-8 decode error: ~?"
                      (utf8-decode-error-format-string condition)
                      (utf8-decode-error-format-args   condition)))))
-  
+
+;; Simple wrapper 
+(defun utf8-decode-error (format-string &rest args)
+  (error 'utf8-decode-error
+         :format-string format-string
+         :format-args args))
+
 (defun read-utf8-codepoint (stream octet-buffer)
   "Read one UTF-8 encoded code point from STREAM, pushing each byte read
-   onto OCTET-BUFFER (an adjustable vector with a fill pointer).
-   Returns an integer code point, or NIL at end of stream."
+  onto OCTET-BUFFER (an adjustable vector with a fill
+  pointer). Returns an integer code point, or NIL at end of stream.
+  If an invalid sequence is detected, and error of type
+  utf8-decode-error is signaled."
   (flet ((next-byte ()
            (let ((b (read-byte stream nil nil)))
              (when b
@@ -285,14 +295,15 @@
          (read-continuation ()
            (let ((b (read-byte stream nil nil)))
              (when (null b)
-               (maxima::merror "UTF-8: unexpected end of stream in multi-byte sequence"))
+               (utf8-decode-error "Unexpected end of stream in multi-byte sequence"))
              (unless (= (logand b #xC0) #x80)
-               (maxima::merror "UTF-8: invalid continuation byte #x~2,'0X" b))
+               (utf8-decode-error "Invalid continuation byte #x~2,'0X" b))
              (vector-push-extend b octet-buffer)
              (logand b #x3F))))
 
     (let ((b0 (next-byte)))
       (when (null b0)
+        ;; End of stream.  Return NIL.
         (return-from read-utf8-codepoint nil))
 
       (cond
@@ -302,14 +313,14 @@
 
         ;; Bare continuation byte — malformed
         ((< b0 #xC0)
-         (maxima::merror "UTF-8: unexpected continuation byte #x~2,'0X" b0))
+         (utf8-decode-error "Unexpected continuation byte #x~2,'0X" b0))
 
         ;; 2-byte: 110xxxxx 10xxxxxx  (U+0080–U+07FF)
         ((< b0 #xE0)
          (let ((cp (logior (ash (logand b0 #x1F) 6)
                            (read-continuation))))
            (when (< cp #x80)
-             (maxima::merror "UTF-8: overlong 2-byte sequence for U+~4,'0X" cp))
+             (utf8-decode-error "Overlong 2-byte sequence for U+~4,'0X" cp))
            cp))
 
         ;; 3-byte: 1110xxxx 10xxxxxx 10xxxxxx  (U+0800–U+FFFF)
@@ -318,9 +329,9 @@
                            (ash (read-continuation) 6)
                            (read-continuation))))
            (when (< cp #x800)
-             (maxima::merror "UTF-8: overlong 3-byte sequence for U+~4,'0X" cp))
+             (utf8-decode-error "Overlong 3-byte sequence for U+~4,'0X" cp))
            (when (<= #xD800 cp #xDFFF)
-             (maxima::merror "UTF-8: surrogate code point U+~4,'0X is not valid" cp))
+             (utf8-decode-error "Surrogate code point U+~4,'0X is not valid" cp))
            cp))
 
         ;; 4-byte: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx  (U+10000–U+10FFFF)
@@ -330,9 +341,9 @@
                            (ash (read-continuation) 6)
                            (read-continuation))))
            (when (< cp #x10000)
-             (maxima::merror "UTF-8: overlong 4-byte sequence for U+~6,'0X" cp))
+             (utf8-decode-error "Overlong 4-byte sequence for U+~6,'0X" cp))
            (when (> cp #x10FFFF)
-             (maxima::merror "UTF-8: code point U+~6,'0X out of Unicode range" cp))
+             (utf8-decode-error "Code point U+~6,'0X out of Unicode range" cp))
            cp))
 
         (t
@@ -361,8 +372,10 @@
           (let ((read-count 0))
             (handler-bind
                 ((utf8-decode-error
-                   (lambda (condition)
-                     (maxima::merror "UTF-8 decoding failed: ~A" condition))))
+                   #'(lambda (condition)
+                       ;; Resignal the error with the appropriate
+                       ;; error message about why decoding failed.
+                       (maxima::merror "UTF-8 decoding failed: ~A" condition))))
               (loop for count from 0 below char-count
                     while (read-utf8-codepoint in octet-buffer)
                     do (incf read-count)))
@@ -373,8 +386,9 @@
           ;; Got all the code points.  Convert the saved octets into
           ;; characters.
 	  (map 'string #'code-char octet-buffer))
-      (error () (maxima::merror "Cannot find documentation for `~M': missing info file ~M~%"
-				(car parameters) (namestring path+filename))))))
+      (error ()
+        (maxima::merror "Cannot find documentation for `~M': missing info file ~M~%"
+			(car parameters) (namestring path+filename))))))
 )
 
 ; --------------- build help topic indices ---------------
