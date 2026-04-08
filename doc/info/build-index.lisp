@@ -2,7 +2,25 @@
 ;;; Requires: pregexp  (https://ds26gte.github.io/pregexp/index.html)
 ;;;
 ;;; Usage: (build-index "maxima.info")
-;;;        (build-index "maxima.info" "./")
+;;;        (build-index "maxima.info" :pprint t)
+;;;        (build-index "maxima.info" :info-installation-path "/usr/share/info/")
+;;;
+;;; Output format:
+;;;
+;;;   (in-package :cl-info)
+;;;   (let ((deffn-defvr-pairs '(...))
+;;;         (section-pairs '(...)))
+;;;     (load-info-hashtables <path> deffn-defvr-pairs section-pairs))
+;;;
+;;; deffn-defvr-pairs is an alist mapping index topic strings to
+;;; (filename byte-offset nchars node-name), where byte-offset is the
+;;; byte position in the file of the item text, and nchars is the
+;;; character length of the item text.
+;;;
+;;; section-pairs is an alist mapping section title strings to
+;;; (filename byte-offset nchars), where byte-offset is the byte
+;;; position of the section heading line and nchars is the character
+;;; length of the section content up to the next node separator.
 
 ;;; ---------------------------------------------------------------------------
 ;;; I/O helpers
@@ -28,19 +46,19 @@
                  (vector-push
                   (code-char
                    (cond
-                     ((< b #x80)
+                     ((< b #x80)                    ; 1-byte (ASCII)
                       (incf i)
                       b)
-                     ((< b #xE0)
+                     ((< b #xE0)                    ; 2-byte
                       (prog1 (logior (ash (logand b #x1F) 6)
                                      (logand (aref bytes (1+ i)) #x3F))
                         (incf i 2)))
-                     ((< b #xF0)
+                     ((< b #xF0)                    ; 3-byte
                       (prog1 (logior (ash (logand b #x0F) 12)
                                      (ash (logand (aref bytes (1+ i)) #x3F) 6)
                                      (logand (aref bytes (+ i 2)) #x3F))
                         (incf i 3)))
-                     (t
+                     (t                             ; 4-byte
                       (prog1 (logior (ash (logand b #x07) 18)
                                      (ash (logand (aref bytes (1+ i)) #x3F) 12)
                                      (ash (logand (aref bytes (+ i 2)) #x3F) 6)
@@ -84,6 +102,7 @@
                           (if p (subseq string (car p) (cdr p)) nil))
                         m)
                 results)
+          ;; Advance past match; step 1 if zero-length to avoid infinite loop.
           (setf pos (if (> end start) end (1+ end)))
           (when (>= pos len) (return)))))
     (nreverse results)))
@@ -95,35 +114,68 @@
 ;;; Constants
 ;;; ---------------------------------------------------------------------------
 
-(defparameter *us-byte* 31)   ; unit-separator as byte
+(defparameter *us-byte* 31
+  "The GNU info unit-separator byte (ASCII 31, ^_). Each info node
+   is preceded by a newline and this byte in the file.")
 
 ;;; ---------------------------------------------------------------------------
 ;;; Global state
 ;;; ---------------------------------------------------------------------------
 
-(defvar *main-info* nil)
-(defvar *info-installation-path* nil)
-(defvar *makeinfo-major-version* nil)
-(defvar *makeinfo-minor-version* nil)
-(defvar *info-filenames* '())
-(defvar *node-offset*   (make-hash-table :test #'equal))
-(defvar *topic-locator* (make-hash-table :test #'equal))
-(defvar *node-locator*  (make-hash-table :test #'equal))
-(defvar *item-cnt*    0)
-(defvar *section-cnt* 0)
+(defvar *main-info* nil
+  "Filename of the top-level info file (e.g. \"maxima.info\").")
+(defvar *info-installation-path* nil
+  "Directory where info files are installed, embedded in the output.
+   When NIL the output uses (maxima::maxima-load-pathname-directory).")
+(defvar *makeinfo-major-version* nil
+  "Major version of makeinfo that built the info files,
+   detected from the header of the main info file.")
+(defvar *makeinfo-minor-version* nil
+  "Minor version of makeinfo that built the info files.")
+(defvar *info-filenames* '()
+  "List of all info filenames (main file plus maxima.info-N files),
+   populated by part-1-1a.")
+(defvar *node-offset*   (make-hash-table :test #'equal)
+  "Maps node-name -> (filename byte-offset). byte-offset is the byte
+   position of the \\n just before the unit separator that precedes
+   the node -- the starting point for line-skipping in part-1-2.")
+(defvar *topic-locator* (make-hash-table :test #'equal)
+  "Maps index topic string -> (node-name filename byte-offset nchars).
+   Initially populated by part-1-1b with (node-name lines-offset),
+   then resolved to absolute byte offsets and lengths by part-1-2.")
+(defvar *node-locator*  (make-hash-table :test #'equal)
+  "Maps section title -> (filename byte-offset nchars). byte-offset is
+   the start of the N.M heading line; nchars is the character length up
+   to the next unit separator.")
+(defvar *item-cnt*    0
+  "Count of deffn/defvr entries emitted; used for the empty-index warning.")
+(defvar *section-cnt* 0
+  "Count of section heading entries emitted; used for the empty-index warning.")
 
 ;;; ---------------------------------------------------------------------------
 ;;; Pre-compiled regexp patterns
 ;;; ---------------------------------------------------------------------------
 
 (defparameter *re-deffn-marker*
-  (pregexp:pregexp "^ -- \\S"))
+  (pregexp:pregexp "^ -- \\S")
+  "Matches a @deffn/@defvr definition line: a line starting with
+   ' -- ' followed by a non-whitespace character, e.g.
+     -- Function: foo (x)
+   Used only in the makeinfo 4.x workaround in part-1-2.")
 
 (defparameter *re-index-entry*
-  (pregexp:pregexp "\\* (?!Menu)(\\S+|[^:]+):\\s+(.*?)\\.\\s+\\(line\\s+(\\d+)\\)"))
+  (pregexp:pregexp "\\* (?!Menu)(\\S+|[^:]+):\\s+(.*?)\\.\\s+\\(line\\s+(\\d+)\\)")
+  "Matches a single index entry line in the info index node, e.g.:
+     * foo:                          Some Node.   (line  42)
+   Group 1: the index topic (e.g. \"foo\").
+   Group 2: the node name  (e.g. \"Some Node\").
+   Group 3: the line offset within the node (e.g. \"42\").
+   The (?!Menu) negative lookahead skips the '* Menu:' separator lines.")
 
 (defparameter *re-escape-quote*
-  (pregexp:pregexp "\""))
+  (pregexp:pregexp "\"")
+  "Matches a double-quote character; used to escape quotes in index
+   topic and section title strings when writing the output.")
 
 ;;; ---------------------------------------------------------------------------
 ;;; PART 1 - Build index for @deffn and @defvr items
@@ -132,22 +184,35 @@
 ;;; (1.1a) Scan *.info* files; populate *node-offset*.
 
 (defparameter *node-prefix-bytes*
-  (map '(simple-array (unsigned-byte 8) (*)) #'char-code "Node: "))
+  (map '(simple-array (unsigned-byte 8) (*)) #'char-code "Node: ")
+  "The ASCII bytes of \"Node: \", pre-allocated for fast byte-level
+   scanning of info file node headers without string allocation.")
 
 (defparameter *file-prefix-bytes*
-  (map '(simple-array (unsigned-byte 8) (*)) #'char-code "File: "))
+  (map '(simple-array (unsigned-byte 8) (*)) #'char-code "File: ")
+  "The ASCII bytes of \"File: \", pre-allocated for fast byte-level
+   scanning of info file node headers without string allocation.")
 
 (defun parse-node-name-from-header (bytes start end)
   "Parse the node name from a File:/Node: header in BYTES[START..END).
    Real node headers have File: and Node: on the same line.
    Tag table entries have bare Node: lines without File: -- we skip those.
    Returns the node name string, or NIL if not found."
+  ;; Outer loop: scan byte positions looking for the start of "File: ".
+  ;; We require "File: " before accepting "Node: " because tag table
+  ;; entries have bare "Node: FooNNN" lines with no "File: " prefix,
+  ;; and we must not mistake them for real node headers.
+  ;; When "File: " is found we process its line and immediately return --
+  ;; there is only one File:/Node: header per region.
   (loop for i from start below (- end 6)
-        when (loop for j from 0 below 6
+        when (loop for j from 0 below 6   ; does bytes[i..i+5] == "File: "?
                    always (= (aref bytes (+ i j)) (aref *file-prefix-bytes* j)))
-        return (let* ((line-end (or (position (char-code #\Newline) bytes
+        return (let* (;; Find the newline ending the File:/Node: header line.
+                      (line-end (or (position (char-code #\Newline) bytes
                                               :start (+ i 6) :end end)
                                    end))
+                      ;; Inner loop: scan the same line for "Node: ".
+                      ;; Returns the byte index of the N in "Node: ", or NIL.
                       (node-pos (loop for k from (+ i 6) below (max (+ i 6) (- line-end 6))
                                       when (loop for j from 0 below 6
                                                  always (= (aref bytes (+ k j))
@@ -155,13 +220,17 @@
                                       return k
                                       finally (return nil))))
                  (when node-pos
-                   (let* ((name-start (+ node-pos 6))
+                   (let* ((name-start (+ node-pos 6))  ; skip past "Node: "
+                          ;; Innermost loop: find end of node name.
+                          ;; The name is terminated by a comma or newline,
+                          ;; e.g. "Node: Foo,  Next: Bar" yields "Foo".
                           (name-end   (loop for k from name-start below line-end
                                             when (let ((b (aref bytes k)))
                                                    (or (= b (char-code #\,))
                                                        (= b (char-code #\Newline))))
                                             return k
                                             finally (return line-end))))
+                     ;; Header is ASCII so code-char is safe here.
                      (map 'string #'code-char (subseq bytes name-start name-end)))))
         finally (return nil)))
 
@@ -190,12 +259,16 @@
                            (= (aref bytes (1- us-pos)) #x0A))
                       (1- us-pos)
                       us-pos)))
+          ;; Walk pos forward to nl byte by byte, counting UTF-8 characters
+          ;; to keep char-count in sync -- we need both the byte position and
+          ;; the character offset (what Perl's pos() returns).
           (loop while (< pos nl)
                 do (let ((width (let ((b (aref bytes pos)))
-                                  (cond ((< b #x80) 1)
-                                        ((< b #xE0) 2)
-                                        ((< b #xF0) 3)
-                                        (t          4)))))
+                                  (cond ((< b #x80) 1)   ; ASCII
+                                        ((< b #xE0) 2)   ; 2-byte UTF-8
+                                        ((< b #xF0) 3)   ; 3-byte UTF-8
+                                        (t          4)))) ; 4-byte UTF-8
+                        )
                      (incf char-count)
                      (incf pos width)))
           (setf nl-byte-pos   pos)
@@ -293,6 +366,11 @@
   "Return the character length of the item text starting at byte offset START
    in BYTES, matching what Perl computes with length($1).
    Scans bytes directly for the termination conditions."
+  ;; Replicates Perl: (.*?)(?:\n\n(?= -- )|\n(?=[0-9])|(?=\x1f))
+  ;; with /s (dot matches newlines).  Three terminators:
+  ;;   \x1f        -- unit separator: end of node
+  ;;   \n[0-9]     -- next item number begins
+  ;;   \n\n<space>--<space> -- next @deffn/@defvr begins
   (let ((pos  start)
         (blen (length bytes)))
     (loop
@@ -300,14 +378,14 @@
         (return (count-chars bytes start blen)))
       (let ((b (aref bytes pos)))
         (cond
-          ((= b *us-byte*)
+          ((= b *us-byte*)           ; end of node
            (return (count-chars bytes start pos)))
           ((= b #x0A)
            (let ((next (if (< (1+ pos) blen) (aref bytes (1+ pos)) 0)))
              (cond
-               ((and (>= next (char-code #\0)) (<= next (char-code #\9)))
+               ((and (>= next (char-code #\0)) (<= next (char-code #\9))) ; \n[0-9]
                 (return (count-chars bytes start pos)))
-               ((= next #x0A)
+               ((= next #x0A)        ; \n\n -- check for " -- "
                 (let ((after (+ pos 2)))
                   (when (and (< (+ after 3) blen)
                              (= (aref bytes after)       (char-code #\Space))
@@ -348,6 +426,8 @@
 
       (maphash
        (lambda (filename file-entries)
+         ;; Sort by node-byte-offset then lines-offset so we can skip
+         ;; lines incrementally within each node rather than re-seeking.
          (let* ((sorted (sort file-entries
                               (lambda (a b)
                                 (or (< (fourth a) (fourth b))
