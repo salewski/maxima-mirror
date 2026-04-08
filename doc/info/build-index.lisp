@@ -1,17 +1,8 @@
-;;; -----------------------------
-;;;  Common Lisp translation of build_index.pl
-;;;  Requires: pregexp  (https://ds26gte.github.io/pregexp/index.html)
-;;; -----------------------------
+;;; Common Lisp translation of build_index.pl
+;;; Requires: pregexp  (https://ds26gte.github.io/pregexp/index.html)
 ;;;
-;;; Usage:
-;;;   sbcl --load compat.lisp --script build-index.lisp \
-;;;        <main-info-file> [info-installation-path]
-;;;
-;;; The script writes Lisp s-expressions to *standard-output*, exactly as
-;;; the original Perl script does.
-;;;
-;;; Load compat.lisp before loading this file.
-;;; Then call (build-index "maxima.info") or (build-index "maxima.info" "./").
+;;; Usage: (build-index "maxima.info")
+;;;        (build-index "maxima.info" "./")
 
 ;;; ---------------------------------------------------------------------------
 ;;; I/O helpers
@@ -26,27 +17,60 @@
       (read-sequence buf s)
       buf)))
 
+;;; UTF-8 decoder for implementations that lack stream:octets-to-string.
+;;; No error checking -- assumes the input is always valid UTF-8.
+(defun utf8-bytes-to-string (bytes start end)
+  (let* ((n   (- end start))
+         (out (make-array n :element-type 'character :fill-pointer 0)))
+    (let ((i start))
+      (loop while (< i end)
+            do (let ((b (aref bytes i)))
+                 (vector-push
+                  (code-char
+                   (cond
+                     ((< b #x80)
+                      (incf i)
+                      b)
+                     ((< b #xE0)
+                      (prog1 (logior (ash (logand b #x1F) 6)
+                                     (logand (aref bytes (1+ i)) #x3F))
+                        (incf i 2)))
+                     ((< b #xF0)
+                      (prog1 (logior (ash (logand b #x0F) 12)
+                                     (ash (logand (aref bytes (1+ i)) #x3F) 6)
+                                     (logand (aref bytes (+ i 2)) #x3F))
+                        (incf i 3)))
+                     (t
+                      (prog1 (logior (ash (logand b #x07) 18)
+                                     (ash (logand (aref bytes (1+ i)) #x3F) 12)
+                                     (ash (logand (aref bytes (+ i 2)) #x3F) 6)
+                                     (logand (aref bytes (+ i 3)) #x3F))
+                        (incf i 4)))))
+                  out))))
+    (coerce out 'string)))
+
 (defun bytes-to-string (bytes &optional (start 0) end)
-  "Convert a region of a (unsigned-byte 8) vector to a string via UTF-8."
-  (stream:octets-to-string bytes :start start :end (or end (length bytes))
-                                 :external-format :utf-8))
+  "Convert a region of a (unsigned-byte 8) vector to a UTF-8 string."
+  (let ((end (or end (length bytes))))
+    #+cmucl (stream:octets-to-string bytes :start start :end end :external-format :utf-8)
+    #+sbcl  (sb-ext:octets-to-string bytes :start start :end end :external-format :utf-8)
+    #+ccl   (ccl:decode-string-from-octets bytes :start start :end end :external-format :utf-8)
+    #+ecl   (ext:octets-to-string bytes :start start :end end :external-format :utf-8)
+    #+clisp (ext:convert-string-from-bytes bytes charset:utf-8 :start start :end end)
+    #-(or cmucl sbcl ccl ecl clisp) (utf8-bytes-to-string bytes start end)))
 
 ;;; ---------------------------------------------------------------------------
 ;;; Regexp helpers built on pregexp
 ;;; ---------------------------------------------------------------------------
 
 (defun re-match (pattern string &optional (start 0))
-  "Return the list of substrings matched by PATTERN in STRING (starting at
-   START), or NIL if no match.  Group 0 is the whole match; 1..n are captures."
   (pregexp:pregexp-match pattern string start))
 
 (defun re-match-positions (pattern string &optional (start 0))
-  "Like re-match but returns position pairs (start . end)."
   (pregexp:pregexp-match-positions pattern string start))
 
 (defun re-search-all (pattern string)
-  "Return a list of all non-overlapping matches of PATTERN in STRING.
-   Each element is a list of group strings (group 0 first)."
+  "Return a list of all non-overlapping matches of PATTERN in STRING."
   (let ((results '())
         (pos 0)
         (len (length string)))
@@ -65,7 +89,6 @@
     (nreverse results)))
 
 (defun re-replace-all (pattern string replacement)
-  "Replace every occurrence of PATTERN in STRING with REPLACEMENT."
   (pregexp:pregexp-replace* pattern string replacement))
 
 ;;; ---------------------------------------------------------------------------
@@ -80,15 +103,12 @@
 
 (defvar *main-info* nil)
 (defvar *info-installation-path* nil)
-
 (defvar *makeinfo-major-version* nil)
 (defvar *makeinfo-minor-version* nil)
-
 (defvar *info-filenames* '())
 (defvar *node-offset*   (make-hash-table :test #'equal))
 (defvar *topic-locator* (make-hash-table :test #'equal))
 (defvar *node-locator*  (make-hash-table :test #'equal))
-
 (defvar *item-cnt*    0)
 (defvar *section-cnt* 0)
 
@@ -97,16 +117,13 @@
 ;;; ---------------------------------------------------------------------------
 
 (defparameter *re-deffn-marker*
-  (pregexp:pregexp "^ -- \\S")
-  "Matches a deffn/defvr definition line.")
+  (pregexp:pregexp "^ -- \\S"))
 
 (defparameter *re-index-entry*
-  (pregexp:pregexp "\\* (?!Menu)(\\S+|[^:]+):\\s+(.*?)\\.\\s+\\(line\\s+(\\d+)\\)")
-  "Matches a single index entry line in the info index node.")
+  (pregexp:pregexp "\\* (?!Menu)(\\S+|[^:]+):\\s+(.*?)\\.\\s+\\(line\\s+(\\d+)\\)"))
 
 (defparameter *re-escape-quote*
-  (pregexp:pregexp "\"")
-  "Matches a double-quote character.")
+  (pregexp:pregexp "\""))
 
 ;;; ---------------------------------------------------------------------------
 ;;; PART 1 - Build index for @deffn and @defvr items
@@ -115,12 +132,10 @@
 ;;; (1.1a) Scan *.info* files; populate *node-offset*.
 
 (defparameter *node-prefix-bytes*
-  (map '(simple-array (unsigned-byte 8) (*)) #'char-code "Node: ")
-  "ASCII bytes for 'Node: ', pre-allocated for fast header scanning.")
+  (map '(simple-array (unsigned-byte 8) (*)) #'char-code "Node: "))
 
 (defparameter *file-prefix-bytes*
-  (map '(simple-array (unsigned-byte 8) (*)) #'char-code "File: ")
-  "ASCII bytes for 'File: ', pre-allocated for fast header scanning.")
+  (map '(simple-array (unsigned-byte 8) (*)) #'char-code "File: "))
 
 (defun parse-node-name-from-header (bytes start end)
   "Parse the node name from a File:/Node: header in BYTES[START..END).
@@ -164,15 +179,13 @@
    by walking the byte array one UTF-8 character at a time."
   (let ((last-node-name nil)
         (blen           (length bytes))
-        (pos            0)    ; current byte position
-        (char-count     0)    ; characters counted so far (= char offset of pos)
-        (nl-char-count  0)    ; char offset of last nl-byte-pos stored
-        (nl-byte-pos    0))   ; byte offset stored for last-node-name
+        (pos            0)
+        (char-count     0)
+        (nl-char-count  0)
+        (nl-byte-pos    0))
     (loop
       (let ((us-pos (position *us-byte* bytes :start pos)))
         (unless us-pos (return last-node-name))
-        ;; Walk byte-pos forward from pos to the \n before the US,
-        ;; counting characters to maintain char-count in sync.
         (let ((nl (if (and (> us-pos 0)
                            (= (aref bytes (1- us-pos)) #x0A))
                       (1- us-pos)
@@ -204,9 +217,6 @@
    Populates *info-filenames* and *node-offset*.
    Returns the last node name seen across all files (the index node)."
   (let* ((main-bytes     (slurp-bytes *main-info*))
-         ;; The makeinfo version is in the first line; the indirect table
-         ;; is between the first and second US bytes. Decode up to the
-         ;; second US (or 8KB, whichever is smaller) to cover both.
          (second-us      (let ((u1 (position *us-byte* main-bytes)))
                            (if u1
                                (or (position *us-byte* main-bytes :start (1+ u1))
@@ -245,9 +255,8 @@
          (node-byte-pos  (cadr loc))
          (index-bytes    (slurp-bytes index-filename))
          (blen           (length index-bytes))
-         ;; node-byte-pos is the \n before the US. The node content starts
-         ;; after the US (\n at node-byte-pos, US at node-byte-pos+1, \n at +2,
-         ;; then File:/Node: header). Find the NEXT US after this one.
+         ;; node-byte-pos is the \n before the US; skip past the US itself
+         ;; to find the end of this node.
          (next-us        (or (position *us-byte* index-bytes :start (+ node-byte-pos 2)) blen))
          (content        (bytes-to-string index-bytes node-byte-pos next-us))
          (node-start
@@ -267,8 +276,7 @@
 ;;; (1.2) Resolve (node-name, lines-offset) -> (node-name, filename, byte-offset, length).
 
 (defun count-chars (bytes start end)
-  "Count the number of UTF-8 characters encoded in BYTES from START to END.
-   This avoids allocating a string just to call LENGTH on it."
+  "Count the number of UTF-8 characters encoded in BYTES from START to END."
   (let ((pos start)
         (n   0))
     (loop while (< pos end)
@@ -283,10 +291,8 @@
 
 (defun item-text-length (bytes start)
   "Return the character length of the item text starting at byte offset START
-   in BYTES, matching what Perl computes with length($1) after:
-     if ($stuff =~ m/(.*?)(?:\\n\\n(?= -- )|\\n(?=[0-9])|(?=$unit_separator))/cgsm)
-   We scan bytes directly for the termination conditions, then count UTF-8
-   characters in the matched region without allocating an intermediate string."
+   in BYTES, matching what Perl computes with length($1).
+   Scans bytes directly for the termination conditions."
   (let ((pos  start)
         (blen (length bytes)))
     (loop
@@ -294,17 +300,13 @@
         (return (count-chars bytes start blen)))
       (let ((b (aref bytes pos)))
         (cond
-          ;; US byte (\x1f) — item ends here (zero-width lookahead in Perl).
           ((= b *us-byte*)
            (return (count-chars bytes start pos)))
-          ;; \n — check for \n\n(?= -- ) or \n(?=[0-9])
           ((= b #x0A)
            (let ((next (if (< (1+ pos) blen) (aref bytes (1+ pos)) 0)))
              (cond
-               ;; \n followed by digit — ends here (Perl: \n(?=[0-9]))
                ((and (>= next (char-code #\0)) (<= next (char-code #\9)))
                 (return (count-chars bytes start pos)))
-               ;; \n\n — check for ' -- ' after the second \n
                ((= next #x0A)
                 (let ((after (+ pos 2)))
                   (when (and (< (+ after 3) blen)
@@ -330,7 +332,7 @@
   "For every entry in *topic-locator*, resolve to an absolute byte offset
    and compute the length of the item text.  Each file is slurped once.
    Within each file, entries are sorted by (node-byte-offset, lines-offset)
-   so that line-skipping is done incrementally — each line is visited once."
+   so that line-skipping is done incrementally -- each line is visited once."
   (let ((entries '()))
     (maphash (lambda (key val)
                (destructuring-bind (node-name lines-offset) val
@@ -352,7 +354,6 @@
                                     (and (= (fourth a) (fourth b))
                                          (< (fifth a) (fifth b)))))))
                 (bytes  (slurp-bytes filename))
-                ;; Incremental line-skip state: track position within current node.
                 (cur-node-offset -1)
                 (cur-lines-done   0)
                 (cur-byte-pos     0))
@@ -362,7 +363,7 @@
                (declare (ignore _filename))
                (let ((item-byte-offset
                       (cond
-                        ;; Makeinfo 4.x bug workaround — always re-scan from node start.
+                        ;; Makeinfo 4.x bug workaround
                         ((and *makeinfo-major-version*
                               (= *makeinfo-major-version* 4))
                          (let ((x          -1)
@@ -379,11 +380,9 @@
                         ;; Normal path (makeinfo 5+): skip lines incrementally.
                         (t
                          (when (/= node-byte-offset cur-node-offset)
-                           ;; New node — reset incremental state.
                            (setf cur-node-offset node-byte-offset)
                            (setf cur-lines-done   0)
                            (setf cur-byte-pos     node-byte-offset))
-                         ;; Skip only the additional lines since last entry.
                          (setf cur-byte-pos
                                (read-lines-from-bytes bytes cur-byte-pos
                                                       (- lines-offset cur-lines-done)))
@@ -456,8 +455,7 @@
 
 (defun part-2-1 ()
   "Scan all info files for section headings of the form 'N.M Title'.
-   Populates *node-locator* with (filename byte-offset length) entries.
-   Works entirely in bytes: scans for newline + N.M<space> in the byte array."
+   Populates *node-locator* with (filename byte-offset length) entries."
   (dolist (filename *info-filenames*)
     (let* ((bytes (slurp-bytes filename))
            (blen  (length bytes))
@@ -476,14 +474,12 @@
                                        (setf (char s i)
                                              (code-char (aref bytes (+ title-start i)))))))
                       (us-pos      (or (position *us-byte* bytes :start heading-start) blen))
-                      ;; node-length must be in characters (like Perl's length),
-                      ;; not bytes, since the Perl script uses string length.
                       (node-length (count-chars bytes heading-start us-pos)))
                  (setf (gethash node-title *node-locator*)
                        (list filename heading-start node-length))
                  (setf pos (1+ title-end))))
               (t
-               (setf pos (1+ nl)))))))))  )
+               (setf pos (1+ nl))))))))))
 
 ;;; (2.2) Emit Lisp for section pairs.
 
@@ -549,7 +545,6 @@
   "Build the info index for MAIN-INFO, writing Lisp s-expressions to
    *standard-output*.  INFO-INSTALLATION-PATH, if supplied, is embedded in
    the emitted load-info-hashtables call; otherwise the Maxima default is used."
-  (set-stdout-utf-8)
   (reset-state)
   (setf *main-info*              main-info)
   (setf *info-installation-path* info-installation-path)
