@@ -393,41 +393,32 @@
                          (list node-name filename item-byte-offset text-length))))))))
        by-file))))
 
-;;; (1.3) Emit Lisp for deffn/defvr pairs.
+;;; (1.3) Collect deffn/defvr pairs as an alist.
 
 (defun part-1-3 ()
-  (format t "(in-package :cl-info)~%")
-  (format t "(let (~%")
-  (format t "(deffn-defvr-pairs '(~%")
-  (format t "; CONTENT: (<INDEX TOPIC> . (<FILENAME> <BYTE OFFSET> <LENGTH IN CHARACTERS> <NODE NAME>))~%")
-
+  "Return an alist of (key . (filename byte-offset nchars node-name)) for all
+   deffn/defvr entries, sorted by key."
   (let ((keys (sort (loop for k being the hash-keys of *topic-locator* collect k)
-                    #'string<)))
+                    #'string<))
+        (pairs '()))
     (dolist (key keys)
       (incf *item-cnt*)
-      (let* ((entry         (gethash key *topic-locator*))
-             (node-name     (first  entry))
-             (file-name     (second entry))
-             (byte-offset   (third  entry))
-             (nchars        (fourth entry))
-             (sanitized-key (re-replace-all *re-escape-quote* key "\\\""))
-             (bad?          (or (string= sanitized-key "")
-                                (string= file-name "")
-                                (< byte-offset 0)
-                                (< nchars 0)
-                                (string= node-name ""))))
+      (let* ((entry       (gethash key *topic-locator*))
+             (node-name   (first  entry))
+             (file-name   (second entry))
+             (byte-offset (third  entry))
+             (nchars      (fourth entry))
+             (bad?        (or (string= key "")
+                              (string= file-name "")
+                              (< byte-offset 0)
+                              (< nchars 0)
+                              (string= node-name ""))))
         (when bad?
           (format *error-output*
-                  "build-index.lisp: something seems wrong for key=\"~a\"; emit it anyway.~%"
-                  sanitized-key)
-          (format *error-output*
-                  "build-index.lisp: sanitized-key=\"~a\", file-name=\"~a\", byte-offset=~a, nchars=~a, node-name=\"~a\"~%"
-                  sanitized-key file-name byte-offset nchars node-name)
-          (format t ";; build-index.lisp: something seems wrong for this next item~%"))
-        (format t "(\"~a\" . (\"~a\" ~a ~a \"~a\"))~%"
-                sanitized-key file-name byte-offset nchars node-name))))
+                  "build-index.lisp: bad entry for key=~s~%" key))
+        (push (cons key (list file-name byte-offset nchars node-name)) pairs)))
+    (nreverse pairs)))
 
-  (format t "))~%~%"))
 
 ;;; ---------------------------------------------------------------------------
 ;;; PART 2 - Build index for @node items (section headings "N.M Title")
@@ -481,48 +472,65 @@
               (t
                (setf pos (1+ nl))))))))))
 
-;;; (2.2) Emit Lisp for section pairs.
+;;; (2.2) Collect section pairs as an alist.
 
 (defun part-2-2 ()
-  (format t "(section-pairs '(~%")
-  (format t "; CONTENT: (<NODE NAME> . (<FILENAME> <BYTE OFFSET> <LENGTH IN CHARACTERS>))~%")
-
+  "Return an alist of (title . (filename byte-offset nchars)) for all
+   section headings, sorted by title."
   (let ((keys (sort (loop for k being the hash-keys of *node-locator* collect k)
-                    #'string<)))
+                    #'string<))
+        (pairs '()))
     (dolist (key keys)
       (incf *section-cnt*)
       (destructuring-bind (filename begin-node-offset length)
           (gethash key *node-locator*)
-        (let* ((sanitized-title (re-replace-all *re-escape-quote* key "\\\""))
-               (bad?            (or (string= sanitized-title "")
-                                    (string= filename "")
-                                    (< begin-node-offset 0)
-                                    (< length 0))))
+        (let ((bad? (or (string= key "")
+                        (string= filename "")
+                        (< begin-node-offset 0)
+                        (< length 0))))
           (when bad?
             (format *error-output*
-                    "build-index.lisp: something seems wrong for title=\"~a\"; emit it anyway.~%"
-                    sanitized-title)
-            (format *error-output*
-                    "build-index.lisp: sanitized-title=\"~a\", filename=\"~a\", begin-node-offset=~a, length=~a~%"
-                    sanitized-title filename begin-node-offset length)
-            (format t ";; build-index.lisp: something seems wrong for this next item~%"))
-          (format t "(\"~a\" . (\"~a\" ~a ~a))~%"
-                  sanitized-title filename begin-node-offset length)))))
+                    "build-index.lisp: bad entry for title=~s~%" key))
+          (push (cons key (list filename begin-node-offset length)) pairs))))
+    (nreverse pairs)))
 
-  (format t ")))~%"))
 
-;;; (2.3) Close the LET and call load-info-hashtables.
+;;; (2.3) Build and emit the complete output form.
 
-(defun part-2-3 ()
-  (let ((info-path-or-how
-         (if *info-installation-path*
-             (format nil "#p\"~a/\"" *info-installation-path*)
-             "(maxima::maxima-load-pathname-directory)")))
-    (format t "(load-info-hashtables ~a deffn-defvr-pairs section-pairs))~%"
-            info-path-or-how))
-
+(defun emit-index (deffn-pairs sect-pairs prettify)
+  "Emit the complete index as a Lisp form to *standard-output*.
+   If PRETTIFY is true, use pprint with *print-case* :downcase.
+   Otherwise write compactly, one entry per line."
   (when (zerop (+ *item-cnt* *section-cnt*))
-    (format *error-output* "WARNING: Empty index. Not sure what's going on.~%")))
+    (format *error-output* "WARNING: Empty index. Not sure what's going on.~%"))
+  (let ((path-form (if *info-installation-path*
+                       (pathname (format nil "~a/" *info-installation-path*))
+                       '(maxima::maxima-load-pathname-directory)))
+        (*print-case*   :downcase)
+        (*print-length* nil)
+        (*print-level*  nil))
+    (if prettify
+        (pprint
+         `(progn
+            (in-package :cl-info)
+            (let ((deffn-defvr-pairs ',deffn-pairs)
+                  (section-pairs ',sect-pairs))
+              (load-info-hashtables ,path-form
+                                    deffn-defvr-pairs
+                                    section-pairs))))
+        (progn
+          (format t "(in-package :cl-info)~%(let (~%")
+          (format t "(deffn-defvr-pairs '(~%")
+          (format t "; CONTENT: (<INDEX TOPIC> . (<FILENAME> <BYTE OFFSET> <LENGTH IN CHARACTERS> <NODE NAME>))~%")
+          (dolist (pair deffn-pairs)
+            (format t "(~s . ~s)~%" (car pair) (cdr pair)))
+          (format t "))~%~%(section-pairs '(~%")
+          (format t "; CONTENT: (<NODE NAME> . (<FILENAME> <BYTE OFFSET> <LENGTH IN CHARACTERS>))~%")
+          (dolist (pair sect-pairs)
+            (format t "(~s . ~s)~%" (car pair) (cdr pair)))
+          (format t ")))~%")
+          (format t "(load-info-hashtables ~s deffn-defvr-pairs section-pairs))~%"
+                  path-form)))))
 
 ;;; ---------------------------------------------------------------------------
 ;;; Entry point
@@ -541,17 +549,18 @@
   (setf *item-cnt*               0)
   (setf *section-cnt*            0))
 
-(defun build-index (main-info &optional info-installation-path)
+(defun build-index (main-info &key (info-installation-path "./") pprint)
   "Build the info index for MAIN-INFO, writing Lisp s-expressions to
-   *standard-output*.  INFO-INSTALLATION-PATH, if supplied, is embedded in
-   the emitted load-info-hashtables call; otherwise the Maxima default is used."
+   *standard-output*.  :INFO-INSTALLATION-PATH, if supplied, is embedded in
+   the emitted load-info-hashtables call; otherwise the Maxima default is used.
+   If :PPRINT T is given, pretty-print the output with lowercase symbols."
   (reset-state)
   (setf *main-info*              main-info)
   (setf *info-installation-path* info-installation-path)
   (let ((index-node-name (part-1-1a)))
     (part-1-1b index-node-name))
   (part-1-2)
-  (part-1-3)
-  (part-2-1)
-  (part-2-2)
-  (part-2-3))
+  (let ((deffn-pairs (part-1-3)))
+    (part-2-1)
+    (let ((sect-pairs (part-2-2)))
+      (emit-index deffn-pairs sect-pairs pprint))))
