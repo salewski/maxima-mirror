@@ -26,14 +26,20 @@
 ;;; I/O helpers
 ;;; ---------------------------------------------------------------------------
 
+(defvar *bytes-cache* (make-hash-table :test #'equal)
+  "Cache of filename -> byte vector to avoid reading the same file multiple times.")
+
 (defun slurp-bytes (filename)
-  "Return the entire contents of FILENAME as a (unsigned-byte 8) vector."
-  (with-open-file (s filename :direction :input
-                              :element-type '(unsigned-byte 8))
-    (let* ((len (file-length s))
-           (buf (make-array len :element-type '(unsigned-byte 8))))
-      (read-sequence buf s)
-      buf)))
+  "Return the entire contents of FILENAME as a (unsigned-byte 8) vector.
+   Results are cached in *bytes-cache* so each file is read only once."
+  (or (gethash filename *bytes-cache*)
+      (setf (gethash filename *bytes-cache*)
+            (with-open-file (s filename :direction :input
+                                        :element-type '(unsigned-byte 8))
+              (let* ((len (file-length s))
+                     (buf (make-array len :element-type '(unsigned-byte 8))))
+                (read-sequence buf s)
+                buf)))))
 
 ;;; UTF-8 decoder for implementations that lack stream:octets-to-string.
 ;;; No error checking -- assumes the input is always valid UTF-8.
@@ -152,6 +158,23 @@
 (defvar *section-cnt* 0
   "Count of section heading entries emitted; used for the empty-index warning.")
 
+(defvar *verbose* nil
+  "Verbosity level for build-index progress messages written to *error-output*.
+   NIL = silent, T or 1 = high-level phase messages, 2 = per-file detail.")
+
+(defun verbose-p (level)
+  "Return true if the current verbosity level is at least LEVEL."
+  (cond ((eq *verbose* t) t)
+        ((integerp *verbose*) (>= *verbose* level))
+        (t nil)))
+
+(defun progress (level fmt &rest args)
+  "Print a progress message to *error-output* if verbosity >= LEVEL."
+  (when (verbose-p level)
+    (apply #'format *error-output* fmt args)
+    (finish-output *error-output*)))
+
+
 ;;; ---------------------------------------------------------------------------
 ;;; Pre-compiled regexp patterns
 ;;; ---------------------------------------------------------------------------
@@ -262,15 +285,26 @@
           ;; Walk pos forward to nl byte by byte, counting UTF-8 characters
           ;; to keep char-count in sync -- we need both the byte position and
           ;; the character offset (what Perl's pos() returns).
+          ;; Fast path: skip ASCII runs using position-if.
           (loop while (< pos nl)
-                do (let ((width (let ((b (aref bytes pos)))
-                                  (cond ((< b #x80) 1)   ; ASCII
-                                        ((< b #xE0) 2)   ; 2-byte UTF-8
-                                        ((< b #xF0) 3)   ; 3-byte UTF-8
-                                        (t          4)))) ; 4-byte UTF-8
-                        )
-                     (incf char-count)
-                     (incf pos width)))
+                do (let ((next-high (position-if (lambda (b) (>= b #x80))
+                                                 bytes :start pos :end nl)))
+                     (cond
+                       ((null next-high)
+                        ;; Rest of run to nl is ASCII: count = bytes.
+                        (incf char-count (- nl pos))
+                        (setf pos nl))
+                       ((> next-high pos)
+                        ;; ASCII run from pos to next-high.
+                        (incf char-count (- next-high pos))
+                        (setf pos next-high))
+                       (t
+                        ;; Multi-byte sequence.
+                        (incf char-count)
+                        (incf pos (let ((b (aref bytes pos)))
+                                    (cond ((< b #xE0) 2)
+                                          ((< b #xF0) 3)
+                                          (t          4))))))))
           (setf nl-byte-pos   pos)
           (setf nl-char-count char-count)
           (let* ((header-start (1+ us-pos))
@@ -304,6 +338,7 @@
         (setf *makeinfo-minor-version* (parse-integer (caddr m)))))
 
     (push *main-info* *info-filenames*)
+    (progress 2 ";   scanning ~a (~a bytes)...~%" *main-info* (length main-bytes))
     (setf last-node-name (scan-info-file-for-nodes *main-info* main-bytes))
 
     (let* ((pattern (concatenate 'string
@@ -313,8 +348,10 @@
       (dolist (match matches)
         (let ((sub-filename (format nil "~a-~a" *main-info* (cadr match))))
           (push sub-filename *info-filenames*)
-          (let ((n (scan-info-file-for-nodes sub-filename (slurp-bytes sub-filename))))
-            (when n (setf last-node-name n))))))
+          (let ((sub-bytes (slurp-bytes sub-filename)))
+            (progress 2 ";   scanning ~a (~a bytes)...~%" sub-filename (length sub-bytes))
+            (let ((n (scan-info-file-for-nodes sub-filename sub-bytes)))
+              (when n (setf last-node-name n)))))))
 
     last-node-name))
 
@@ -349,18 +386,34 @@
 ;;; (1.2) Resolve (node-name, lines-offset) -> (node-name, filename, byte-offset, length).
 
 (defun count-chars (bytes start end)
-  "Count the number of UTF-8 characters encoded in BYTES from START to END."
-  (let ((pos start)
-        (n   0))
-    (loop while (< pos end)
-          do (incf n)
-             (incf pos
-                   (let ((b (aref bytes pos)))
-                     (cond ((< b #x80) 1)
-                           ((< b #xE0) 2)
-                           ((< b #xF0) 3)
-                           (t          4)))))
-    n))
+  "Count the number of UTF-8 characters encoded in BYTES from START to END.
+   Uses position to skip ASCII runs quickly -- most info file content is ASCII."
+  ;; If there are no high bytes at all, char count == byte count.
+  (if (null (position-if (lambda (b) (>= b #x80)) bytes :start start :end end))
+      (- end start)
+      ;; Otherwise walk byte by byte, but skip ASCII runs with position.
+      (let ((pos start)
+            (n   0))
+        (loop while (< pos end)
+              do (let ((next-high (position-if (lambda (b) (>= b #x80))
+                                               bytes :start pos :end end)))
+                   (cond
+                     ((null next-high)
+                      ;; Rest is ASCII.
+                      (incf n (- end pos))
+                      (setf pos end))
+                     ((> next-high pos)
+                      ;; ASCII run from pos to next-high.
+                      (incf n (- next-high pos))
+                      (setf pos next-high))
+                     (t
+                      ;; Multi-byte sequence at pos.
+                      (incf n)
+                      (incf pos (let ((b (aref bytes pos)))
+                                  (cond ((< b #xE0) 2)
+                                        ((< b #xF0) 3)
+                                        (t          4))))))))
+        n)))
 
 (defun item-text-length (bytes start)
   "Return the character length of the item text starting at byte offset START
@@ -437,7 +490,13 @@
                 (cur-node-offset -1)
                 (cur-lines-done   0)
                 (cur-byte-pos     0))
+           (progress 2 ";   resolving ~a entries in ~a...~%"
+                     (length sorted) filename)
+           (let ((entry-cnt 0))
            (dolist (e sorted)
+             (incf entry-cnt)
+             (when (and (verbose-p 2) (zerop (mod entry-cnt 100)))
+               (progress 2 ";     ~a/~a entries done...~%" entry-cnt (length sorted)))
              (destructuring-bind (key node-name _filename node-byte-offset lines-offset)
                  e
                (declare (ignore _filename))
@@ -470,7 +529,7 @@
                          cur-byte-pos))))
                  (let ((text-length (item-text-length bytes item-byte-offset)))
                    (setf (gethash key *topic-locator*)
-                         (list node-name filename item-byte-offset text-length))))))))
+                         (list node-name filename item-byte-offset text-length)))))))))
        by-file))))
 
 ;;; (1.3) Collect deffn/defvr pairs as an alist.
@@ -528,6 +587,7 @@
   "Scan all info files for section headings of the form 'N.M Title'.
    Populates *node-locator* with (filename byte-offset length) entries."
   (dolist (filename *info-filenames*)
+    (progress 2 ";   scanning sections in ~a...~%" filename)
     (let* ((bytes (slurp-bytes filename))
            (blen  (length bytes))
            (pos   0))
@@ -616,6 +676,7 @@
 ;;; Entry point
 ;;; ---------------------------------------------------------------------------
 
+
 (defun reset-state ()
   "Reset all global state so repeated calls to BUILD-INDEX produce correct results."
   (setf *main-info*              nil)
@@ -627,20 +688,36 @@
   (clrhash *topic-locator*)
   (clrhash *node-locator*)
   (setf *item-cnt*               0)
-  (setf *section-cnt*            0))
+  (setf *section-cnt*            0)
+  (setf *verbose*                nil)
+  (clrhash *bytes-cache*))
 
-(defun build-index (main-info &key (info-installation-path "./") pprint)
+(defun build-index (main-info &key (info-installation-path "./") pprint verbose)
   "Build the info index for MAIN-INFO, writing Lisp s-expressions to
    *standard-output*.  :INFO-INSTALLATION-PATH, if supplied, is embedded in
    the emitted load-info-hashtables call; otherwise the Maxima default is used.
-   If :PPRINT T is given, pretty-print the output with lowercase symbols."
+   If :PPRINT T is given, pretty-print the output with lowercase symbols.
+   :VERBOSE controls progress messages to *error-output*:
+     NIL (default) -- silent
+     T or 1        -- high-level phase messages
+     2             -- phase messages plus per-file scanning detail"
   (reset-state)
   (setf *main-info*              main-info)
   (setf *info-installation-path* info-installation-path)
+  (setf *verbose*                verbose)
+  (progress 1 "~&; build-index: scanning info files...~%")
   (let ((index-node-name (part-1-1a)))
+    (progress 1 "; build-index: reading index node ~s...~%" index-node-name)
     (part-1-1b index-node-name))
+  (progress 1 "; build-index: ~a index topics found, resolving byte offsets...~%"
+            (hash-table-count *topic-locator*))
   (part-1-2)
+  (progress 1 "; build-index: scanning for section headings...~%")
   (let ((deffn-pairs (part-1-3)))
     (part-2-1)
+    (progress 1 "; build-index: ~a deffn/defvr entries, ~a section headings, emitting...~%"
+              *item-cnt* (hash-table-count *node-locator*))
     (let ((sect-pairs (part-2-2)))
-      (emit-index deffn-pairs sect-pairs pprint))))
+      (emit-index deffn-pairs sect-pairs pprint)))
+  (progress 1 "; build-index: done (~a deffn/defvr, ~a sections).~%"
+            *item-cnt* *section-cnt*))
