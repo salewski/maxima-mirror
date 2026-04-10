@@ -29,17 +29,29 @@
 (defvar *bytes-cache* (make-hash-table :test #'equal)
   "Cache of filename -> byte vector to avoid reading the same file multiple times.")
 
+#+gcl
+(defun slurp-bytes-gcl (filename)
+  "Read FILENAME into a byte vector using si:fread for bulk binary I/O."
+  (with-open-file (s filename :direction :input :element-type 'character)
+    (let* ((len (file-length s))
+           (buf (make-array len :element-type '(unsigned-byte 8)))
+           (n   (si:fread buf 0 len s)))
+      (if (= n len)
+          buf
+          (subseq buf 0 n)))))
+
 (defun slurp-bytes (filename)
   "Return the entire contents of FILENAME as a (unsigned-byte 8) vector.
    Results are cached in *bytes-cache* so each file is read only once."
   (or (gethash filename *bytes-cache*)
       (setf (gethash filename *bytes-cache*)
-            (with-open-file (s filename :direction :input
-                                        :element-type '(unsigned-byte 8))
-              (let* ((len (file-length s))
-                     (buf (make-array len :element-type '(unsigned-byte 8))))
-                (read-sequence buf s)
-                buf)))))
+            #+gcl (slurp-bytes-gcl filename)
+            #-gcl (with-open-file (s filename :direction :input
+                                              :element-type '(unsigned-byte 8))
+                    (let* ((len (file-length s))
+                           (buf (make-array len :element-type '(unsigned-byte 8))))
+                      (read-sequence buf s)
+                      buf)))))
 
 ;;; UTF-8 decoder for implementations that lack stream:octets-to-string.
 ;;; No error checking -- assumes the input is always valid UTF-8.
