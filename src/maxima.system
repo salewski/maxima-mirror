@@ -248,9 +248,7 @@
    (:module reader :source-pathname ""
 	    :depends-on ("globals" "defmfun" "compatibility-macros" "compatibility-macros1"
                                    "declarations" "fundamental-macros" "prerequisites"
-                                   "utility-macros"
-                                   ;; For compiler macros
-                                   "i-o")
+                                   "utility-macros")
 	    :components
 	    ((:file "nparse")))
    (:module other-macros :source-pathname ""
