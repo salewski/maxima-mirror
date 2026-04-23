@@ -431,11 +431,6 @@ is EQ to FNNAME if the latter is non-NIL."
       (cadr form)
       (caar form)))
 
-(defun margs (form)
-  (if (eq (caar form) 'mqapply)
-      (cddr form)
-      (cdr form)))
-
 (defun badfunchk (fnname val flag)
   (if (or flag (numberp val) (member val '(t nil $%e $%pi $%i) :test #'eq))
       (let ((type (if aryp (intl:gettext "an array") (intl:gettext "a function"))))

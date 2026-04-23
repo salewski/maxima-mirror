@@ -250,14 +250,19 @@
             ;; circular dependency.
             :depends-on ("prerequisites" "defmfun")
             :components
-            ((:file "simp-utils")
-             (:file "mopers")
+            ((:file "mopers")
              (:file "opers"
+                    :depends-on ("mopers"))
+             (:file "simp-utils"
                     :depends-on ("mopers"))
              (:file "mutils"
                     :depends-on ("simp-utils"))
              (:file "simp"
                     :depends-on ("simp-utils" "opers" "mopers" "mutils"))))
+   (:module basic-utilities :source-pathname ""
+            :components
+            ((:file "opr-util")
+             (:file "basic-util")))
    (:module m2-pattern-matcher :source-pathname ""
             :depends-on ("simp-utilities")
             :components
@@ -305,7 +310,8 @@
 	    :depends-on ("globals" "defmfun" "compatibility-macros" "compatibility-macros1"
                                    "declarations" "fundamental-macros" "prerequisites"
                                    "utility-macros"
-                                   "simp-utilities")
+                                   "simp-utilities"
+                                   "basic-utilities")
 	    :components
 	    ((:file "comm")
 	     (:file "comm2")))
