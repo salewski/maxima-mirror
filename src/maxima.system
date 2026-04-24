@@ -714,7 +714,7 @@
    (:module numerical-utilities :source-pathname ""
     :components
     ((:file "numerical-utils")))
-   (:module numerical-functions :source-pathname ""
+   (:module bessel-functions :source-pathname ""
 	    :depends-on ("globals" "defmfun" "trigonometry" "algebraic-database" 
                                    "utility-macros" "reader"
                                    "fundamental-macros" "other-macros" "prerequisites"
@@ -722,10 +722,21 @@
             ;; These files are mutually independent.
 	    :components
 	    ((:file "bessel")
-	     (:file "ellipt")
-	     (:file "airy")
-	     (:file "plasma")
-	     (:file "intpol")))
+	     (:file "airy")))
+   (:module elliptic-functions :source-pathname ""
+	    :depends-on ("globals" "defmfun" "trigonometry" "algebraic-database" 
+                                   "utility-macros" "reader"
+                                   "fundamental-macros" "other-macros" "prerequisites"
+                                   "numerical-utilities")
+	    :components
+	    ((:file "ellipt")))
+   (:module numerical-functions :source-pathname ""
+	    :depends-on ("globals" "defmfun" "trigonometry" "algebraic-database" 
+                                   "utility-macros" "reader"
+                                   "fundamental-macros" "other-macros" "prerequisites"
+                                   "numerical-utilities")
+	    :components
+	    ((:file "intpol")))
    (:module display :source-pathname ""
 	    :depends-on ("globals" "defmfun" "compatibility-macros1" "declarations"
                                    "fundamental-macros" "prerequisites"
@@ -894,7 +905,8 @@
     :depends-on ("numerical-utilities" "m2-pattern-matcher")
     :components
     ((:file "expintegral")
-     (:file "gamma")))
+     (:file "gamma")
+     (:file "plasma")))
    (:module miscellaneous :source-pathname ""
 	    :depends-on ("globals" "defmfun" "compatibility-macros1"
                                    "reader" "utility-macros" "commands"
