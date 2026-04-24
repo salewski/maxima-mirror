@@ -260,8 +260,8 @@
              (:file "simp"
                     :depends-on ("simp-utils" "opers" "mopers" "mutils"))))
    (:module nformat :source-pathname ""
-            ;; There are other dependencies.  
-            :depends-on ("float-properties" "simp-utilities")
+            ;; poisson-series just to get $outofpois defined before its use.
+            :depends-on ("float-properties" "simp-utilities" "poisson-series")
             :components
             ((:file "nforma")))
    (:module basic-utilities :source-pathname ""
