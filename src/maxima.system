@@ -730,8 +730,12 @@
                                    "fundamental-macros" "prerequisites"
                                    "simp-utilities")
 	    :components
-	    ((:file "displa")
-	     (:file "grind")))
+	    ((:file "mgrind") ; grinding/sizing utilities
+             ;; displa and grind are now independent.
+             (:file "displa"            ; 2D display
+                    :depends-on ("mgrind"))
+	     (:file "grind"             ; Linear display
+                    :depends-on ("mgrind"))))
    (:module gcd :source-pathname ""
 	    :depends-on ("globals" "defmfun" "declarations" "destructuring-let"
                                    "fundamental-macros" "prerequisites" 
