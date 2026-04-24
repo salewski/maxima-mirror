@@ -731,10 +731,9 @@
 	    :components
 	    ((:file "ellipt")))
    (:module numerical-functions :source-pathname ""
-	    :depends-on ("globals" "defmfun" "trigonometry" "algebraic-database" 
+	    :depends-on ("globals" "defmfun" "algebraic-database" 
                                    "utility-macros" "reader"
-                                   "fundamental-macros" "other-macros" "prerequisites"
-                                   "numerical-utilities")
+                                   "fundamental-macros" "other-macros" "prerequisites")
 	    :components
 	    ((:file "intpol")))
    (:module display :source-pathname ""

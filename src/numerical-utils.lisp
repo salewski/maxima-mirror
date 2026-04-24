@@ -150,6 +150,12 @@
             ((mtimesp u) (if (N*i u) (values t R I))) ;N*%i
             (t nil)))))
 
+(defun float-or-rational-p (x)
+  (or (floatp x) ($ratnump x)))
+
+(defun bigfloat-or-number-p (x)
+  (or ($bfloatp x) (numberp x) ($ratnump x)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Utilitye function to signal an error denoting a domain error for
