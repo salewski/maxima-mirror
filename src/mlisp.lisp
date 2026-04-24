@@ -58,93 +58,6 @@ or if apply is being used are printed.")
   "Holds the value to which a variable is about to be set when a
   'setcheckbreak' occurs.")
 
-(defun displace (x y)
-  (setf (car x) (car y))
-  (setf (cdr x) (cdr y))
-  x)
-
-;;; EVALUATING A MACRO CALL ;;;
-
-
-(defun mmacro-apply (defn form)
-  (mmacroexpansion-check form
-			 (if (and (atom defn)
-				  (not (symbolp defn)))
-			     ;; added this clause for NIL. MAPPLY
-			     ;; doesn't really handle applying interpreter
-			     ;; closures and subrs very well.
-			     (apply defn (cdr form))
-			     (mapply1 defn (cdr form) (caar form) form))))
-
-;;; MACROEXPANSION HACKERY ;;;
-
-
-;; does any reformatting necessary according to the current setting of
-;; $MACROEXPANSION.  Note that it always returns the expansion returned
-;; by displace, for future displacing.
-
-(defun mmacroexpansion-check (form expansion)
-  (case $macroexpansion
-    (( () )
-     (cond ((eq (caar form) 'mmacroexpanded)
-	    (mmacro-displace form expansion))
-	   (t expansion)))
-    (($expand)
-     (cond ((not (eq (caar form) 'mmacroexpanded))
-	    (displace form `((mmacroexpanded) 
-			     ,expansion
-			     ,(copy1cons form)))))
-     expansion)
-    (($displace)
-     (mmacro-displace form expansion))
-    (t (mtell (intl:gettext "warning: unrecognized value of 'macroexpansion'.")))))
-
-
-(defun mmacro-displace (form expansion)
-  (displace form (cond ((atom expansion) `((mprogn) ,expansion))
-		       (t expansion))))
-
-
-;; Handles memo-ized forms.  Reformats them if $MACROEXPANSION has changed.
-;; Format is ((MMACROEXPANDED) <expansion> <original form>)
-
-(defmspec mmacroexpanded (form)
-  (meval (mmacroexpansion-check form (cadr form))))
-
-;; Expands the top-level form repeatedly until it is no longer a macro
-;; form.  Has to copy the form each time because if macros are displacing
-;; the form given to mmacroexpand1 will get bashed each time.  Recursion
-;; is used instead of iteration so the user gets a pdl overflow error
-;; if he tries to expand recursive macro definitions that never terminate.
-
-(defun mmacroexpand (form)
-  (let ((test-form (if (atom form) form (copy1cons form)))
-	(expansion (mmacroexpand1 form)))
-    (cond ((equal expansion test-form)
-	   expansion)
-	  (t (mmacroexpand expansion)))))
-
-
-;; only expands the form once.  If the form is not a valid macro
-;; form it just gets returned (eq'ness is preserved).  Note that if the
-;; macros are displacing, the returned form is also eq to the given
-;; form (which has been bashed).
-
-(defun mmacroexpand1 (form)
-  (let ((funname) (macro-defn))
-    (cond ((or (atom form)
-	       (atom (car form))
-	       (member 'array (cdar form) :test #'eq)
-	       (not (symbolp (setq funname (mop form)))))
-	   form)
-	  ((eq funname 'mmacroexpanded)
-	   (mmacroexpansion-check form (cadr form)))
-	  ((setq macro-defn
-		 (or (and $transrun 
-			  (get (caar form) 'translated-mmacro))
-		     (mget (caar form) 'mmacro)))
-	   (mmacro-apply macro-defn form))
-	  (t form))))
 
 (defun mapply1 (fn args fnname form)
   (cond ((atom fn)
@@ -2534,3 +2447,91 @@ wrapper for this."
     (:compile-toplevel :execute)
 
     (setq  *read-base* *old-read-base*))
+
+(defun displace (x y)
+  (setf (car x) (car y))
+  (setf (cdr x) (cdr y))
+  x)
+
+(defun mmacro-displace (form expansion)
+  (displace form (cond ((atom expansion) `((mprogn) ,expansion))
+		       (t expansion))))
+
+
+;;; MACROEXPANSION HACKERY ;;;
+
+
+;; does any reformatting necessary according to the current setting of
+;; $MACROEXPANSION.  Note that it always returns the expansion returned
+;; by displace, for future displacing.
+
+(defun mmacroexpansion-check (form expansion)
+  (case $macroexpansion
+    (( () )
+     (cond ((eq (caar form) 'mmacroexpanded)
+	    (mmacro-displace form expansion))
+	   (t expansion)))
+    (($expand)
+     (cond ((not (eq (caar form) 'mmacroexpanded))
+	    (displace form `((mmacroexpanded) 
+			     ,expansion
+			     ,(copy1cons form)))))
+     expansion)
+    (($displace)
+     (mmacro-displace form expansion))
+    (t (mtell (intl:gettext "warning: unrecognized value of 'macroexpansion'.")))))
+
+
+;;; EVALUATING A MACRO CALL ;;;
+
+
+(defun mmacro-apply (defn form)
+  (mmacroexpansion-check form
+			 (if (and (atom defn)
+				  (not (symbolp defn)))
+			     ;; added this clause for NIL. MAPPLY
+			     ;; doesn't really handle applying interpreter
+			     ;; closures and subrs very well.
+			     (apply defn (cdr form))
+			     (mapply1 defn (cdr form) (caar form) form))))
+
+;; only expands the form once.  If the form is not a valid macro
+;; form it just gets returned (eq'ness is preserved).  Note that if the
+;; macros are displacing, the returned form is also eq to the given
+;; form (which has been bashed).
+
+(defun mmacroexpand1 (form)
+  (let ((funname) (macro-defn))
+    (cond ((or (atom form)
+	       (atom (car form))
+	       (member 'array (cdar form) :test #'eq)
+	       (not (symbolp (setq funname (mop form)))))
+	   form)
+	  ((eq funname 'mmacroexpanded)
+	   (mmacroexpansion-check form (cadr form)))
+	  ((setq macro-defn
+		 (or (and $transrun 
+			  (get (caar form) 'translated-mmacro))
+		     (mget (caar form) 'mmacro)))
+	   (mmacro-apply macro-defn form))
+	  (t form))))
+
+;; Expands the top-level form repeatedly until it is no longer a macro
+;; form.  Has to copy the form each time because if macros are displacing
+;; the form given to mmacroexpand1 will get bashed each time.  Recursion
+;; is used instead of iteration so the user gets a pdl overflow error
+;; if he tries to expand recursive macro definitions that never terminate.
+
+(defun mmacroexpand (form)
+  (let ((test-form (if (atom form) form (copy1cons form)))
+	(expansion (mmacroexpand1 form)))
+    (cond ((equal expansion test-form)
+	   expansion)
+	  (t (mmacroexpand expansion)))))
+
+;; Handles memo-ized forms.  Reformats them if $MACROEXPANSION has changed.
+;; Format is ((MMACROEXPANDED) <expansion> <original form>)
+
+(defmspec mmacroexpanded (form)
+  (meval (mmacroexpansion-check form (cadr form))))
+
