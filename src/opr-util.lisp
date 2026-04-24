@@ -1,10 +1,12 @@
 ;;; -*-  Mode: Lisp; Package: Maxima; Syntax: Common-Lisp; Base: 10 -*- ;;;;
 ;;;
-;;; This file is part of the Maxima computer algebra system
-;;; (https://sourceforge.net/projects/maxima/)
+;;; This file is part of the Maxima computer algebra project
+;;; (https://sourceforge.net/projects/maxima/) 
+;;; SPDX-License-Identifier: GPL-2.0-or-later 
 ;;;
 ;;; Maxima is copyrighted by its authors and licensed under the GNU
-;;; General Public License.  See COPYING and AUTHORS for details.
+;;; General Public License.  This program is distributed WITHOUT ANY
+;;; WARRANTY. See COPYING and AUTHORS for details.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (in-package :maxima)
