@@ -328,10 +328,11 @@
                                    "compatibility-macros1" "declarations" "destructuring-let"
                                    "fundamental-macros" "prerequisites" "utilities" "commands"
                                    "simp-utilities")
+            ;; There are no circular dependencies among these files.
 	    :components
-	    ((:file "mlisp")
-	     (:file "mmacro")
-	     (:file "buildq")))
+	    ((:file "mmacro")
+             (:file "mlisp" :depends-on ("mmacro"))
+	     (:file "buildq" :depends-on ("mlisp"))))
    ;; The free versions of Allegro and Lispworks have a heap limit.
    ;; Let's not compile these routines so that we can at least
    ;; get the rest of maxima built.
