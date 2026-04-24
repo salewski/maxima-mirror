@@ -719,11 +719,11 @@
                                    "utility-macros" "reader"
                                    "fundamental-macros" "other-macros" "prerequisites"
                                    "numerical-utilities")
+            ;; These files are mutually independent.
 	    :components
 	    ((:file "bessel")
 	     (:file "ellipt")
-	     (:file "airy"
-		    :depends-on ("ellipt"))
+	     (:file "airy")
 	     (:file "plasma")
 	     (:file "intpol")))
    (:module display :source-pathname ""
