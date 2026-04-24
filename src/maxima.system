@@ -260,6 +260,9 @@
              (:file "simp"
                     :depends-on ("simp-utils" "opers" "mopers" "mutils"))))
    (:module basic-utilities :source-pathname ""
+            ;; Note: this depends on nformat and merror which causes a
+            ;; circular dependency.
+            :depends-on ("simp-utilities" "fundamental-macros")
             :components
             ((:file "opr-util")
              (:file "basic-util")))
