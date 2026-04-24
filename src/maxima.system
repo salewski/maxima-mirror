@@ -806,11 +806,17 @@
                                    "hypergeometric"
                                    "m2-pattern-matcher"
                                    "variable-predicates")
+            ;; An analysis using xref data shows that these files have
+            ;; no circular dependencies.  residu.lisp and hypeo.lisp
+            ;; are independent of the other files, and the
+            ;; dependencies listed below are correct.
 	    :components
-	    ((:file "defint")
-	     (:file "residu")
-	     (:file "laplac")
-             (:file "hypgeo")))
+	    ((:file "residu")
+             (:file "defint"
+                    :depends-on ("residu"))
+             (:file "hypgeo")
+	     (:file "laplac"
+                    :depends-on ("defint" "hypgeo"))))
    (:module trigonometry :source-pathname ""
 	    :depends-on ("globals" "defmfun"
                                    "compatibility-macros" "declarations"
