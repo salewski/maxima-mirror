@@ -259,10 +259,15 @@
                     :depends-on ("simp-utils"))
              (:file "simp"
                     :depends-on ("simp-utils" "opers" "mopers" "mutils"))))
+   (:module nformat :source-pathname ""
+            ;; There are other dependencies.  
+            :depends-on ("float-properties" "simp-utilities")
+            :components
+            ((:file "nforma")))
    (:module basic-utilities :source-pathname ""
-            ;; Note: this depends on nformat and merror which causes a
-            ;; circular dependency.
-            :depends-on ("simp-utilities" "fundamental-macros")
+            ;; Note: this depends on merror which causes a circular
+            ;; dependency.
+            :depends-on ("simp-utilities" "fundamental-macros" "nformat")
             :components
             ((:file "opr-util")
              (:file "basic-util")))
@@ -726,7 +731,6 @@
                                    "simp-utilities")
 	    :components
 	    ((:file "displa")
-	     (:file "nforma")
 	     (:file "grind")))
    (:module gcd :source-pathname ""
 	    :depends-on ("globals" "defmfun" "declarations" "destructuring-let"

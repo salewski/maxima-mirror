@@ -270,3 +270,37 @@
 
 (defmfun $float_nan_p (x)
   (and (typep x 'double-float) (/= x x)))
+
+(defun float-nan-p (x)
+  (and (floatp x) (not (= x x))))
+
+(defun float-inf-p (x)
+  (and (floatp x) (not (float-nan-p x)) (beyond-extreme-values x)))
+
+(defun beyond-extreme-values (x)
+  (multiple-value-bind (most-negative most-positive) (extreme-float-values x)
+    (cond
+      ((< x 0) (< x most-negative))
+      ((> x 0) (> x most-positive))
+      (t nil))))
+
+(defun extreme-float-values (x)
+  ;; BLECHH, I HATE ENUMERATING CASES. IS THERE A BETTER WAY ??
+  (typecase x ;gcl returns an atomic list type with type-of
+    ;; The main purpose of the #+ read-time conditionals is to prevent
+    ;; compiler warnings on Lisp implementations that don't have distinct types
+    ;; for all floating point types defined by Common Lisp.
+;;    #+has-distinct-short-float
+    (short-float (values most-negative-short-float most-positive-short-float))
+;;    #+has-distinct-single-float
+    (single-float (values most-negative-single-float most-positive-single-float))
+;;    #+has-distinct-double-float
+    (double-float (values most-negative-double-float most-positive-double-float))
+;;    #+has-distinct-long-float
+    (long-float (values most-negative-long-float most-positive-long-float))
+    ;; NOT SURE THE FOLLOWING REALLY WORKS
+    ;; #+(and cmu double-double)
+    ;; (kernel:double-double-float
+    ;;   (values most-negative-double-double-float most-positive-double-double-float))
+    ))
+
