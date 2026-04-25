@@ -639,9 +639,17 @@
   (let ((foo (ignore-errors (probe-file name))))
     (if foo (not (apparently-a-directory-p foo)))))
 
+(defun pathname-component-present-p (value)
+  "Return T iff VALUE represents a present, meaningful pathname component.
+  NIL, :UNSPECIFIC and the empty string mean the component is absent."
+  (not (member value '(nil :unspecific "") :test #'equal)))
+
 (defun apparently-a-directory-p (path)
-  #+allegro (excl:file-directory-p path)
-  #-allegro (member (pathname-name path) '(nil :unspecific) :test #'eq))
+  "Return T iff PATH looks like a directory, i.e. has a non-NIL directory
+  and an absent name and type component."
+  (and (pathname-directory path)
+       (not (pathname-component-present-p (pathname-name path)))
+       (not (pathname-component-present-p (pathname-type path)))))
 
 ;; We keep these here in case we want to optimize the search.  To
 ;; speed things up, we might want to support search lists like
