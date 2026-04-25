@@ -714,7 +714,8 @@
 (defun file-mtime (path)
   "Returns the modification time of the file/directory PATH."
   #+clisp
-  ;; CLISP's FILE-WRITE-DATE only works for regular files, not directories.
+  ;; CLISP's FILE-WRITE-DATE (on UNIX) only works for regular files,
+  ;; not directories.
   (nth-value 2 (ext:probe-pathname path))
   #-clisp
   (file-write-date path))
