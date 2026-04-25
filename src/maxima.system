@@ -288,6 +288,7 @@
    (:module other-macros :source-pathname ""
 	    :depends-on ("defmfun" "compatibility-macros1" "declarations"
                                    "prerequisites" "utility-macros")
+            ;; These files appear to be independent of each other.
 	    :components
 	    ((:file "mrgmac")
 	     (:file "rzmac")
@@ -712,8 +713,12 @@
 	     (:file "trprop")
 	     (:file "mdefun")))
    (:module numerical-utilities :source-pathname ""
-    :components
-    ((:file "numerical-utils")))
+            :depends-on ("simp-utilities" ; for add/mul/sub
+                         "globals"        ; $numer, errorsw
+                         "utilities"      ; merror
+                         )
+            :components
+            ((:file "numerical-utils")))
    (:module bessel-functions :source-pathname ""
 	    :depends-on ("globals" "defmfun" "trigonometry" "algebraic-database" 
                                    "utility-macros" "reader"
