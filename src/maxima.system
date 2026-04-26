@@ -234,6 +234,8 @@
 	    :depends-on ("globals" "defmfun" "compatibility-macros1"
                                    "declarations" "prerequisites"
                                    "compatibility-macros")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
 	    :components
 	    ((:file "defcal")
 	     (:file "maxmac")))
@@ -249,6 +251,7 @@
             ;; and can't depend on those modules because that causes a
             ;; circular dependency.
             :depends-on ("prerequisites" "defmfun")
+            ;; Module is a clean DAG at every level.
             :components
             ((:file "mopers")
              (:file "opers"
@@ -268,11 +271,15 @@
             ;; Note: this depends on merror which causes a circular
             ;; dependency.
             :depends-on ("simp-utilities" "fundamental-macros" "nformat")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
             :components
             ((:file "opr-util")
              (:file "basic-util")))
    (:module m2-pattern-matcher :source-pathname ""
             :depends-on ("simp-utilities")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
             :components
             ((:file "schatc")
              (:file "schatc-util")))
@@ -288,7 +295,7 @@
    (:module other-macros :source-pathname ""
 	    :depends-on ("defmfun" "compatibility-macros1" "declarations"
                                    "prerequisites" "utility-macros")
-            ;; These files appear to be independent of each other.
+            ;; Module is a clean DAG at every level.
 	    :components
 	    ((:file "mrgmac")
 	     (:file "rzmac")
@@ -306,6 +313,8 @@
 	    :depends-on ("globals" "defmfun" "utility-macros" "compatibility-macros"
                                    "compatibility-macros1" "declarations" "fundamental-macros"
                                    "prerequisites")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
 	    :components
 	    ((:file "utils")
 	     (:file "sumcon")
@@ -339,6 +348,7 @@
    ;; get the rest of maxima built.
    (:module numerical
 	    :depends-on ("defmfun")
+            ;; Compile-time deps form a DAG.
 	    :components
 	    ((:module packages :source-pathname ""
 		      :components
@@ -759,7 +769,8 @@
                                    "utility-macros" "reader"
                                    "fundamental-macros" "other-macros" "prerequisites"
                                    "numerical-utilities")
-            ;; These files are mutually independent.
+            ;; Module is a clean DAG at every level: function calls, macros,
+            ;; special-variable references.
 	    :components
 	    ((:file "bessel")
 	     (:file "airy")))
@@ -780,7 +791,8 @@
 	    :depends-on ("globals" "defmfun" "compatibility-macros1" "declarations"
                                    "fundamental-macros" "prerequisites"
                                    "simp-utilities")
-            ;; No circular dependencies between these files.
+            ;; Module is a clean DAG at every level: function calls, macros,
+            ;; special-variable references.
 	    :components
 	    ((:file "mgrind") ; grinding/sizing utilities
 	     (:file "grind"             ; Linear display
@@ -791,6 +803,8 @@
 	    :depends-on ("globals" "defmfun" "declarations" "destructuring-let"
                                    "fundamental-macros" "prerequisites" 
                                    "rat-macros" "utilities")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
 	    :components
 	    ((:file "spgcd")
 	     (:file "ezgcd")))
@@ -804,6 +818,11 @@
 	    :depends-on ("globals" "defmfun" "compatibility-macros1" "declarations"
                                    "evaluator" "fundamental-macros" "other-macros"
                                    "prerequisites" "utility-macros")
+            ;; Compile-time deps form a DAG.  Two runtime cycles are
+            ;; structural: compar <-> db (sign/comparison logic vs the
+            ;; fact database) and askp <-> compar (interactive
+            ;; integer/parity queries vs the predicates that prompt
+            ;; them).
 	    :components
 	    ((:file "inmis")
 	     (:file "db")
@@ -821,6 +840,8 @@
                          "miscellaneous" "other-macros" "prerequisites" "utility-macros"
                          "m2-pattern-matcher"
                          "variable-predicates")
+            ;; Module is a clean DAG at every level: function calls, macros,
+            ;; special-variable references.
             :components
             ((:file "hyp")
 	     (:file "hypergeometric")
@@ -866,10 +887,8 @@
                                    "hypergeometric"
                                    "m2-pattern-matcher"
                                    "variable-predicates")
-            ;; xref analysis confirms compile-time dependencies form a
-            ;; DAG (no defmacro is used cross-file).  residu is the
-            ;; leaf; defint depends on it (function calls); laplac
-            ;; depends on defint and hypgeo.  No cycles.
+            ;; Module is a clean DAG at every level: function calls, macros,
+            ;; special-variable references.
 	    :components
 	    ((:file "residu")
              (:file "defint"
@@ -885,6 +904,10 @@
                                    "prerequisites" "utility-macros"
                                    "taylor-series"
                                    "m2-pattern-matcher")
+            ;; Compile-time deps form a DAG.  Runtime cycle trigi <->
+            ;; trigo is structural (trigi calls trigo:trigexpand for
+            ;; forward simplification, trigo calls trigi for shared
+            ;; eval/reflection helpers).
 	    :components
 	    ((:file "trigi")
 	     (:file "trigo")
@@ -902,8 +925,8 @@
                                    "maxima-language-compiler-macros"
                                    "prerequisites" "utility-macros"
                                    "destructuring-let" "utilities")
-            ;; Now circular dependencies; all functions defined before
-            ;; use.
+            ;; Module is a clean DAG at every level: function calls, macros,
+            ;; special-variable references.
 	    :components
 	    ((:file "mat")
 	     (:file "matrix" :depends-on ("mat"))
@@ -912,6 +935,8 @@
 	    :depends-on ("globals" "defmfun" "declarations"
                                    "maxima-language-compiler-macros"
                                    "prerequisites")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
 	    :components
 	    ((:file "sprdet")
 	     (:file "newinv")
@@ -922,6 +947,8 @@
                                    "fundamental-macros" "prerequisites"
                                    "rat-macros"
                                    "simp-utilities")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
 	    :components
 	    ((:file "matcom")
 	     (:file "matrun")
@@ -932,8 +959,9 @@
                                    "errset" "fundamental-macros"
                                    "other-macros" "prerequisites"
                                    "utilities" "utility-macros")
-            ;; These 2 files are coupled.  Hard to separate out
-            ;; without moving lots and lots of things around.
+            ;; Compile-time deps form a DAG.  Runtime cycle limit <->
+            ;; tlimit is structural (mutual dispatch between limit and
+            ;; Taylor-limit).
 	    :components ((:file "tlimit")
 			 (:file "limit")))
    (:module solve :source-pathname ""
@@ -962,17 +990,20 @@
 	    :depends-on ("globals" "defmfun" "compatibility-macros1" "compatibility-macros"
                                    "declarations" "fundamental-macros"
                                    "prerequisites" "utility-macros")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
 	    :components
 	    ((:file "mtrace")
 	     (:file "mdebug")))
    (:module gamma-expint :source-pathname ""
-    :depends-on ("numerical-utilities" "m2-pattern-matcher")
-    ;; No circular dependencies among the files here.
-    :components
-    ((:file "expintegral")
-     (:file "gamma"
-            :depends-on ("expintegral"))
-     (:file "plasma")))
+            :depends-on ("numerical-utilities" "m2-pattern-matcher")
+            ;; Module is a clean DAG at every level: function calls, macros,
+            ;; special-variable references.
+            :components
+            ((:file "expintegral")
+             (:file "gamma"
+                    :depends-on ("expintegral"))
+             (:file "plasma")))
    (:module miscellaneous :source-pathname ""
 	    :depends-on ("globals" "defmfun" "compatibility-macros1"
                                    "reader" "utility-macros" "commands"
@@ -1007,6 +1038,8 @@
    (:module poisson-series :source-pathname ""
 	    :depends-on ("defmfun" "declarations" "fundamental-macros"
                                    "prerequisites")
+            ;; Module is a clean DAG at every level: function calls, macros,
+            ;; special-variable references.
 	    :components
 	    ((:file "pois2")
 	     (:file "pois3"
@@ -1017,6 +1050,8 @@
 			 "defmfun" "declarations" "errset"
                                    "miscellaneous" "other-macros" "prerequisites"
                                    "utility-macros")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
 	    :components
 	    ((:file "desoln")
 	     (:file "elim")
@@ -1025,6 +1060,8 @@
 	     (:file "plot")))
    (:module graphics-drivers :source-pathname ""
 	    :depends-on ("defmfun")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
 	    :components
 	    ((:file "plotcolors")
              (:file "gnuplot_def")
@@ -1037,6 +1074,8 @@
 	    ;; at runtime are not part of the final executable if they aren't.
 	    ;; compiled.
 	    #-ecl :load-only #-ecl t
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
 	    :components
 	    ((:file "autol")
 	     (:file "max_ext")
