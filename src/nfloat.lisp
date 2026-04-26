@@ -127,7 +127,7 @@
 	(acc 0) (err 0) (x) (q))
 
     (cond ((and (integerp lo) (integerp hi))
-	   (maxima::while (<= lo hi)
+	   (while (<= lo hi)
 	     (setq q (maxima::$sublis `((maxima::mlist) ((maxima::mequal) ,v ,lo)) sumand))
 	     (setq q (maxima::simplify q))
 	     (setq x (running-error-eval q subs bits))
@@ -145,7 +145,7 @@
 	(acc 1) (err 0) (x))
 
     (cond ((and (integerp lo) (integerp hi))
-	   (maxima::while (<= lo hi)
+	   (while (<= lo hi)
 	     (setq x (maxima::$sublis `((maxima::mlist) ((maxima::mequal) ,v ,lo)) prodand))
 	     (setq x (maxima::simplify x))
 	     (setq x (running-error-eval x subs bits))

@@ -15,6 +15,14 @@
 
 (in-package #:bigfloat)
 
+;; A while-loop macro for bigfloat-package code.  Mirrors maxima::while
+;; but lives in the bigfloat package so callers don't need to qualify
+;; the symbol or worry about importing across packages.
+(defmacro while (cond &rest body)
+  `(do ()
+       ((not ,cond))
+     ,@body))
+
 (defun intofp (re)
   ;; Kind of like Maxima's INTOFP, but we only handle numeric types.
   ;; We should return a Maxima bigfloat object (list of bigfloat

@@ -301,13 +301,6 @@
 
 (in-package #:bigfloat)
 
-;(import 'maxima::while) ;; <--- broken Why?
-
-(defmacro while (cond &rest body)
-  `(do ()
-       ((not ,cond))
-     ,@body))
-
 (defun 0f0-numeric (x)
   (exp x))
 
