@@ -762,8 +762,9 @@
    (:module documentation :source-pathname ""
 	    :depends-on ("globals" "defmfun" "fundamental-macros")
 	    :components
-	    ((:file "macdes")
-	     (:file "verify-html-index")))
+	    ((:file "verify-html-index")
+             (:file "macdes"
+                    :depends-on ("verify-html-index"))))
    (:module algebraic-database :source-pathname ""
 	    :depends-on ("globals" "defmfun" "compatibility-macros1" "declarations"
                                    "evaluator" "fundamental-macros" "other-macros"
@@ -884,6 +885,8 @@
                                    "errset" "fundamental-macros"
                                    "other-macros" "prerequisites"
                                    "utilities" "utility-macros")
+            ;; These 2 files are coupled.  Hard to separate out
+            ;; without moving lots and lots of things around.
 	    :components ((:file "tlimit")
 			 (:file "limit")))
    (:module solve :source-pathname ""
@@ -947,7 +950,8 @@
                                    "prerequisites")
 	    :components
 	    ((:file "pois2")
-	     (:file "pois3")))
+	     (:file "pois3"
+                    :depends-on ("pois2"))))
    (:module translated-packages :source-pathname ""
 	    :depends-on ("globals" "maxima-language-compiler-macros"
 			 "compatibility-macros1"
