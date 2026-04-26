@@ -331,7 +331,7 @@ ff(a,b,c,x,n) := block([f, f0 : 1, f1 : 1- 2 * b / c,s : 1,k : 1, cf : a / (1-2/
 	(eps (epsilon x)) (done 0))
     (setq b (- c (* 2 b)))
     (setq z (- 1 (/ 2 x)))
-    (while (< done 3)
+    (maxima::while (< done 3)
       (setq ds (* cf f1))
       (setq s (+ s ds))
       (setq done (if (< (abs ds) (* eps (max 1 (abs s)))) (+ done 1) 0))
@@ -374,7 +374,7 @@ ff(a,b,c,x,n) := block([f, f0 : 1, f1 : 1- 2 * b / c,s : 1,k : 1, cf : a / (1-2/
       (setq er 1)
       (setq f 1)
 
-      (while (> (abs er) (* eps (max (abs f) 1)))
+      (maxima::while (> (abs er) (* eps (max (abs f) 1)))
 	(maxima::bind-fpprec local-fpprec
 			     (setq mma (maxima::nfloat ma `((maxima::mlist)) local-fpprec maxima::$max_fpprec))
 			     (setq mmb (maxima::nfloat mb `((maxima::mlist)) local-fpprec maxima::$max_fpprec))
@@ -418,7 +418,7 @@ ff(a,b,c,x,n) := block([f, f0 : 1, f1 : 1- 2 * b / c,s : 1,k : 1, cf : a / (1-2/
 	  (format t "d = ~A~%" d)
 	  (format t "region = ~A~%" region))
 	(setq f nil)
-	(while d 
+	(maxima::while d 
 	  (setq f (if (equal region "none")
 		      `((maxima::multiple_values) ,ff t)
 		      (maxima::mfuncall 'maxima::$abramowitz_id ff region)))
@@ -449,7 +449,7 @@ ff(a,b,c,x,n) := block([f, f0 : 1, f1 : 1- 2 * b / c,s : 1,k : 1, cf : a / (1-2/
 
   (let ((s 0) (s0 1) (k 0) (z 1) (es 0) (ez 1) (n) (p) (q) (stop 20000) (dig))
     (setq n (* 2 (+ (length a) (length b) 1)))
-    (while (and (< k stop) (/= s s0)) ;; (not (= s s0)))
+    (maxima::while (and (< k stop) (/= s s0)) ;; (not (= s s0)))
       (setq s s0)
       (setq p (reduce #'* (mapcar #'(lambda (s) (+ s k)) a))) ;; p adds and p-1 multiplications
       (setq q (reduce #'* (mapcar #'(lambda (s) (+ s k)) b))) ;; q adds and q-1 multiplications
@@ -480,7 +480,7 @@ ff(a,b,c,x,n) := block([f, f0 : 1, f1 : 1- 2 * b / c,s : 1,k : 1, cf : a / (1-2/
  
 (defun hypergeometric-poly-case (a b x)
   (let ((z 1) (s 1) (k 0) (p) (q))
-    (while (not (zerop z))
+    (maxima::while (not (zerop z))
       (setq p (reduce #'* (mapcar #'(lambda (s) (+ s k)) a)))
       (setq q (reduce #'* (mapcar #'(lambda (s) (+ s k)) b)))
       (incf k)
@@ -546,7 +546,7 @@ ff(a,b,c,x,n) := block([f, f0 : 1, f1 : 1- 2 * b / c,s : 1,k : 1, cf : a / (1-2/
 
 	   ;; recurse on local-fpprec; bailout when local-fpprec exceeds $max_fpprec.
 	 
-	   (while (and (or (null f) (< d digits)) (< local-fpprec maxima::$max_fpprec))
+	   (maxima::while (and (or (null f) (< d digits)) (< local-fpprec maxima::$max_fpprec))
 	     (maxima::bind-fpprec local-fpprec
 				  (multiple-value-setq (f d) (hypergeometric-by-series a b x))
 				  (setq a (mapcar #'(lambda (s) (bigfloat::to (maxima::$bfloat s))) ma))
@@ -582,7 +582,7 @@ ff(a,b,c,x,n) := block([f, f0 : 1, f1 : 1- 2 * b / c,s : 1,k : 1, cf : a / (1-2/
 	  ((eql a -1) (values fm1 0))
 	  (t
 	   (setq x (- x b))
-	   (while (>= k a)
+	   (maxima::while (>= k a)
 	     (setq f (/ (- (* k fo) (* (+ (* 2 k) x) fm1)) (- b k)))
 	     (setq ef 
 		   (+

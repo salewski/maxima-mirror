@@ -785,7 +785,6 @@
             :depends-on ("compatibility-macros1" "declarations" "defmfun" "errset" "globals"
                          "miscellaneous" "other-macros" "prerequisites" "utility-macros"
                          "m2-pattern-matcher"
-                         "numeric-bigfloat"
                          "variable-predicates")
             :components
             ((:file "hyp")
