@@ -800,10 +800,19 @@
                                    "prerequisites" "rat-macros" "utility-macros"
                                    "m2-pattern-matcher"
                                    "variable-predicates")
+            ;; Compile-time deps form a DAG.  Runtime: risch.lisp and
+            ;; sin.lisp are mutually recursive by design -- risch's
+            ;; hypertrigint1 falls back to sin's sinint when Risch
+            ;; can't make progress, and sin's integrate1 dispatches to
+            ;; risch's rischint.  The cycle is structural; not broken.
+            ;;
+            ;; This could be fixed by moving lots of code around to a
+            ;; separate file.
 	    :components
 	    ((:file "sin-util")
              (:file "sinint")
-	     (:file "risch")
+	     (:file "risch"
+                    :depends-on ("sinint"))
 	     (:file "irinte"
                     :depends-on ("sin-util"))
              (:file "sin"
