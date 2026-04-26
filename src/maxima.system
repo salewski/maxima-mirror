@@ -831,17 +831,18 @@
                                    "hypergeometric"
                                    "m2-pattern-matcher"
                                    "variable-predicates")
-            ;; An analysis using xref data shows that these files have
-            ;; no circular dependencies.  residu.lisp and hypeo.lisp
-            ;; are independent of the other files, and the
-            ;; dependencies listed below are correct.
+            ;; xref analysis confirms compile-time dependencies form a
+            ;; DAG (no defmacro is used cross-file).  residu is the
+            ;; leaf; defint depends on it (function calls); laplac
+            ;; depends on defint and hypgeo.  No cycles.
 	    :components
 	    ((:file "residu")
              (:file "defint"
                     :depends-on ("residu"))
-             (:file "hypgeo")
+             (:file "hypgeo"
+                    :depends-on ("residu"))
 	     (:file "laplac"
-                    :depends-on ("defint" "hypgeo"))))
+                    :depends-on ("defint" "hypgeo" "residu"))))
    (:module trigonometry :source-pathname ""
 	    :depends-on ("globals" "defmfun"
                                    "compatibility-macros" "declarations"
@@ -905,13 +906,23 @@
                                    "declarations" "fundamental-macros"
                                    "other-macros" "prerequisites" "rat-macros"
                                    "utilities" "utility-macros")
+            ;; Compile-time deps form a DAG.  Two runtime call cycles
+            ;; remain by design: solve <-> psolve (cubic/quartic
+            ;; formulas tightly coupled to solve's display
+            ;; machinery), and solve <-> algsys (univariate vs
+            ;; system-of-equations dispatchers calling each other).
+            ;; sqrtdenest, polyrz, and cpoly are leaves, called from
+            ;; algsys.
 	    :components
-	    ((:file "solve")
-	     (:file "psolve")
-	     (:file "algsys")
-	     (:file "sqrtdenest")
+	    ((:file "sqrtdenest")
 	     (:file "polyrz")
-	     (:file "cpoly")))
+             (:file "cpoly")
+	     (:file "solve")
+	     (:file "psolve"
+                    :depends-on ("solve"))
+	     (:file "algsys"
+                    :depends-on ("solve" "sqrtdenest" "polyrz" "cpoly")
+	     ))
    (:module debugging :source-pathname ""
 	    :depends-on ("globals" "defmfun" "compatibility-macros1" "compatibility-macros"
                                    "declarations" "fundamental-macros"
