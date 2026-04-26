@@ -698,6 +698,9 @@
                                    "compatibility-macros" "declarations" "destructuring-let"
                                    "fundamental-macros" "prerequisites" "utilities"
                                    "simp-utilities")
+            ;; Compile-time deps ahve no cross-file macros nor
+            ;; cross-file specials.  However, there's lots of mutually
+            ;; recursive calls amlong the files.  Pretty hard to fix this. 
 	    :components
 	    ((:file "rat3a")
 	     (:file "rat3b")
@@ -711,6 +714,11 @@
                                    "compatibility-macros" "compatibility-macros1"
                                    "declarations" "destructuring-let" "fundamental-macros"
                                    "i-o" "prerequisites")
+            ;; Compile-time deps form a DAG.  Three small runtime
+            ;; cycles remain, all between transl (the translator core)
+            ;; and its tightly-coupled helpers: trans2 (array
+            ;; dispatch), trutil (defvar pushing), trmode (mode
+            ;; system).
 	    :components
 	    ((:file "transl")
 	     (:file "transs"
