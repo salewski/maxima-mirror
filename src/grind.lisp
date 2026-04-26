@@ -12,9 +12,7 @@
 
 (macsyma-module grind)
 
-(declare-top (special lop rop *grind-charlist* chrps))
-
-(defun chrct* () (- $linel chrps))
+(declare-top (special lop rop *grind-charlist*))
 
 (defmspec $grind (x)
   (setq x (cdr x))
@@ -57,11 +55,6 @@
 	   (t (mgrind x nil) (write-char #\$ nil)))
     '$done))
 
-
-(defun mtyotbsp (n out)
-  (declare (fixnum n))
-  (incf chrps n)
-  (do () ((< n 1)) (write-char #\space out) (decf n)))
 
 (defun strgrind (x)
   (let (*grind-charlist* (chrps 0))
@@ -112,32 +105,6 @@
 
 ;;; ----------------------------------------------------------------------------
 
-;; Formatting a mdefine or mdefmacro expression
-
-
-
-(defun strmdo (x)
-  (nconc (cond ((second x) `($for ,(second x))))
-	 (cond ((equal 1 (third x)) nil)
-	       ((third x)  `($from ,(third x))))
-	 (cond ((equal 1 (fourth x)) nil)
-	       ((fourth x) `($step ,(fourth x)))
-	       ((fifth x)  `($next ,(fifth x))))
-	 (cond ((sixth x)  `($thru ,(sixth x))))
-	 (cond ((null (seventh x)) nil)
-	       ((and (consp (seventh x)) (eq 'mnot (caar (seventh x))))
-		`($while ,(cadr (seventh x))))
-	       (t `($unless ,(seventh x))))
-	 `($do ,(eighth x))))
-
-(defun strmdoin (x)
-  (nconc `($for ,(second x) $in ,(third x))
-	 (cond ((sixth x) `($thru ,(sixth x))))
-	 (cond ((null (seventh x)) nil)
-	       ((and (consp (seventh x)) (eq 'mnot (caar (seventh x))))
-		`($while ,(cadr (seventh x))))
-	       (t `($unless ,(seventh x))))
-	 `($do ,(eighth x))))
 
 (defprop mfunction 190. lbp)
 (defprop mfunction 190. rbp)

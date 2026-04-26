@@ -745,13 +745,13 @@
 	    :depends-on ("globals" "defmfun" "compatibility-macros1" "declarations"
                                    "fundamental-macros" "prerequisites"
                                    "simp-utilities")
+            ;; No circular dependencies between these files.
 	    :components
 	    ((:file "mgrind") ; grinding/sizing utilities
-             ;; displa and grind are now independent.
-             (:file "displa"            ; 2D display
-                    :depends-on ("mgrind"))
 	     (:file "grind"             ; Linear display
-                    :depends-on ("mgrind"))))
+                    :depends-on ("mgrind"))
+             (:file "displa"            ; 2D display
+                    :depends-on ("mgrind" "grind"))))
    (:module gcd :source-pathname ""
 	    :depends-on ("globals" "defmfun" "declarations" "destructuring-let"
                                    "fundamental-macros" "prerequisites" 
@@ -910,9 +910,11 @@
 	     (:file "mdebug")))
    (:module gamma-expint :source-pathname ""
     :depends-on ("numerical-utilities" "m2-pattern-matcher")
+    ;; No circular dependencies among the files here.
     :components
     ((:file "expintegral")
-     (:file "gamma")
+     (:file "gamma"
+            :depends-on ("expintegral"))
      (:file "plasma")))
    (:module miscellaneous :source-pathname ""
 	    :depends-on ("globals" "defmfun" "compatibility-macros1"

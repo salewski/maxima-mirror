@@ -11,6 +11,89 @@
 
 (in-package :maxima)
 
+;;; Current character position on the output line.  Used by the
+;;; grinding/sizing printer to track where the next character will
+;;; appear, so that mprint can decide when to break a line and so
+;;; that strgrind (in grind.lisp) can buffer string-mode output via
+;;; styo/sterpri.
+(defvar chrps 0)
+
+;;; Number of characters left on the current output line, given the
+;;; current position chrps and Maxima's $linel.
+(defun chrct* () (- $linel chrps))
+
+;;; Output N spaces to OUT, advancing chrps.
+(defun mtyotbsp (n out)
+  (declare (fixnum n))
+  (incf chrps n)
+  (do () ((< n 1)) (write-char #\space out) (decf n)))
+
+;;; Format a Maxima `do' form (mdo) as a flat keyword-tagged list,
+;;; suitable for grinding.  Pure data builder.
+(defun strmdo (x)
+  (nconc (cond ((second x) `($for ,(second x))))
+	 (cond ((equal 1 (third x)) nil)
+	       ((third x)  `($from ,(third x))))
+	 (cond ((equal 1 (fourth x)) nil)
+	       ((fourth x) `($step ,(fourth x)))
+	       ((fifth x)  `($next ,(fifth x))))
+	 (cond ((sixth x)  `($thru ,(sixth x))))
+	 (cond ((null (seventh x)) nil)
+	       ((and (consp (seventh x)) (eq 'mnot (caar (seventh x))))
+		`($while ,(cadr (seventh x))))
+	       (t `($unless ,(seventh x))))
+	 `($do ,(eighth x))))
+
+;;; Format a Maxima `do in' form (mdoin) as a flat keyword-tagged list,
+;;; suitable for grinding.  Pure data builder.
+(defun strmdoin (x)
+  (nconc `($for ,(second x) $in ,(third x))
+	 (cond ((sixth x) `($thru ,(sixth x))))
+	 (cond ((null (seventh x)) nil)
+	       ((and (consp (seventh x)) (eq 'mnot (caar (seventh x))))
+		`($while ,(cadr (seventh x))))
+	       (t `($unless ,(seventh x))))
+	 `($do ,(eighth x))))
+
+;;; Wrap nformat: only re-format if $display_format_internal is true and
+;;; the form has structure worth re-formatting.  Used to preprocess a
+;;; form before sizing or printing it.
+(defmvar $display_format_internal nil
+  "Setting this TRUE can help give the user a greater understanding
+	 of the behavior of maxima on certain of his problems,
+	 especially those involving roots and quotients")
+
+(defun nformat-check (form)
+  (if (and $display_format_internal
+	   (not (or (atom form) (atom (car form)) (specrepp form))))
+      form
+      (nformat form)))
+
+;;; Convert ATOM to a list of characters suitable for printing.
+;;; Handles numbers, strings (with optional surrounding quotes),
+;;; symbols (stripping leading $ or %, mapping aliases, etc.).
+(defun makestring (atom)
+  (let (dummy)
+    (cond ((numberp atom) (exploden atom))
+          ((stringp atom)
+           (setq dummy (coerce atom 'list))
+           (if $stringdisp
+               (cons #\" (nconc dummy (list #\")))
+               dummy))
+          ((not (symbolp atom)) (exploden atom))
+          ((and (setq dummy (get atom 'reversealias))
+                (not (and (member atom $aliases :test #'eq) (get atom 'noun))))
+           (exploden (stripdollar dummy)))
+          ((not (eq (getop atom) atom))
+           (makestring (getop atom)))
+          (t (setq dummy (exploden atom))
+             (cond
+               ((null dummy) nil)
+               ((char= #\$ (car dummy)) (cdr dummy))
+               ((char= #\% (car dummy)) (cdr dummy))
+               ($lispdisp (cons #\? dummy))
+               (t dummy))))))
+
 (defun mgrind (x out)
   (setq chrps 0)
   (mprint (msize x nil nil 'mparen 'mparen) out))

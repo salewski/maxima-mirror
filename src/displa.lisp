@@ -87,17 +87,6 @@
   (mgrind form *standard-output*)
   (mterpri))
 
-(defmvar $display_format_internal nil
-  "Setting this TRUE can help give the user a greater understanding
-	 of the behavior of maxima on certain of his problems,
-	 especially those involving roots and quotients")
-
-(defun nformat-check (form)
-  (if (and $display_format_internal
-	   (not (or (atom form) (atom (car form)) (specrepp form))))
-      form
-      (nformat form)))
-
 (defun dimension (form result lop rop w right)
   (let ((level (1+ level))
 	(break (if (and w break) (+ w break))))
@@ -151,28 +140,6 @@
 			(setq result nil w (+ $linel width))
 			(incf width))
 		      (setq result (rplacd dummy result))))))))
-
-(defun makestring (atom)
-  (let (dummy)
-    (cond ((numberp atom) (exploden atom))
-          ((stringp atom)
-           (setq dummy (coerce atom 'list))
-           (if $stringdisp
-               (cons #\" (nconc dummy (list #\")))
-               dummy))
-          ((not (symbolp atom)) (exploden atom))
-          ((and (setq dummy (get atom 'reversealias))
-                (not (and (member atom $aliases :test #'eq) (get atom 'noun))))
-           (exploden (stripdollar dummy)))
-          ((not (eq (getop atom) atom))
-           (makestring (getop atom)))
-          (t (setq dummy (exploden atom))
-             (cond
-               ((null dummy) nil)
-               ((char= #\$ (car dummy)) (cdr dummy))
-               ((char= #\% (car dummy)) (cdr dummy))
-               ($lispdisp (cons #\? dummy))
-               (t dummy))))))
 
 (defun dimension-paren (form result)
   (setq result (cons #\) (dimension form (cons #\( result) 'mparen 'mparen 1 (1+ right))))
