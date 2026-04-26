@@ -857,10 +857,12 @@
                                    "maxima-language-compiler-macros"
                                    "prerequisites" "utility-macros"
                                    "destructuring-let" "utilities")
+            ;; Now circular dependencies; all functions defined before
+            ;; use.
 	    :components
 	    ((:file "mat")
-	     (:file "linnew")
-	     (:file "matrix")))
+	     (:file "matrix" :depends-on ("mat"))
+	     (:file "linnew" :depends-on ("mat" "matrix"))))
    (:module determinants :source-pathname ""
 	    :depends-on ("globals" "defmfun" "declarations"
                                    "maxima-language-compiler-macros"

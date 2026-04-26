@@ -22,12 +22,6 @@
 
 (defvar *mat*)
 
-;;I believe that all the code now stores arrays in the value cell 
-(defun get-array-pointer (symbol)
-  "There may be nesting of functions and we may well need to apply
-   this twice in a row"
-  (if (arrayp symbol) symbol (symbol-value symbol)))
-
 (defun mxc (x)
   (mapcar #'(lambda (y) (cons '(mlist) y)) x)) ; Matrix to MACSYMA conversion
 	

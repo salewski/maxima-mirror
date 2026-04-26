@@ -23,6 +23,16 @@
 (defvar *col*)
 (defvar *colinv*)
 
+;; If SYMBOL is an array, return it directly; otherwise return its
+;; value cell.  Used to follow indirect array references where one
+;; symbol is bound to another that holds the actual array.  (Moved
+;; from matrix.lisp so that mat.lisp is a leaf in the
+;; matrix-algebra module's call graph.)
+(defun get-array-pointer (symbol)
+  "There may be nesting of functions and we may well need to apply
+   this twice in a row"
+  (if (arrayp symbol) symbol (symbol-value symbol)))
+
 
 (defun solcoef (m *c varl flag)
   (prog (cc answer leftover)
