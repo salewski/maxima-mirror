@@ -542,17 +542,6 @@
 	     (setf $aliases (delete x $aliases :count 1 :test #'eq))
 	     (remprop (setq x y) 'alias) (remprop x 'verb) x))))
 
-(defun stripdollar (x)
-  (cond ((not (atom x))
-	 (cond ((and (eq (caar x) 'bigfloat) (not (minusp (cadr x)))) (implode (fpformat x)))
-	       (t (merror (intl:gettext "STRIPDOLLAR: argument must be an atom; found: ~M") x))))
-	((numberp x) x)
-	((null x) 'false)
-	((eq x t) 'true)
-        ((member (get-first-char x) '(#\$ #\%) :test #'char=)
-         (intern (subseq (string x) 1)))
-	(t x)))
-
 (defun fullstrip (x)
   (mapcar #'fullstrip1 x))
 
@@ -780,6 +769,9 @@
   (if (> thistime 0)
       (incf thistime (- (get-internal-run-time) tim))))
 
+
+(defvar *maxima-epilog* ""
+  "String printed when Maxima exits via $quit.")
 
 (defmfun $quit (&optional (exit-code 0))
   "Quit Maxima with an optional exit code for Lisps and systems that
