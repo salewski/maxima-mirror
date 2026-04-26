@@ -57,7 +57,7 @@
 
 
 (defun strgrind (x)
-  (let (*grind-charlist* (chrps 0))
+  (let (*grind-charlist* (*chrps* 0))
     (strprint (msize x nil nil 'mparen 'mparen))
     (nreverse *grind-charlist*)))
 
@@ -65,27 +65,27 @@
   (cond ((atom x) (styo x))
 	((< (car x) (chrct*)) (mapc #'strprint (cdr x)))
 	(t (prog (i)
-	      (setq i chrps)
+	      (setq i *chrps*)
 	      (strprint (cadr x))
 	      (cond ((null (cddr x)) (return nil))
 		    ((and (or (atom (cadr x)) (< (caadr x) (chrct*)))
 			  (or (> (chrct*) (truncate $linel 2))
 			      (atom (caddr x)) (< (caaddr x) (chrct*))))
-		     (setq i chrps)
+		     (setq i *chrps*)
 		     (strprint (caddr x)))
-		    (t (setq i (1+ i)) (setq chrps 0) (sterpri)
+		    (t (setq i (1+ i)) (setq *chrps* 0) (sterpri)
 		       (styotbsp i) (strprint (caddr x))))
 	      (do ((l (cdddr x) (cdr l))) ((null l))
 		(cond
 		  ((or (atom (car l)) (< (caar l) (chrct*))) nil)
-		  (t (setq chrps 0) (sterpri) (styotbsp i)))
+		  (t (setq *chrps* 0) (sterpri) (styotbsp i)))
 		(strprint (car l)))))))
 
-(defun styo (x) (setq *grind-charlist* (cons x *grind-charlist*) chrps (1+ chrps)))
+(defun styo (x) (setq *grind-charlist* (cons x *grind-charlist*) *chrps* (1+ chrps)))
 
-(defun sterpri () (setq *grind-charlist* (cons #\newline *grind-charlist*) chrps 0))
+(defun sterpri () (setq *grind-charlist* (cons #\newline *grind-charlist*) *chrps* 0))
 
-(defun styotbsp (n) (declare (fixnum n)) (setq chrps n)
+(defun styotbsp (n) (declare (fixnum n)) (setq *chrps* n)
        (do () ((< n 1)) (setq *grind-charlist* (cons #\space *grind-charlist*) n (1- n))))
 
 (defun mstring (x)

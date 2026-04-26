@@ -16,16 +16,16 @@
 ;;; appear, so that mprint can decide when to break a line and so
 ;;; that strgrind (in grind.lisp) can buffer string-mode output via
 ;;; styo/sterpri.
-(defvar chrps 0)
+(defvar *chrps* 0)
 
 ;;; Number of characters left on the current output line, given the
 ;;; current position chrps and Maxima's $linel.
-(defun chrct* () (- $linel chrps))
+(defun chrct* () (- $linel *chrps*))
 
 ;;; Output N spaces to OUT, advancing chrps.
 (defun mtyotbsp (n out)
   (declare (fixnum n))
-  (incf chrps n)
+  (incf *chrps* n)
   (do () ((< n 1)) (write-char #\space out) (decf n)))
 
 ;;; Format a Maxima `do' form (mdo) as a flat keyword-tagged list,
@@ -95,28 +95,28 @@
                (t dummy))))))
 
 (defun mgrind (x out)
-  (setq chrps 0)
+  (setq *chrps* 0)
   (mprint (msize x nil nil 'mparen 'mparen) out))
 
 (defun mprint (x out)
   (cond ((characterp x)
-	 (incf chrps)
+	 (incf *chrps*)
 	 (write-char x out))
 	((< (car x) (chrct*)) (mapc #'(lambda (l) (mprint l out)) (cdr x)))
-	(t (prog (i) (setq i chrps)
+	(t (prog (i) (setq i *chrps*)
 		 (mprint (cadr x) out)
 		 (cond ((null (cddr x)) (return nil))
 		       ((and (or (atom (cadr x)) (< (caadr x) (chrct*)))
 			     (or (> (chrct*) (truncate $linel 2))
 				 (atom (caddr x)) (< (caaddr x) (chrct*))))
-			(setq i chrps)
+			(setq i *chrps*)
 			(mprint (caddr x) out))
-		       (t (setq i (1+ i)) (setq chrps 0) (terpri out)
+		       (t (setq i (1+ i)) (setq *chrps* 0) (terpri out)
 			  (mtyotbsp i out) (mprint (caddr x) out)))
 		 (do ((l (cdddr x) (cdr l))) ((null l))
 		   (cond
 		     ((or (atom (car l)) (< (caar l) (chrct*))) nil)
-		     (t (setq chrps 0) (terpri out) (mtyotbsp i out)))
+		     (t (setq *chrps* 0) (terpri out) (mtyotbsp i out)))
 		   (mprint (car l) out))))))
 
 (defun msize (x l r lop rop)
