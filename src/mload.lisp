@@ -263,6 +263,12 @@
           (with-open-file (in-stream filename)
             (batch-stream in-stream demo)))))))
 
+(defmfun $demo (filename)
+  (let ((tem ($file_search filename $file_search_demo)))
+    (or tem (merror (intl:gettext "demo: could not find ~M in ~M.")
+		    filename '$file_search_demo))
+    ($batch tem	'$demo)))
+
 (defun batch-stream (in-stream demo)
   (declare (special $batch_answers_from_file))
   (let ($load_pathname)

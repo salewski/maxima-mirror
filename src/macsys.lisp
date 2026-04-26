@@ -308,35 +308,6 @@
     (third (mread #+(or sbcl cmu) *standard-input*
                   #-(or sbcl cmu) *query-io*))))
 
-;; FUNCTION BATCH APPARENTLY NEVER CALLED. OMIT FROM GETTEXT SWEEP AND DELETE IT EVENTUALLY
-(defun batch (filename &optional demo-p
-	      &aux (orig filename) list
-	      file-obj (accumulated-time 0.0) (abortp t))
-  (setq list (if demo-p '$file_search_demo '$file_search_maxima))
-  (setq filename ($file_search filename (symbol-value list)))
-  (or filename (merror "Could not find ~M in ~M: ~M"
-		       orig list (symbol-value list)))
-
-  (unwind-protect
-       (progn (batch-internal (setq file-obj (open filename)) demo-p)
-	      (setq abortp nil)
-	      (when $showtime
-		(format t "~&Batch spent ~,4F seconds in evaluation.~%"
-			accumulated-time)))
-    (if file-obj (close file-obj))
-    (when abortp (format t "~&(Batch of ~A aborted.)~%" filename))))
-
-
-(defun batch-internal (fileobj demo-p)
-  (continue :stream (make-echo-stream fileobj *standard-output*)
-	    :batch-or-demo-flag (if demo-p ':demo ':batch)))
-
-(defmfun $demo (filename)
-  (let ((tem ($file_search filename $file_search_demo)))
-    (or tem (merror (intl:gettext "demo: could not find ~M in ~M.")
-		    filename '$file_search_demo))
-    ($batch tem	'$demo)))
-
 (defmfun $bug_report ()
   (if $maxima_frontend
       (format t (intl:gettext
