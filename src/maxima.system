@@ -654,13 +654,24 @@
 	    :depends-on ("globals" "defmfun" "compatibility-macros" "compatibility-macros1"
                                    "declarations" "fundamental-macros" "other-macros"
                                    "prerequisites" "rat-macros" "utilities")
-	    :components
-	    ((:file "lesfac")
-	     (:file "factor")
-	     (:file "algfac")
-	     (:file "nalgfa")
-	     (:file "ufact")
-	     (:file "result")))
+            ;; Compile-time deps form a DAG.  Runtime cycle by design:
+            ;; factor <-> algfac (7+7 calls) -- factor's general
+            ;; factoring dispatches to algfac for algebraic
+            ;; extensions; algfac uses factor's primitives.  Several
+            ;; declare-top specials in factor.lisp (var, res, trl*,
+            ;; ind, alc, *xn, split*) are mutated cross-file.
+            :components
+	    ((:file "factor")           ; declare-top specials, base primitives
+	     (:file "lesfac"            ; calls factor:testdivide
+                    :depends-on ("factor"))
+	     (:file "ufact"             ; mutates factor's specials
+                    :depends-on ("factor"))
+	     (:file "result"
+                    :depends-on ("factor" "lesfac" "ufact"))
+	     (:file "algfac"            ; cycle with factor; uses result:redresult
+                    :depends-on ("factor" "result"))
+	     (:file "nalgfa"            ; calls result:resultant)
+                    :depends-on ("factor" "result"))))
    (:module ifactor :source-pathname ""
 	    :depends-on ("defmfun" "prerequisites" "rat-macros" "utility-macros")
 	    :components
