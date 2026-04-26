@@ -622,14 +622,22 @@
                                    "fundamental-macros" "i-o" "other-macros" "prerequisites"
                                    "numerical-utilities"
                                    "simp-utilities")
+            ;; Module is a clean DAG at every level: function calls,
+            ;; macros, special-variable references.
 	    :components
 	    ((:file "simp-fn")
-	     (:file "float")
 	     (:file "csimp")
-	     (:file "csimp2")
-	     (:file "zero")
 	     (:file "logarc")
-	     (:file "rpart")))
+	     (:file "rpart"
+                    :depends-on ("logarc"))
+	     (:file "float"
+                    :depends-on ("logarc" "rpart"))
+	     (:file "csimp2"
+                    :depends-on ("csimp" "float" "rpart"))
+	     (:file "zero"
+                    :depends-on ("rpart"))
+	     (:file "halfangle"
+                    :depends-on ("rpart"))))
    (:module numeric-bigfloat :source-pathname ""
 	    :depends-on ("globals" "defmfun" #-gcl "package"
 			       #+gcl "proclaim")
