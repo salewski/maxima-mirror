@@ -647,18 +647,27 @@
             ;; prompt-formatting cluster (format-prompt, break-prompt,
             ;; main-prompt, stripdollar, plus their specials),
             ;; extracted from macsys and suprv1 so both can depend on
-            ;; it without forming a cycle.  One small runtime cycle
-            ;; remains: macsys <-> mload (macsys:demo-impl invokes
-            ;; mload's $batch / $file_search; mload:batch-stream
-            ;; re-enters macsys:continue for the batch loop).
+            ;; it without forming a cycle.  generic-autoload and
+            ;; $directory were moved from suprv1 to mload (where they
+            ;; logically belong, since both are file-loading
+            ;; operations) to break the suprv1 <-> mload cycle.  One
+            ;; small runtime cycle remains: macsys <-> mload
+            ;; (macsys:demo-impl invokes mload's $batch / $file_search;
+            ;; mload:batch-stream re-enters macsys:continue for the
+            ;; batch loop).
 	    :components
-	    ((:file "prompt")
-	     (:file "suprv1" :depends-on ("prompt"))
-	     (:file "macsys" :depends-on ("prompt" "suprv1"))
+	    ((:file "prompt-util")
+	     (:file "suprv1"
+                    :depends-on ("prompt-util"))
+	     (:file "macsys"
+                    :depends-on ("prompt-util" "suprv1"))
 	     (:file "testsuite")
-	     (:file "mload"  :depends-on ("prompt" "suprv1" "macsys" "testsuite"))
-	     (:file "mactex" :depends-on ("prompt" "suprv1"))
-	     (:file "dskfn"  :depends-on ("prompt" "suprv1"))))
+	     (:file "mload"
+                    :depends-on ("prompt-util" "suprv1" "macsys" "testsuite"))
+	     (:file "mactex"
+                    :depends-on ("prompt-util" "suprv1"))
+	     (:file "dskfn"
+                    :depends-on ("prompt-util" "suprv1"))))
    (:module factoring :source-pathname ""
 	    :depends-on ("globals" "defmfun" "compatibility-macros" "compatibility-macros1"
                                    "declarations" "fundamental-macros" "other-macros"
