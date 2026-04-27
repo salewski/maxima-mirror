@@ -1009,13 +1009,19 @@
                     :depends-on ("expintegral"))
              (:file "plasma")))
 
+   (:module random :source-pathname ""
+            ;; Mersenne Twister random-number implementation.
+            :depends-on ("globals" "utilities")
+            :components
+            ((:file "rand-mt19937")))
    (:module miscellaneous :source-pathname ""
 	    :depends-on ("globals" "defmfun" "compatibility-macros1"
                                    "reader" "utility-macros" "commands"
                                    "destructuring-let" "errset" "other-macros"
                                    "rat-macros" "declarations"  "fundamental-macros"
                                    "numerical-utilities"
-                                   "m2-pattern-matcher")
+                                   "m2-pattern-matcher"
+                                   "random")
 	    :components
 	    ((:file "scs")
 	     (:file "asum")
@@ -1028,8 +1034,8 @@
 	     (:file "pade")
 	     (:file "homog")
 	     (:file "combin")
+             ;; nset needs $random.
 	     (:file "nset")
-	     (:file "rand-mt19937")
 	     (:file "maxmin")
 	     (:file "conjugate")
              (:file "hstep")
