@@ -844,7 +844,11 @@
             ;; special-variable references.
             :components
             ((:file "hyp")
-	     (:file "hypergeometric")
+             ;; Note: nummod uses apply-reflection-rule from trigi.
+             ;; This should be updated.
+             (:file "nummod")
+	     (:file "hypergeometric"
+                    :depends-on ("nummod"))
 	     (:file "nfloat"
 		    ;; Comment in nfloat says hypergeometric needs to
 		    ;; be loaded first.
@@ -1004,6 +1008,7 @@
              (:file "gamma"
                     :depends-on ("expintegral"))
              (:file "plasma")))
+
    (:module miscellaneous :source-pathname ""
 	    :depends-on ("globals" "defmfun" "compatibility-macros1"
                                    "reader" "utility-macros" "commands"
@@ -1026,7 +1031,6 @@
 	     (:file "nset")
 	     (:file "rand-mt19937")
 	     (:file "maxmin")
-	     (:file "nummod")
 	     (:file "conjugate")
              (:file "hstep")
              (:file "sinc")
