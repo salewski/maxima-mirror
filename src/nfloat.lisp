@@ -339,7 +339,7 @@
 	     (setq e (nformat e))
 	     (setq eps (expt 10.0 (- digits)))
 	     (setq eps (/ eps (- 1 eps)))
-	     (while (and (or (null (first z)) (bigfloat::not-done (second z) (first z) eps machine-epsilon))
+	     (maxima::while (and (or (null (first z)) (bigfloat::not-done (second z) (first z) eps machine-epsilon))
 			 (< digits max-digits))
 	       (bind-fpprec digits 
 			    (setq z (bigfloat::running-error-eval e subs fpprec))

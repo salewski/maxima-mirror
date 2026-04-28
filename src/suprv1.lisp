@@ -142,22 +142,6 @@
 
 (defvar *autoloaded-files* ())
 
-(defun generic-autoload (file &aux type)
-  (unless (member file *autoloaded-files* :test #'equal)
-    (push file *autoloaded-files*)
-    (setq file (pathname (cdr file)))
-    (setq type (pathname-type file))
-    (let ((bin-ext #+gcl "o"
-		   #+cmu (c::backend-fasl-file-type c::*target-backend*)
-		   #+clisp "fas"
-		   #+allegro "fasl"
-		   #+openmcl (pathname-type ccl::*.fasl-pathname*)
-		   #+lispworks (pathname-type (compile-file-pathname "foo.lisp"))
-		   #-(or gcl cmu clisp allegro openmcl lispworks) ""))
-      (if (member type (list bin-ext "lisp" "lsp")  :test 'equalp)
-	  (let ((*read-base* 10.) (*print-base* 10.)) #-sbcl (load file) #+sbcl (with-compilation-unit nil (load file)))
-	  ($load file)))))
-
 (defvar autoload 'generic-autoload)
 
 (defun load-function (func mexprp)	; The dynamic loader
@@ -168,14 +152,6 @@
 (defmspec $loadfile (form)
   (loadfile (namestring (maxima-string (meval (cadr form)))) nil
 	    (not (member $loadprint '(nil $autoload) :test #'equal))))
-
-(defmfun $setup_autoload (filename &rest functions)
-  (let ((file ($file_search filename)))
-    (dolist (func functions)
-      (nonsymchk func '$setup_autoload)
-      (putprop (setq func ($verbify func)) file 'autoload)
-      (add2lnc func $props)))
-  '$done)
 
 (defun dollarify (l)
   (let ((errset t))
@@ -204,9 +180,6 @@
 	 (tem (errset #-sbcl (load (pathname file)) #+sbcl (with-compilation-unit nil (load (pathname file))))))
     (or tem (merror (intl:gettext "loadfile: failed to load ~A") (namestring path)))
     (namestring path)))
-
-(defmfun $directory (path)
-  (cons '(mlist) (mapcar 'namestring (directory ($filename_merge path)))))
 
 (defmspec $kill (form)
   (clear)	;; get assume db into consistent state
@@ -542,17 +515,6 @@
 	     (setf $aliases (delete x $aliases :count 1 :test #'eq))
 	     (remprop (setq x y) 'alias) (remprop x 'verb) x))))
 
-(defun stripdollar (x)
-  (cond ((not (atom x))
-	 (cond ((and (eq (caar x) 'bigfloat) (not (minusp (cadr x)))) (implode (fpformat x)))
-	       (t (merror (intl:gettext "STRIPDOLLAR: argument must be an atom; found: ~M") x))))
-	((numberp x) x)
-	((null x) 'false)
-	((eq x t) 'true)
-        ((member (get-first-char x) '(#\$ #\%) :test #'char=)
-         (intern (subseq (string x) 1)))
-	(t x)))
-
 (defun fullstrip (x)
   (mapcar #'fullstrip1 x))
 
@@ -780,6 +742,9 @@
   (if (> thistime 0)
       (incf thistime (- (get-internal-run-time) tim))))
 
+
+(defvar *maxima-epilog* ""
+  "String printed when Maxima exits via $quit.")
 
 (defmfun $quit (&optional (exit-code 0))
   "Quit Maxima with an optional exit code for Lisps and systems that

@@ -14,82 +14,6 @@
 
 (macsyma-module system)
 
-;;; Standard Kinds of Input Prompts
-
-(defmvar $prompt '_
-  "Prompt symbol of the demo function, playback, and the Maxima break loop.")
-
-
-;; A prefix and suffix that are wrapped around every prompt that Maxima
-;; emits. This is designed for use with text-based interfaces that drive Maxima
-;; through standard input and output and need to decorate prompts to make the
-;; output easier to parse. There are some more notes in
-;; doc/implementation/external-interface.txt.
-(defvar *prompt-prefix* "")
-(defvar *prompt-suffix* "")
-(defvar *general-display-prefix* "")
-(defvar $alt_format_prompt nil "If NIL, use DEFAULT-FORMAT-PROMPT to print input prompt; if a function, use it to print input prompt.")
-
-(defun format-prompt (destination control-string &rest arguments)
-  "If $ALT_FORMAT_PROMPT is NIL, use DEFAULT-FORMAT-PROMPT to print
-prompt; otherwise MFUNCALL $ALT_FORMAT_PROMPT to print prompt."
-  (funcall (if $alt_format_prompt #'alt-format-prompt #'default-format-prompt)
-	   destination control-string arguments))
-
-(defun alt-format-prompt (destination control-string arguments)
-  "MFUNCALL $ALT_FORMAT_PROMPT with a heavy coating of error protection."
-  (handler-bind ((error (lambda(msg) (setq $alt_format_prompt nil)
-			       (format t (intl:gettext "Error in printing prompt; reverting to default.~%~a") msg)
-			       (throw 'macsyma-quit 'maxima-error))))
-    (with-$error (let ((prompt (mfuncall $alt_format_prompt destination control-string arguments)))
-		   (if (stringp prompt) prompt (merror "alt_format_prompt returned an object of type ~a, needed a string." (type-of prompt)))))))
-
-(defun default-format-prompt (destination control-string arguments)
-  "Like AFORMAT, but add the prefix and suffix configured for a prompt. This
-function deals correctly with the ~M control character, but only when
-DESTINATION is an actual stream (rather than nil for a string)."
-  (let ((*print-circle* nil) (*print-base* 10.) *print-radix*)
-    (if (null destination)
-	;; return value string is important
-	(concatenate 'string
-		     *prompt-prefix*		     
-		     (apply #'aformat destination
-			    control-string
-			    arguments)
-		     *prompt-suffix*)
-      (progn
-	(format destination "~A~A~A"
-		*prompt-prefix*		     
-		(apply #'aformat nil
-		       control-string
-		       arguments)
-		*prompt-suffix*)))))
-    
-
-(defvar $default_format_prompt (symbol-function 'default-format-prompt))
-
-;;  "When time began" (or at least the start of version control history),
-;;  the following comment was made at this point:
-;;
-;;     instead of using this STRIPDOLLAR hackery, the
-;;     MREAD function should call MFORMAT to print the prompt,
-;;     and take a format string and format arguments.
-;;     Even easier and more general is for MREAD to take
-;;     a FUNARG as the prompt. -gjc
-;;
-;;  I guess we're still failing miserably, but unfortunately MFORMAT/AFORMAT
-;;  don't deal correctly with ~M plus a string output stream.
-(defun main-prompt ()
-  (if (and *display-labels-p* (not *suppress-input-echo*))
-      (format-prompt nil "(~A~A) "
-                     (print-invert-case (stripdollar $inchar))
-                     $linenum)
-      ""))
-
-(defun break-prompt ()
-  (format-prompt nil "~A"
-                 (print-invert-case (stripdollar $prompt))))
-
 (defun toplevel-macsyma-eval (x)
   ;; Catch rat-err's here.
   ;;
@@ -384,35 +308,6 @@ DESTINATION is an actual stream (rather than nil for a string)."
     (third (mread #+(or sbcl cmu) *standard-input*
                   #-(or sbcl cmu) *query-io*))))
 
-;; FUNCTION BATCH APPARENTLY NEVER CALLED. OMIT FROM GETTEXT SWEEP AND DELETE IT EVENTUALLY
-(defun batch (filename &optional demo-p
-	      &aux (orig filename) list
-	      file-obj (accumulated-time 0.0) (abortp t))
-  (setq list (if demo-p '$file_search_demo '$file_search_maxima))
-  (setq filename ($file_search filename (symbol-value list)))
-  (or filename (merror "Could not find ~M in ~M: ~M"
-		       orig list (symbol-value list)))
-
-  (unwind-protect
-       (progn (batch-internal (setq file-obj (open filename)) demo-p)
-	      (setq abortp nil)
-	      (when $showtime
-		(format t "~&Batch spent ~,4F seconds in evaluation.~%"
-			accumulated-time)))
-    (if file-obj (close file-obj))
-    (when abortp (format t "~&(Batch of ~A aborted.)~%" filename))))
-
-
-(defun batch-internal (fileobj demo-p)
-  (continue :stream (make-echo-stream fileobj *standard-output*)
-	    :batch-or-demo-flag (if demo-p ':demo ':batch)))
-
-(defmfun $demo (filename)
-  (let ((tem ($file_search filename $file_search_demo)))
-    (or tem (merror (intl:gettext "demo: could not find ~M in ~M.")
-		    filename '$file_search_demo))
-    ($batch tem	'$demo)))
-
 (defmfun $bug_report ()
   (if $maxima_frontend
       (format t (intl:gettext
@@ -518,7 +413,6 @@ DESTINATION is an actual stream (rather than nil for a string)."
 (defvar *maxima-started* nil)
 
 (defvar *maxima-prolog* "")
-(defvar *maxima-epilog* "")
 
 (defvar *maxima-quiet* nil)
 

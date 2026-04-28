@@ -137,3 +137,19 @@
        (zerop1 (sub exp
                     (mul var (coeff exp var 1))))))
 
+(defun margs (form)
+  (if (eq (caar form) 'mqapply)
+      (cddr form)
+      (cdr form)))
+
+(defun atomchk (e fun 2ndp)
+  (if (or (atom e) (eq (caar e) 'bigfloat))
+      (merror (intl:gettext "~:M: ~Margument must be a non-atomic expression; found ~M") fun (if 2ndp "2nd " "") e)))
+
+(defmfun $member (x e)
+  (atomchk e '$member t)
+  (setq x (specrepcheck x))
+  (dolist (i (margs e))
+    (when (alike1 x (specrepcheck i))
+      (return t))))
+
