@@ -16,6 +16,9 @@
 (export '*maxima-build-time*)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
+  ;; All Lisp files MUST be compiled with this so that every literal
+  ;; number is read as a double-float.
+  (setf cl:*read-default-float-format* 'cl:double-float)
   (unless (find-package :maxima.system)
     (defpackage :maxima.system
       (:use :common-lisp :asdf))))
@@ -31,12 +34,6 @@
     :components (#-gcl (:file "maxima-package")
                  #+ecl (:file "ecl-port")
                  (:file "autoconf-variables" :depends-on ("maxima-package"))))
-   ;; Very important module to set the float format correctly so that
-   ;; all literal floats numbers have the desired type.
-   ;;
-   ;; NOTE: For any new module that's added that has literal floats,
-   ;; make sure it depends on float-format or, transitively,
-   ;; compatibility-macros1.
    (:module float-format :pathname ""
     :components
     ((:file "float-format")))
