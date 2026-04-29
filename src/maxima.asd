@@ -534,7 +534,7 @@
       (:file "bfloat"
         :depends-on ("logarc" "rpart"))
       (:file "csimp2"
-        :depends-on ("csimp" "float" "rpart"))
+        :depends-on ("csimp" "bfloat" "rpart"))
       (:file "zero"
         :depends-on ("rpart"))
       (:file "halfangle"
