@@ -1097,6 +1097,8 @@
       (:file "pade")
       (:file "combin"
         :depends-on ("asum" "series"))
+      (:file "sumprod"
+        :depends-on ("asum" "combin"))
       ;; This file should probably in the special-functions-misc
       ;; module, but things break if it gets moved.
       (:file "conjugate")))
