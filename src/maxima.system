@@ -1097,11 +1097,6 @@
       ;; This file should probably in the special-functions-misc
       ;; module, but things break if it gets moved.
       (:file "conjugate")))
-   (:module series-expansion
-     :source-pathname ""
-     :components
-     ((:file "series")
-      (:file "pade")))
    (:module number-theory
      :source-pathname ""
      :depends-on ("globals" "defmfun" "compatibility-macros1"
@@ -1120,6 +1115,7 @@
                   "rat-macros" "declarations"  "fundamental-macros"
                   "numerical-utilities"
                   "m2-pattern-matcher" "sets")
+     ;; These files are completely independent of each other.
      :components
      ((:file "hstep")
       (:file "sinc")
@@ -1144,6 +1140,7 @@
                   "numerical-utilities"
                   "m2-pattern-matcher"
                   "miscellaneous")
+     ;; These files are completely independent of each other.
      :components
      ((:file "scs")
       (:file "optim")
