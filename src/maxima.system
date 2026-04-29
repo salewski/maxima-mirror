@@ -682,7 +682,7 @@
    (:module numeric-bigfloat
      :source-pathname ""
      :depends-on ("globals" "defmfun" #-gcl "package"
-			              #+gcl "proclaim")
+                                      #+gcl "proclaim")
      :components
      ((:file "numeric")))
    (:module server
@@ -1084,27 +1084,88 @@
                   "destructuring-let" "errset" "other-macros"
                   "rat-macros" "declarations"  "fundamental-macros"
                   "numerical-utilities"
-                  "m2-pattern-matcher"
-                  "random")
+                  "m2-pattern-matcher")
      :components
-     ((:file "scs")
-      (:file "asum")
-      (:file "fortra")
-      (:file "optim")
-      (:file "marray")
+     ((:file "asum")
+      (:file "combin")
       (:file "mdot")
       (:file "series")
-      (:file "numth")
       (:file "pade")
-      (:file "homog")
-      (:file "combin")
-      ;; nset needs $random.
-      (:file "nset")
-      (:file "maxmin")
-      (:file "conjugate")
-      (:file "hstep")
+      ;; This file should probably in the special-functions-misc
+      ;; module, but things break if it gets moved.
+      (:file "conjugate")))
+   (:module series-expansion
+     :source-pathname ""
+     :components
+     ((:file "series")
+      (:file "pade")))
+   (:module number-theory
+     :source-pathname ""
+     :depends-on ("globals" "defmfun" "compatibility-macros1"
+                  "reader" "utility-macros" "commands"
+                  "destructuring-let" "errset" "other-macros"
+                  "rat-macros" "declarations"  "fundamental-macros"
+                  "numerical-utilities"
+                  "m2-pattern-matcher" "miscellaneous")
+     :components
+     ((:file "numth")))
+   (:module special-functions-misc
+     :source-pathname ""
+     :depends-on ("globals" "defmfun" "compatibility-macros1"
+                  "reader" "utility-macros" "commands"
+                  "destructuring-let" "errset" "other-macros"
+                  "rat-macros" "declarations"  "fundamental-macros"
+                  "numerical-utilities"
+                  "m2-pattern-matcher" "sets")
+     :components
+     ((:file "hstep")
       (:file "sinc")
+      (:file "maxmin")))
+   (:module sets
+     :source-pathname ""
+     :depends-on ("globals" "defmfun" "compatibility-macros1"
+                  "reader" "utility-macros" "commands"
+                  "destructuring-let" "errset" "other-macros"
+                  "rat-macros" "declarations"  "fundamental-macros"
+                  "numerical-utilities"
+                  "m2-pattern-matcher"
+                  "random" "miscellaneous")
+     :components
+     ((:file "nset")))
+   (:module expression-utils
+     :source-pathname ""
+     :depends-on ("globals" "defmfun" "compatibility-macros1"
+                  "reader" "utility-macros" "commands"
+                  "destructuring-let" "errset" "other-macros"
+                  "rat-macros" "declarations"  "fundamental-macros"
+                  "numerical-utilities"
+                  "m2-pattern-matcher"
+                  "miscellaneous")
+     :components
+     ((:file "scs")
+      (:file "optim")
+      (:file "homog")
       (:file "mstuff")))
+   (:module fortran-output
+     :source-pathname ""
+     :depends-on ("globals" "defmfun" "compatibility-macros1"
+                  "reader" "utility-macros" "commands"
+                  "destructuring-let" "errset" "other-macros"
+                  "rat-macros" "declarations"  "fundamental-macros"
+                  "numerical-utilities"
+                  "m2-pattern-matcher")
+     :components
+     ((:file "fortra")))
+   (:module arrays
+     :source-pathname ""
+     :depends-on ("globals" "defmfun" "compatibility-macros1"
+                  "reader" "utility-macros" "commands"
+                  "destructuring-let" "errset" "other-macros"
+                  "rat-macros" "declarations"  "fundamental-macros"
+                  "numerical-utilities"
+                  "m2-pattern-matcher")
+     :components
+     ((:file "marray")))
    (:module polynomial
      :source-pathname ""
      :depends-on ("defmfun")
