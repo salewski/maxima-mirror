@@ -748,7 +748,7 @@
 		  "compatibility-macros1" "ifactor" "factoring"
                   "compatibility-macros" "declarations" "destructuring-let"
                   "fundamental-macros" "prerequisites" "utilities"
-                  "simp-utilities")
+                  "simp-utilities" "nummod")
      ;; Compile-time deps ahve no cross-file macros nor
      ;; cross-file specials.  However, there's lots of mutually
      ;; recursive calls amlong the files.  Pretty hard to fix this. 

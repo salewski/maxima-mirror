@@ -601,7 +601,7 @@
                   compatibility-macros1 ifactor factoring
                   compatibility-macros declarations destructuring-let
                   fundamental-macros prerequisites utilities
-                  simp-utilities)
+                  simp-utilities nummod)
      ;; Compile-time deps have no cross-file macros nor cross-file
      ;; specials.  However, there are lots of mutually recursive calls
      ;; among the files.  Pretty hard to fix this.
@@ -662,7 +662,7 @@
      :pathname ""
      :depends-on (globals defmfun trigonometry algebraic-database
                   utility-macros reader fundamental-macros other-macros
-                  prerequisites numerical-utilities)
+                  prerequisites numerical-utilities nummod)
      ;; Module is a clean DAG at every level: function calls, macros,
      ;; special-variable references.
      :components ((:file "bessel")
@@ -671,7 +671,7 @@
      :pathname ""
      :depends-on (globals defmfun trigonometry algebraic-database
                   utility-macros reader fundamental-macros other-macros
-                  prerequisites numerical-utilities)
+                  prerequisites numerical-utilities nummod)
      :components ((:file "ellipt")))
    (:module numerical-functions
      :pathname ""
@@ -694,7 +694,7 @@
      :pathname ""
      :depends-on (globals defmfun declarations destructuring-let
                   fundamental-macros prerequisites
-                  rat-macros utilities)
+                  rat-macros utilities nummod)
      ;; Module is a clean DAG at every level: function calls,
      ;; macros, special-variable references.
      :components ((:file "spgcd")
@@ -724,13 +724,24 @@
      ;; Variable predicates like FREEVAR, VARP.
      :depends-on (simp-utilities)
      :components ((:file "var-predicate")))
+   (:module nummod
+     :pathname ""
+     :depends-on (globals defmfun compatibility-macros
+                  compatibility-macros1 rat-macros
+                  fundamental-macros prerequisites
+                  simp-utilities algebraic-database
+                  commands rational-functions
+                  simplification utilities
+                  limits numeric-bigfloat)
+     :components
+     ((:file "nummod")))
    (:module hypergeometric
      :pathname ""
      ;; Simplification and evaluation of hypergeometric functions.
      :depends-on (compatibility-macros1 declarations defmfun errset globals
                   miscellaneous other-macros prerequisites
                   utility-macros m2-pattern-matcher
-                  variable-predicates)
+                  variable-predicates nummod)
      ;; Module is a clean DAG at every level: function calls, macros,
      ;; special-variable references.
      :components
@@ -796,7 +807,7 @@
      :depends-on (globals defmfun compatibility-macros declarations
                   errset fundamental-macros other-macros
                   prerequisites utility-macros taylor-series
-                  m2-pattern-matcher)
+                  m2-pattern-matcher nummod)
      ;; Compile-time deps form a DAG.  Runtime cycle trigi <->
      ;; trigo is structural (trigi calls trigo:trigexpand for
      ;; forward simplification, trigo calls trigi for shared
@@ -883,7 +894,7 @@
                   (:file "mdebug")))
    (:module gamma-expint
      :pathname ""
-     :depends-on (numerical-utilities m2-pattern-matcher)
+     :depends-on (numerical-utilities m2-pattern-matcher nummod)
      ;; Module is a clean DAG at every level: function calls, macros,
      ;; special-variable references.
      :components ((:file "expintegral")
@@ -901,7 +912,7 @@
                   reader utility-macros commands
                   destructuring-let errset other-macros
                   rat-macros declarations fundamental-macros
-                  numerical-utilities m2-pattern-matcher random)
+                  numerical-utilities m2-pattern-matcher random nummod)
      :components ((:file "scs")
                   (:file "asum")
                   (:file "fortra")
