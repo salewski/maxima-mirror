@@ -1097,7 +1097,7 @@
       (:file "pade")
       (:file "combin"
         :depends-on ("asum" "series"))
-      (:file "sumprod"
+      (:file "sumprod-core"
         :depends-on ("asum" "combin"))
       ;; This file should probably in the special-functions-misc
       ;; module, but things break if it gets moved.
