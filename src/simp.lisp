@@ -3309,3 +3309,10 @@
 	  (let ((term (if (equal pow 1) var (power var pow))))
 	    (if (memalike term (cdr e)) ($delete term e 1) 0)))
 	 (t 0))))
+
+;; If OP has a reflection-rule, apply it.
+(defun apply-reflection-simp (op x &optional (b t))
+  (let ((f (get op 'reflection-rule)))
+    (if (and b f (great (neg x) x)) (funcall f op x) nil)))
+  
+

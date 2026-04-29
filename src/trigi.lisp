@@ -378,10 +378,6 @@
 ;; could cause an infinite loop. I could protect against this possibility with 
 ;; (and b f (great (neg x) x) (not (great x (neg x))).
 
-(defun apply-reflection-simp (op x &optional (b t))
-  (let ((f (get op 'reflection-rule)))
-    (if (and b f (great (neg x) x)) (funcall f op x) nil)))
-  
 (defun taylorize (op x)
   (if ($taylorp x)
       (mfuncall '$apply '$taylor `((mlist) ((,op) ,($ratdisrep x)) ,@(cdr ($taylorinfo x)))) nil))

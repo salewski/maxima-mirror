@@ -72,6 +72,13 @@
 	*bfmhalf* (list (car *bigfloatone*) (- (cadr *bigfloatone*)) 0))
   q)
 
+;; Set fpprec to the given VAL and update the values of the bfloat constants.
+(defmacro bind-fpprec (val &body exprs)
+  `(let (fpprec *bigfloatzero* *bigfloatone* *bfhalf* *bfmhalf*)
+     (let (($fpprec (fpprec1 nil ,val)))
+       ,@exprs)))
+
+
 ;; FPSCAN is called by lexical scan when a
 ;; bigfloat is encountered.  For example, 12.01B-3
 ;; would be the result of (FPSCAN '(/1 /2) '(/0 /1) '(/- /3))
