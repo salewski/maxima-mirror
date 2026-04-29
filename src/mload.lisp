@@ -196,6 +196,43 @@
     (pathname-type pathname)))
   
 
+;; Following GENERIC-AUTOLOAD is copied from orthopoly/orthopoly-init.lisp.
+;; Previous version didn't take Clisp, CMUCL, or SBCL into account.
+;; Moved here from suprv1 (along with $setup_autoload and $directory)
+;; so that mload no longer has a back-edge from suprv1.  The defvar
+;; *autoloaded-files* stays in suprv1 because suprv1's kill code
+;; mutates it; suprv1 also still owns (defvar autoload
+;; 'generic-autoload) since its load-function calls (funcall autoload
+;; ...).
+
+(defun generic-autoload (file &aux type)
+  (unless (member file *autoloaded-files* :test #'equal)
+    (push file *autoloaded-files*)
+    (setq file (pathname (cdr file)))
+    (setq type (pathname-type file))
+    (let ((bin-ext #+gcl "o"
+		   #+cmu (c::backend-fasl-file-type c::*target-backend*)
+		   #+clisp "fas"
+		   #+allegro "fasl"
+		   #+openmcl (pathname-type ccl::*.fasl-pathname*)
+		   #+lispworks (pathname-type (compile-file-pathname "foo.lisp"))
+		   #-(or gcl cmu clisp allegro openmcl lispworks) ""))
+      (if (member type (list bin-ext "lisp" "lsp")  :test 'equalp)
+	  (let ((*read-base* 10.) (*print-base* 10.)) #-sbcl (load file) #+sbcl (with-compilation-unit nil (load file)))
+	  ($load file)))))
+
+(defmfun $directory (path)
+  (cons '(mlist) (mapcar 'namestring (directory ($filename_merge path)))))
+
+(defmfun $setup_autoload (filename &rest functions)
+  (let ((file ($file_search filename)))
+    (dolist (func functions)
+      (nonsymchk func '$setup_autoload)
+      (putprop (setq func ($verbify func)) file 'autoload)
+      (add2lnc func $props)))
+  '$done)
+
+
 (defvar *macsyma-startup-queue* nil)
 
 (declaim (special *mread-prompt*))
@@ -225,6 +262,12 @@
         (t
           (with-open-file (in-stream filename)
             (batch-stream in-stream demo)))))))
+
+(defmfun $demo (filename)
+  (let ((tem ($file_search filename $file_search_demo)))
+    (or tem (merror (intl:gettext "demo: could not find ~M in ~M.")
+		    filename '$file_search_demo))
+    ($batch tem	'$demo)))
 
 (defun batch-stream (in-stream demo)
   (declare (special $batch_answers_from_file))

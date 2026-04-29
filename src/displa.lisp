@@ -87,17 +87,6 @@
   (mgrind form *standard-output*)
   (mterpri))
 
-(defmvar $display_format_internal nil
-  "Setting this TRUE can help give the user a greater understanding
-	 of the behavior of maxima on certain of his problems,
-	 especially those involving roots and quotients")
-
-(defun nformat-check (form)
-  (if (and $display_format_internal
-	   (not (or (atom form) (atom (car form)) (specrepp form))))
-      form
-      (nformat form)))
-
 (defun dimension (form result lop rop w right)
   (let ((level (1+ level))
 	(break (if (and w break) (+ w break))))
@@ -151,28 +140,6 @@
 			(setq result nil w (+ $linel width))
 			(incf width))
 		      (setq result (rplacd dummy result))))))))
-
-(defun makestring (atom)
-  (let (dummy)
-    (cond ((numberp atom) (exploden atom))
-          ((stringp atom)
-           (setq dummy (coerce atom 'list))
-           (if $stringdisp
-               (cons #\" (nconc dummy (list #\")))
-               dummy))
-          ((not (symbolp atom)) (exploden atom))
-          ((and (setq dummy (get atom 'reversealias))
-                (not (and (member atom $aliases :test #'eq) (get atom 'noun))))
-           (exploden (stripdollar dummy)))
-          ((not (eq (getop atom) atom))
-           (makestring (getop atom)))
-          (t (setq dummy (exploden atom))
-             (cond
-               ((null dummy) nil)
-               ((char= #\$ (car dummy)) (cdr dummy))
-               ((char= #\% (car dummy)) (cdr dummy))
-               ($lispdisp (cons #\? dummy))
-               (t dummy))))))
 
 (defun dimension-paren (form result)
   (setq result (cons #\) (dimension form (cons #\( result) 'mparen 'mparen 1 (1+ right))))
@@ -531,8 +498,9 @@
 	      (update-heights height depth)
 	      (return result)))))
 
-(defun dsumprod (form result d-form symbol-w symbol-h symbol-d)
-  (prog (str to dummy (w 0) (h 0) (d 0) dummy2 (lsum (eq (caar form) '%lsum)))
+(defun dsumprod (form result d-form symbol-w-above symbol-w-below symbol-h symbol-d)
+  (prog (str to dummy (w 0) (h 0) (d 0) dummy2 (lsum (eq (caar form) '%lsum)) w1)
+     ;; format the variable
      (setq dummy2 (dimension (caddr form) nil 'mparen 'mequal nil 0)
 	   w width
 	   h height
@@ -541,27 +509,30 @@
 	 (setq str " in " to "")
 	 (setq str " = "  to (cadr (cdddr form))))
      (push-string str dummy2)
+     ;; format the lower limit
      (setq dummy2 (dimension (cadddr form) dummy2 'mequal 'mparen nil 0)
 	   w (+ (length str) w width)
 	   h (max h height)
 	   d (max d depth))
+     ;; format the upper limit
      (setq dummy (dimension to nil 'mparen 'mparen nil 0))
      (unless (checkfit (max w width))
        (return (dimension-function form result)))
-     (setq dummy2 (cons (cons (- symbol-w) (cons (- (+ symbol-d h)) dummy2)) (cons d-form result)))
-     (cond ((> width symbol-w)
-	    (setq symbol-w 0))
+     (setq dummy2 (cons (cons (- symbol-w-below) (cons (- (+ symbol-d h)) dummy2)) (cons d-form result)))
+     (cond ((> width symbol-w-below)
+	    (setq w1 0))
 	   (t
-	    (setq symbol-w (truncate (- symbol-w width) 2)
-		  width (+ symbol-w width))))
-     (setq dummy (cons (cons (- symbol-w w) (cons (+ symbol-h depth) dummy)) dummy2)
+	    (setq w1 (truncate (- symbol-w-below width) 2)
+		  width (+ w1 width))))
+     (setq dummy (cons (cons (- w1 w) (cons (+ symbol-h depth) dummy)) dummy2)
 	   w (max w width)
 	   d (+ symbol-d h d)
 	   h (+ symbol-h height depth))
      (update-heights h d)
+     ;; format the expression
      (setq dummy (dimension (cadr form) (cons (list (1+ (- w width)) 0) dummy)
 			    (caar form) rop w right)
-	   width (+ 1 w width)
+	   width (+ 1 w width (truncate (- symbol-w-above symbol-w-below) 2))
 	   height (max h height)
 	   depth (max d depth))
      (return dummy)))
@@ -604,7 +575,10 @@
 (displa-def %product dim-%product 115.)
 
 (defun dim-%product (form result)
-  (dsumprod form result '(d-prodsign) 5 3 1))
+  (let
+    ((symbol-width-above (if $display2d_unicode 7 5))
+     (symbol-width-below 5))
+    (dsumprod form result '(d-prodsign) symbol-width-above symbol-width-below 3 1)))
 
 (displa-def rat dim-rat "/")
 (displa-def %rat dim-rat "/")
@@ -974,10 +948,10 @@
 (displa-def %lsum   dim-%lsum 110.)
 
 (defun dim-%lsum (form result)
-  (dsumprod form result '(d-sumsign) 4 3 2))
+  (dsumprod form result '(d-sumsign) 4 4 3 2))
 
 (defun dim-%sum (form result)
-  (dsumprod form result '(d-sumsign) 4 3 2))
+  (dsumprod form result '(d-sumsign) 4 4 3 2))
 
 (defun dim-%limit (form result)
   (prog ((w 0) (h 0) (d 0) dummy)

@@ -386,12 +386,6 @@
   (if ($taylorp x)
       (mfuncall '$apply '$taylor `((mlist) ((,op) ,($ratdisrep x)) ,@(cdr ($taylorinfo x)))) nil))
 
-(defun float-or-rational-p (x)
-  (or (floatp x) ($ratnump x)))
-
-(defun bigfloat-or-number-p (x)
-  (or ($bfloatp x) (numberp x) ($ratnump x)))
-
 ;; When z is a Maxima complex float or when 'numer' is true and z is a
 ;; Maxima complex number, evaluate (op z) by applying the mapping from
 ;; the Maxima operator 'op' to the operator in the hash table
