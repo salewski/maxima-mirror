@@ -1085,7 +1085,7 @@
                   "rat-macros" "declarations"  "fundamental-macros"
                   "numerical-utilities"
                   "m2-pattern-matcher")
-     ;; No cycles between files except for the one between asum and combin.
+     ;; No cycles between files.
      :components
      ((:file "bbsort")
       (:file "mdot"
