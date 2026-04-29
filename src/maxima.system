@@ -1087,10 +1087,13 @@
                   "m2-pattern-matcher")
      :components
      ((:file "asum")
-      (:file "combin")
-      (:file "mdot")
-      (:file "series")
+      (:file "mdot"
+        :depends-on ("asum"))
+      (:file "series"
+        :depends-on ("asum"))
       (:file "pade")
+      (:file "combin"
+        :depends-on ("asum" "series"))
       ;; This file should probably in the special-functions-misc
       ;; module, but things break if it gets moved.
       (:file "conjugate")))
