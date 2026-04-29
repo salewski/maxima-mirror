@@ -1085,10 +1085,13 @@
                   "rat-macros" "declarations"  "fundamental-macros"
                   "numerical-utilities"
                   "m2-pattern-matcher")
+     ;; No cycles between files except for the one between asum and combin.
      :components
-     ((:file "asum")
+     ((:file "bbsort")
       (:file "mdot"
-        :depends-on ("asum"))
+        :depends-on ("bbsort"))
+      (:file "asum"
+        :depends-on ("mdot"))
       (:file "series"
         :depends-on ("asum"))
       (:file "pade")

@@ -1017,19 +1017,6 @@
 	   e)
 	  (t (neg e)))))
 
-(defun bbsort1 (l)
-  (prog (sl sl1 antisym-sign)
-     (if (or (null l) (null (cdr l))) (return (values l antisym-sign))
-	 (setq sl (list nil (car l))))
-     loop (setq l (cdr l))
-     (if (null l) (return (values (nreverse (cdr sl)) antisym-sign)))
-     (setq sl1 sl)
-     loop1(cond ((null (cdr sl1)) (rplacd sl1 (cons (car l) nil)))
-		((alike1 (car l) (cadr sl1)) (return (values 0 nil)))
-		((great (car l) (cadr sl1)) (rplacd sl1 (cons (car l) (cdr sl1))))
-		(t (setq antisym-sign (not antisym-sign) sl1 (cdr sl1)) (go loop1)))
-     (go loop)))
-
 (setq opers (cons '$nary opers)
       *opers-list (cons '($nary . nary1) *opers-list))
 
