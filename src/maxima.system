@@ -174,10 +174,6 @@
      :components
      ((:file "pregexp")
       (:file "cl-info")))
-   (:module sloop
-     :source-pathname ""
-     :components
-     ((:file "sloop")))
    (:module declarations
      :source-pathname ""
      :depends-on ("globals")

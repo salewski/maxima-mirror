@@ -57,9 +57,6 @@
      :pathname ""
      :components ((:file "pregexp")
                   (:file "cl-info")))
-   (:module sloop
-     :pathname ""
-     :components ((:file "sloop")))
    (:module declarations
      :pathname ""
      :depends-on (globals)
