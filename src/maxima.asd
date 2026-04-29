@@ -899,24 +899,84 @@
                   destructuring-let errset other-macros
                   rat-macros declarations fundamental-macros
                   numerical-utilities m2-pattern-matcher random)
-     :components ((:file "scs")
-                  (:file "asum")
-                  (:file "fortra")
-                  (:file "optim")
-                  (:file "marray")
-                  (:file "mdot")
-                  (:file "series")
-                  (:file "numth")
+     :components ((:file "bbsort")
+                  (:file "mdot"
+                    :depends-on ("bbsort"))
+                  (:file "asum"
+                    :depends-on ("mdot"))
+                  (:file "series"
+                    :depends-on ("asum"))
                   (:file "pade")
-                  (:file "homog")
-                  (:file "combin")
-                  ;; nset needs $random.
-                  (:file "nset")
-                  (:file "maxmin")
-                  (:file "conjugate")
-                  (:file "hstep")
+                  (:file "combin"
+                    :depends-on ("asum" "series"))
+                  (:file "sumprod-core"
+                    :depends-on ("asum" "combin"))
+                  ;; This file should probably in the special-functions-misc
+                  ;; module, but things break if it gets moved.
+                  (:file "conjugate")))
+   (:module number-theory
+     :pathname ""
+     :depends-on (globals defmfun compatibility-macros1
+                  reader utility-macros commands
+                  destructuring-let errset other-macros
+                  rat-macros declarations  fundamental-macros
+                  numerical-utilities
+                  m2-pattern-matcher miscellaneous)
+     :components ((:file "numth")))
+   (:module special-functions-misc
+     :pathname ""
+     :depends-on (globals defmfun compatibility-macros1
+                  reader utility-macros commands
+                  destructuring-let errset other-macros
+                  rat-macros declarations  fundamental-macros
+                  numerical-utilities
+                  m2-pattern-matcher sets)
+     ;; These files are completely independent of each other.
+     :components ((:file "hstep")
                   (:file "sinc")
+                  (:file "maxmin")))
+   (:module sets
+     :pathname ""
+     :depends-on (globals defmfun compatibility-macros1
+                  reader utility-macros commands
+                  destructuring-let errset other-macros
+                  rat-macros declarations  fundamental-macros
+                  numerical-utilities
+                  m2-pattern-matcher
+                  random miscellaneous)
+     :components ((:file "nset")))
+   (:module expression-utils
+     :pathname ""
+     :depends-on (globals defmfun compatibility-macros1
+                  reader utility-macros commands
+                  destructuring-let errset other-macros
+                  rat-macros declarations  fundamental-macros
+                  numerical-utilities
+                  m2-pattern-matcher
+                  miscellaneous)
+     ;; These files are completely independent of each other.
+     :components ((:file "scs")
+                  (:file "optim")
+                  (:file "homog")
                   (:file "mstuff")))
+   (:module fortran-output
+     :pathname ""
+     :depends-on (globals defmfun compatibility-macros1
+                  reader utility-macros commands
+                  destructuring-let errset other-macros
+                  rat-macros declarations  fundamental-macros
+                  numerical-utilities
+                  m2-pattern-matcher)
+     :components ((:file "fortra")))
+   (:module arrays
+     :pathname ""
+     :depends-on (globals defmfun compatibility-macros1
+                  reader utility-macros commands
+                  destructuring-let errset other-macros
+                  rat-macros declarations  fundamental-macros
+                  numerical-utilities
+                  m2-pattern-matcher)
+     :components ((:file "marray")))
    (:module polynomial
      :pathname ""
      :depends-on (defmfun)
