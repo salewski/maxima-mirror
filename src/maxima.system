@@ -885,22 +885,30 @@
      :depends-on ("simp-utilities")
      :components
      ((:file "var-predicate")))
+   (:module nummod :source-pathname ""
+     :depends-on ("globals" "defmfun" "compatibility-macros"
+                  "compatibility-macros1" "rat-macros"
+                  "fundamental-macros" "prerequisites"
+                  "simp-utilities" "algebraic-database"
+                  "commands" "rational-functions"
+                  "simplification" "utilities"
+                  "limits" "numeric-bigfloat")
+     :components
+     ((:file "nummod")))
    (:module hypergeometric
      :source-pathname ""
      ;; Simplification and evaluation of hypergeometric functions.
      :depends-on ("compatibility-macros1" "declarations" "defmfun" "errset" "globals"
                   "miscellaneous" "other-macros" "prerequisites" "utility-macros"
                   "m2-pattern-matcher"
-                  "variable-predicates")
-     ;; Module is a clean DAG at every level: function calls, macros,
-     ;; special-variable references.
+                  "variable-predicates"
+                  "simplification")
      :components
      ((:file "hyp")
-      ;; Note: nummod uses apply-reflection-rule from trigi.
-      ;; This should be updated.
-      (:file "nummod")
-      (:file "hypergeometric"
-        :depends-on ("nummod"))
+      ;; There is a cycle between hypergeometric and nfloat.  nfloat
+      ;; calls hypergeometric-by-series in hypergeometric.  Not easy
+      ;; to move things around to break this circular dependency.
+      (:file "hypergeometric")
       (:file "nfloat"
 	;; Comment in nfloat says hypergeometric needs to
 	;; be loaded first.
