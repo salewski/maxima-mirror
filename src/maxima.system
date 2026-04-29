@@ -812,7 +812,7 @@
      :depends-on ("globals" "defmfun" "trigonometry" "algebraic-database" 
                   "utility-macros" "reader"
                   "fundamental-macros" "other-macros" "prerequisites"
-                  "numerical-utilities")
+                  "numerical-utilities" "nummod")
      ;; Module is a clean DAG at every level: function calls, macros,
      ;; special-variable references.
      :components
@@ -823,7 +823,7 @@
      :depends-on ("globals" "defmfun" "trigonometry" "algebraic-database" 
                   "utility-macros" "reader"
                   "fundamental-macros" "other-macros" "prerequisites"
-                  "numerical-utilities")
+                  "numerical-utilities" "nummod")
      :components
      ((:file "ellipt")))
    (:module numerical-functions
@@ -850,7 +850,7 @@
      :source-pathname ""
      :depends-on ("globals" "defmfun" "declarations" "destructuring-let"
                   "fundamental-macros" "prerequisites" 
-                  "rat-macros" "utilities")
+                  "rat-macros" "utilities" "nummod")
      ;; Module is a clean DAG at every level: function calls,
      ;; macros, special-variable references.
      :components
@@ -902,7 +902,8 @@
                   "miscellaneous" "other-macros" "prerequisites" "utility-macros"
                   "m2-pattern-matcher"
                   "variable-predicates"
-                  "simplification")
+                  "simplification"
+                  "nummod")
      :components
      ((:file "hyp")
       ;; There is a cycle between hypergeometric and nfloat.  nfloat
@@ -971,7 +972,8 @@
                   "errset" "fundamental-macros" "other-macros"
                   "prerequisites" "utility-macros"
                   "taylor-series"
-                  "m2-pattern-matcher")
+                  "m2-pattern-matcher"
+                  "nummod")
      ;; Compile-time deps form a DAG.  Runtime cycle trigi <->
      ;; trigo is structural (trigi calls trigo:trigexpand for
      ;; forward simplification, trigo calls trigi for shared
@@ -1074,7 +1076,7 @@
       (:file "mdebug")))
    (:module gamma-expint
      :source-pathname ""
-     :depends-on ("numerical-utilities" "m2-pattern-matcher")
+     :depends-on ("numerical-utilities" "m2-pattern-matcher" "nummod")
      ;; Module is a clean DAG at every level: function calls, macros,
      ;; special-variable references.
      :components
@@ -1097,7 +1099,8 @@
                   "rat-macros" "declarations"  "fundamental-macros"
                   "numerical-utilities"
                   "m2-pattern-matcher"
-                  "random")
+                  "random"
+                  "nummod")
      :components
      ((:file "scs")
       (:file "asum")
