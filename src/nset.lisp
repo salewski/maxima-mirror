@@ -1,4 +1,4 @@
-;;  Copyright 2002-2003 by
+;;  Copyright 2002-2003, 2026 by
 ;;  Stavros Macrakis (macrakis@alum.mit.edu) and
 ;;  Barton Willis (willisb@unk.edu)
 
@@ -120,7 +120,9 @@
 
 (defun simp-set (a yy z)
   (declare (ignore yy))
-  (setq a (if z (cdr a) (mapcar #'(lambda (x) (simplifya x nil)) (cdr a))))
+  (setq a (if z 
+            (copy-list (cdr a))
+            (mapcar #'(lambda (x) (simplifya x nil)) (cdr a))))
   (setq a (sorted-remove-duplicates (stable-sort a '$orderlessp)));FIXME consider a total order function with #'sort
   `(($set simp) ,@a))
 
