@@ -863,8 +863,8 @@ integrate(x^3/(exp(x)-1),x,0,inf);
 %pi^4/15$
 
 
-block([numer : true,ratprint : false], integrate(x^3/(exp(x)-1),x,0,inf));
- 6.493939402266837$
+block([numer : true], integrate(x^3/(exp(x)-1),x,0,inf));
+6.493939402266828$
 
 /* #3142 limit((x^(1/x) - 1)*sqrt(x), x, inf) => inf */
 limit((x^(1/x) - 1)*sqrt(x), x, inf);

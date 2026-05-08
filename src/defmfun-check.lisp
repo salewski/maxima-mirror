@@ -887,9 +887,9 @@
 ;;
 ;; Otherwise, EXPR must be a symbol and a generic message is printed.
 ;; (This is for backward compatibility for existing uses of WNA-ERR.)
-(defun wna-err (exprs &optional required-arg-count (pretty-name (caar exprs)))
+(defun wna-err (exprs &optional required-arg-count pretty-name)
   (if required-arg-count
-      (let ((op pretty-name)
+      (let ((op (or pretty-name (caar exprs)))
 	    (actual-count (length (rest exprs))))
 	(merror (intl:gettext "~M: expected exactly ~M arguments but got ~M: ~M")
 		op required-arg-count actual-count (list* '(mlist) (rest exprs))))

@@ -2004,3 +2004,174 @@ true;
 is (S1 = apply(op(S1), args(S1)));
 true;
 
+/* Tests related to bug #4724: xreduce with init arg and declared nary function */
+
+/* In the tests below:
+ *
+ *   * foo is not nary
+ *   * fnary is declare'd nary
+ *   * "and" is nary and handled specially by xreduce
+ */
+
+(kill (foo, fnary),
+ declare (fnary, nary),
+ 0)$
+0$
+
+/* Empty list and no init arg */
+
+errcatch (lreduce (foo, []))$
+[]$
+
+errcatch (lreduce (fnary, []))$
+[]$
+
+errcatch (lreduce ("and", []))$
+[]$
+
+errcatch (rreduce (foo, []))$
+[]$
+
+errcatch (rreduce (fnary, []))$
+[]$
+
+errcatch (rreduce ("and", []))$
+[]$
+
+errcatch (xreduce (foo, []))$
+[]$
+
+xreduce (fnary, [])$
+fnary ()$
+
+xreduce ("and", [])$
+true$
+
+errcatch (tree_reduce (foo, []))$
+[]$
+
+errcatch (tree_reduce (fnary, []))$
+[]$
+
+errcatch (tree_reduce ("and", []))$
+[]$
+
+/* Empty list and init arg */
+
+lreduce (foo, [], 13)$
+13$
+
+lreduce (fnary, [], 13)$
+13$
+
+lreduce ("and", [], 13)$
+13$
+
+rreduce (foo, [], 13)$
+13$
+
+rreduce (fnary, [], 13)$
+13$
+
+rreduce ("and", [], 13)$
+13$
+
+xreduce (foo, [], 13)$
+13$
+
+xreduce (fnary, [], 13)$
+fnary (13)$
+
+xreduce ("and", [], 13)$
+13$
+
+tree_reduce (foo, [], 13)$
+13$
+
+tree_reduce (fnary, [], 13)$
+13$
+
+tree_reduce ("and", [], 13)$
+13$
+
+/* Nonempty list and no init arg */
+
+lreduce (foo, [1, 2, 3, 4])$
+foo (foo (foo (1, 2), 3), 4)$
+
+lreduce (fnary, [1, 2, 3, 4])$
+fnary (1, 2, 3, 4)$
+
+lreduce ("and", [1, 2, 3, 4])$
+1 and 2 and 3 and 4$
+
+rreduce (foo, [1, 2, 3, 4])$
+foo (1, foo (2, foo (3, 4)))$
+
+rreduce (fnary, [1, 2, 3, 4])$
+fnary (1, 2, 3, 4)$
+
+rreduce ("and", [1, 2, 3, 4])$
+1 and 2 and 3 and 4$
+
+xreduce (foo, [1, 2, 3, 4])$
+foo (foo (foo (1, 2), 3), 4)$
+
+xreduce (fnary, [1, 2, 3, 4])$
+fnary (1, 2, 3, 4)$
+
+xreduce ("and", [1, 2, 3, 4])$
+1 and 2 and 3 and 4$
+
+tree_reduce (foo, [1, 2, 3, 4])$
+foo(foo (1, 2), foo (3, 4))$
+
+tree_reduce (fnary, [1, 2, 3, 4])$
+fnary (1, 2, 3, 4)$
+
+tree_reduce ("and", [1, 2, 3, 4])$
+1 and 2 and 3 and 4$
+
+/* Nonempty list and init arg */
+
+lreduce (foo, [1, 2, 3, 4], 13)$
+foo (foo (foo (foo (13, 1), 2), 3), 4)$
+
+lreduce (fnary, [1, 2, 3, 4], 13)$
+fnary (13, 1, 2, 3, 4)$
+
+lreduce ("and", [1, 2, 3, 4], 13)$
+13 and 1 and 2 and 3 and 4$
+
+rreduce (foo, [1, 2, 3, 4], 13)$
+foo (1, foo (2, foo (3, foo (4, 13))))$
+
+rreduce (fnary, [1, 2, 3, 4], 13)$
+fnary (1, 2, 3, 4, 13)$
+
+rreduce ("and", [1, 2, 3, 4], 13)$
+1 and 2 and 3 and 4 and 13$
+
+xreduce (foo, [1, 2, 3, 4], 13)$
+foo (foo (foo (foo (13, 1), 2), 3), 4)$
+
+xreduce (fnary, [1, 2, 3, 4], 13)$
+fnary (13, 1, 2, 3, 4)$
+
+xreduce ("and", [1, 2, 3, 4], 13)$
+13 and 1 and 2 and 3 and 4$
+
+tree_reduce (foo, [1, 2, 3, 4], 13)$
+foo(foo (foo (13, 1), foo (2, 3)), 4)$
+
+tree_reduce (fnary, [1, 2, 3, 4], 13)$
+fnary (13, 1, 2, 3, 4)$
+
+tree_reduce ("and", [1, 2, 3, 4], 13)$
+13 and 1 and 2 and 3 and 4$
+
+(kill (fnary), 0)$
+0$
+
+/* End of tests related to bug #4724 */
+

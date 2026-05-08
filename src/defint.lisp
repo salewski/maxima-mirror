@@ -930,7 +930,8 @@ in the interval of integration.")
 ;; the integral has a discontinuity at x=0.
 ;;
 (defun intsubs (e a b ivar)
-  (let ((edges (cond ((not $intanalysis)
+  (let (($float nil)
+        (edges (cond ((not $intanalysis)
 		      '$no)		;don't do any checking.
 		    (t (discontinuities-in-interval 
 			(let (($algebraic t)) 
